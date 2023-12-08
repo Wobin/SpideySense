@@ -193,7 +193,7 @@ end
 local getlocal = debug.getlocal
 
 mod.hook_monster = function(sound_type, sound_name, delta, unit)
-  if delta ~= nil and delta < 0.05 then return end
+  if delta ~= nil and delta < 0.04 then return end
   if sound_type == "source_sound" or sound_type == "3d_sound"  then 
     local name, value = getlocal(4, 2)  
     if (sound_type == "source_sound" and name == "unit") or (sound_type == "3d_sound" and name == "event_name") then
