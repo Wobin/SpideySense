@@ -17,7 +17,7 @@ local localizations =
   },
   mutant_only_behind = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器"
+    ["zh-cn"] = "仅在背后时显示指示器",
     },
   mutant_front_opacity = {
     en = "Foreground Opacity",
@@ -41,7 +41,7 @@ local localizations =
   },
   mutant_distance = {
     en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）"    
+    ["zh-cn"] = "检测距离（米）",
     },
   trapper_colour = {
     en = "Colour for Trapper warning",
@@ -53,7 +53,7 @@ local localizations =
   },
   trapper_only_behind = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器"
+    ["zh-cn"] = "仅在背后时显示指示器",
     },
   trapper_front_opacity = {
     en = "Foreground Opacity",
@@ -77,7 +77,7 @@ local localizations =
   },
   trapper_distance = {
     en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）"
+    ["zh-cn"] = "检测距离（米）",
     },
   hound_colour = {
     en = "Colour for Hound warning",
@@ -89,7 +89,7 @@ local localizations =
   },
   hound_only_behind = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器"
+    ["zh-cn"] = "仅在背后时显示指示器",
     },
   hound_front_opacity = {
     en = "Foreground Opacity",
@@ -112,7 +112,8 @@ local localizations =
     ["zh-cn"] = "与原版圆弧之间的距离",
   },
   hound_distance = {
-    en = "Detection range (m)"
+    en = "Detection range (m)",
+    ["zh-cn"] = "检测距离（米）",
     },
   burster_colour = {
     en = "Colour for Burster warning",
@@ -124,7 +125,7 @@ local localizations =
   },
   burster_only_behind = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器"
+    ["zh-cn"] = "仅在背后时显示指示器",
     },
   burster_front_opacity = {
     en = "Foreground Opacity",
@@ -148,11 +149,11 @@ local localizations =
   },
   burster_distance = {
     en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）"
+    ["zh-cn"] = "检测距离（米）",
   },
    grenadier_colour = {
     en = "Colour for Grenadier warning",
-    ["zh-cn"] = "爆破手警告颜色",
+    ["zh-cn"] = "轰炸者警告颜色",
   },
   grenadier_active = {
     en = "Show indicator",
@@ -160,7 +161,7 @@ local localizations =
   },
   grenadier_only_behind = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器"
+    ["zh-cn"] = "仅在背后时显示指示器",
     },
   grenadier_front_opacity = {
     en = "Foreground Opacity",
@@ -184,11 +185,11 @@ local localizations =
   },
   grenadier_distance = {
     en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）"
+    ["zh-cn"] = "检测距离（米）",
   },
   sniper_colour = {
     en = "Colour for Sniper warning",
-    ["zh-cn"] = "爆破手警告颜色",
+    ["zh-cn"] = "狙击手警告颜色",
   },
   sniper_active = {
     en = "Show indicator",
@@ -196,7 +197,7 @@ local localizations =
   },
   sniper_only_behind = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器"
+    ["zh-cn"] = "仅在背后时显示指示器",
     },
   sniper_front_opacity = {
     en = "Foreground Opacity",
@@ -220,7 +221,7 @@ local localizations =
   },
   sniper_distance = {
     en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）"
+    ["zh-cn"] = "检测距离（米）",
     },
   backstab_colour = {
     en = "Colour for Backstab warning",
