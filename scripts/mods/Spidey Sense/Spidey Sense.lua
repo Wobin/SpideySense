@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 09/12/2023
 Repository: https://github.com/Wobin/SpideySense
-Version: 1.2.2
+Version: 1.2.3
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -170,7 +170,7 @@ mod.create_indicator = function(self, unit_or_position, target_type)
     local angle = math.atan2(directionRotatedNormalized.x, directionRotatedNormalized.y)    
     
     local distance = Vector3.distance(position, listener_position)        
-    if distance < mod:get(target_type .. "_distance") or 40 then      
+    if distance < (mod:get(target_type .. "_distance") or 40) then      
       if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
         mod:spawn_indicator(angle, target_type)
       end
