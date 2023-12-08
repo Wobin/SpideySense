@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 07/12/2023
+Date: 08/12/2023
 Repository: https://github.com/Wobin/SpideySense
-Version: 1.0
+Version: 1.2
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -114,7 +114,7 @@ mod:hook_safe(HEDI, "_draw_indicators", function (self, dt, t, ui_renderer)
 	local background_pivot = background_style.pivot
 	local front_style = widget.style.front
 	local front_pivot = front_style.pivot
-	local center_distance = HudElementDamageIndicatorSettings.center_distance + mod:get("radius")
+	local center_distance = HudElementDamageIndicatorSettings.center_distance
 	local pulse_distance = HudElementDamageIndicatorSettings.pulse_distance
 	local pulse_speed_multiplier = HudElementDamageIndicatorSettings.pulse_speed_multiplier
 	local size = HudElementDamageIndicatorSettings.size
@@ -141,7 +141,7 @@ mod:hook_safe(HEDI, "_draw_indicators", function (self, dt, t, ui_renderer)
 			local attack_result = indicator.attack_result
       background_style.color = Color[mod:get(indicator.target_type.."_back_colour")](mod:get(indicator.target_type.."_back_opacity"), true)
       front_style.color = Color[mod:get(indicator.target_type.."_front_colour")](mod:get(indicator.target_type.."_front_opacity"), true)      
-			local distance = center_distance - (pulse_distance - pulse_distance * hit_progress)
+			local distance = center_distance + mod:get(indicator.target_type.."_radius") - (pulse_distance - pulse_distance * hit_progress)
 			widget_offset[2] = -distance + size[2] * 0.5
 			widget_offset[3] = math.min(i, 50)
 			background_pivot[2] = distance
@@ -169,11 +169,13 @@ mod.create_indicator = function(self, unit_or_position, target_type)
     local directionRotatedNormalized = Vector3.normalize(directionRotated)
     local angle = math.atan2(directionRotatedNormalized.x, directionRotatedNormalized.y)    
     
-    local distance = Vector3.distance(position, listener_position)    
-    
-    if distance < 40 then
-      mod:spawn_indicator(angle, target_type)
+    local distance = Vector3.distance(position, listener_position)        
+    if distance < mod:get(target_type .. "_distance") then      
+      if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
+        mod:spawn_indicator(angle, target_type)
+      end
     end
+    
 end
 
 mod.spawn_indicator = function (self, angle, target_type)
@@ -190,7 +192,8 @@ end
 
 local getlocal = debug.getlocal
 
-mod.hook_monster = function(sound_type, sound_name, _, unit)
+mod.hook_monster = function(sound_type, sound_name, delta, unit)
+  if delta ~= nil and delta < 0.05 then return end
   if sound_type == "source_sound" or sound_type == "3d_sound"  then 
     local name, value = getlocal(4, 2)  
     if (sound_type == "source_sound" and name == "unit") or (sound_type == "3d_sound" and name == "event_name") then
@@ -209,7 +212,13 @@ mod.hook_monster = function(sound_type, sound_name, _, unit)
         end  
         if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator_melee") then
           mod:create_indicator(unit, "backstab")
-        end      
+        end
+        if mod:get("sniper_active") and sound_name:match("wwise/events/weapon/play_special_sniper_flash") then
+          mod:create_indicator(value, "sniper")
+        end
+        if mod:get("grenadier_active") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier") then                     
+          mod:create_indicator(value, "grenadier")
+        end
       end
     end
   end
@@ -225,4 +234,8 @@ mod.on_all_mods_loaded = function()
  Audio.hook_sound("wwise/events/minions/play_minion_poxwalker_bomber", mod.hook_monster) 
  Audio.hook_sound("wwise/events/minions/play_enemy_combat_poxwalker_bomber", mod.hook_monster)
  Audio.hook_sound("wwise/events/player/play_backstab_indicator_melee", mod.hook_monster)
+ Audio.hook_sound("wwise/events/weapon/play_special_sniper_flash", mod.hook_monster)
+ Audio.hook_sound("wwise/events/minions/play_traitor_guard_grenadier", mod.hook_monster)
+ 
+ 
 end

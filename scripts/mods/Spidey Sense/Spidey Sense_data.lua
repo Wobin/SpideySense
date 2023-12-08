@@ -25,13 +25,6 @@ return {
 	is_togglable = true,
   options = {
     widgets = {
-      {
-        setting_id = "radius",
-        type = "numeric",
-					default_value = 50,
-					range = {0, 200},
-					decimals_number = 0
-				},        
       	{
 				setting_id = "mutant_colour",
 				type = "group",
@@ -40,6 +33,25 @@ return {
             setting_id = "mutant_active",
             type = "checkbox",
             default_value = true,
+          },
+          {
+          setting_id = "mutant_radius",
+          type = "numeric",
+					default_value = 50,
+					range = {0, 200},
+					decimals_number = 0
+        },
+          {
+          setting_id = "mutant_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },    
+          {
+            setting_id = "mutant_only_behind",
+            type = "checkbox",
+            default_value = false,
           },
           {
             setting_id = "mutant_front_opacity",
@@ -79,6 +91,25 @@ return {
             default_value = true,
           },
           {
+          setting_id = "trapper_radius",
+          type = "numeric",
+					default_value = 50,
+					range = {0, 200},
+					decimals_number = 0
+        },    
+         {
+          setting_id = "trapper_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },    
+        {
+            setting_id = "trapper_only_behind",
+            type = "checkbox",
+            default_value = false,
+          },
+          {
             setting_id = "trapper_front_opacity",
             type = "numeric",
             default_value = 255,
@@ -116,6 +147,25 @@ return {
             default_value = true,
           },
           {
+          setting_id = "hound_radius",
+          type = "numeric",
+					default_value = 50,
+					range = {0, 200},
+					decimals_number = 0
+        },    
+         {
+          setting_id = "hound_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },    
+        {
+            setting_id = "hound_only_behind",
+            type = "checkbox",
+            default_value = false,
+          },
+          {
             setting_id = "hound_front_opacity",
             type = "numeric",
             default_value = 255,
@@ -144,6 +194,62 @@ return {
         }
       },
       {
+				setting_id = "sniper_colour",
+				type = "group",
+				sub_widgets = {
+          {
+            setting_id = "sniper_active",
+            type = "checkbox",
+            default_value = true,
+          },
+          {
+          setting_id = "sniper_radius",
+          type = "numeric",
+					default_value = 50,
+					range = {0, 200},
+					decimals_number = 0
+        },    
+         {
+          setting_id = "sniper_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },    
+        {
+            setting_id = "sniper_only_behind",
+            type = "checkbox",
+            default_value = false,
+          },
+          {
+            setting_id = "sniper_front_opacity",
+            type = "numeric",
+            default_value = 255,
+            range = {0, 255},
+            decimals_number = 0
+          },
+          {
+            setting_id = "sniper_front_colour",
+            type = "dropdown",
+            default_value = "powder_blue",
+            options = get_color_options()
+          },
+          {
+            setting_id = "sniper_back_opacity",
+            type = "numeric",
+            default_value = 255,
+            range = {0, 255},
+            decimals_number = 0
+          },
+          {
+            setting_id = "sniper_back_colour",
+            type = "dropdown",
+            default_value = "ui_ability_purple",
+            options = get_color_options()
+          },
+        }
+      },
+      {
 				setting_id = "burster_colour",
 				type = "group",
 				sub_widgets = {
@@ -151,6 +257,25 @@ return {
             setting_id = "burster_active",
             type = "checkbox",
             default_value = true,
+          },
+          {
+          setting_id = "burster_radius",
+          type = "numeric",
+					default_value = 50,
+					range = {0, 200},
+					decimals_number = 0
+        },    
+         {
+          setting_id = "burster_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },    
+        {
+            setting_id = "burster_only_behind",
+            type = "checkbox",
+            default_value = false,
           },
           {
             setting_id = "burster_front_opacity",
@@ -180,6 +305,62 @@ return {
           },
         }
       },
+           {
+				setting_id = "grenadier_colour",
+				type = "group",
+				sub_widgets = {
+          {
+            setting_id = "grenadier_active",
+            type = "checkbox",
+            default_value = true,
+          },
+          {
+          setting_id = "grenadier_radius",
+          type = "numeric",
+					default_value = 50,
+					range = {0, 200},
+					decimals_number = 0
+        },    
+         {
+          setting_id = "grenadier_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },    
+        {
+            setting_id = "grenadier_only_behind",
+            type = "checkbox",
+            default_value = false,
+          },
+          {
+            setting_id = "grenadier_front_opacity",
+            type = "numeric",
+            default_value = 255,
+            range = {0, 255},
+            decimals_number = 0
+          },
+          {
+            setting_id = "grenadier_front_colour",
+            type = "dropdown",
+            default_value = "sandy_brown",
+            options = get_color_options()
+          },
+          {
+            setting_id = "grenadier_back_opacity",
+            type = "numeric",
+            default_value = 255,
+            range = {0, 255},
+            decimals_number = 0
+          },
+          {
+            setting_id = "grenadier_back_colour",
+            type = "dropdown",
+            default_value = "ui_interaction_pickup",
+            options = get_color_options()
+          },
+        }
+      },
       	{
 				setting_id = "backstab_colour",
 				type = "group",
@@ -189,6 +370,13 @@ return {
             type = "checkbox",
             default_value = true,
           },
+          {
+            setting_id = "backstab_radius",
+            type = "numeric",
+            default_value = 50,
+            range = {0, 200},
+            decimals_number = 0
+          },               
           {
             setting_id = "backstab_front_opacity",
             type = "numeric",
