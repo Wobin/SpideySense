@@ -25,7 +25,7 @@ local localizations =
   },
   flamer_colour = {
     en = "Colour for Flamer warning",
-    ["zh-cn"] = "",
+    ["zh-cn"] = "火焰兵警告颜色",
   },
   grenadier_colour = {
     en = "Colour for Grenadier warning",
@@ -41,7 +41,7 @@ local localizations =
   },
   barrel_colour = {
     en = "Colour for Barrel warning",
-    ["zh-cn"] = "",
+    ["zh-cn"] = "爆炸桶警告颜色",
   }  
 }
 
