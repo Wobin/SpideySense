@@ -10,248 +10,76 @@ local localizations =
   mutant_colour = {
     en = "Colour for Mutant warning",
     ["zh-cn"] = "变种人警告颜色",
-  },
-  mutant_active = {
-    en = "Show indicator",
-    ["zh-cn"] = "显示指示器",
-  },
-  mutant_only_behind = {
-    en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
-    },
-  mutant_front_opacity = {
-    en = "Foreground Opacity",
-    ["zh-cn"] = "前景不透明度",
-  },
-  mutant_front_colour = {
-    en = "Foreground Colour",
-    ["zh-cn"] = "前景颜色",
-    },
-  mutant_back_opacity= {
-    en = "Background Opacity",
-    ["zh-cn"] = "背景不透明度",
-  },
-  mutant_back_colour = {
-    en = "Background Colour",
-    ["zh-cn"] = "背景颜色",
-  },
-  mutant_radius = {
-    en = "Distance from standard arc",
-    ["zh-cn"] = "与原版圆弧之间的距离",
-  },
-  mutant_distance = {
-    en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）",
-    },
+  },  
   trapper_colour = {
     en = "Colour for Trapper warning",
     ["zh-cn"] = "陷阱手警告颜色",
   },
-  trapper_active = {
-    en = "Show indicator",
-    ["zh-cn"] = "显示指示器",
-  },
-  trapper_only_behind = {
-    en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
-    },
-  trapper_front_opacity = {
-    en = "Foreground Opacity",
-    ["zh-cn"] = "前景不透明度",
-  },
-  trapper_front_colour = {
-    en = "Foreground Colour",
-    ["zh-cn"] = "前景颜色",
-    },
-  trapper_back_opacity= {
-    en = "Background Opacity",
-    ["zh-cn"] = "背景不透明度",
-  },
-  trapper_back_colour = {
-    en = "Background Colour",
-    ["zh-cn"] = "背景颜色",
-  },
-  trapper_radius = {
-    en = "Distance from standard arc",
-    ["zh-cn"] = "与原版圆弧之间的距离",
-  },
-  trapper_distance = {
-    en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）",
-    },
   hound_colour = {
     en = "Colour for Hound warning",
     ["zh-cn"] = "猎犬警告颜色",
   },
-  hound_active = {
-    en = "Show indicator",
-    ["zh-cn"] = "显示指示器",
-  },
-  hound_only_behind = {
-    en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
-    },
-  hound_front_opacity = {
-    en = "Foreground Opacity",
-    ["zh-cn"] = "前景不透明度",
-  },
-  hound_front_colour = {
-    en = "Foreground Colour",
-    ["zh-cn"] = "前景颜色",
-    },
-  hound_back_opacity= {
-    en = "Background Opacity",
-    ["zh-cn"] = "背景不透明度",
-  },
-  hound_back_colour = {
-    en = "Background Colour",
-    ["zh-cn"] = "背景颜色",
-  },
-  hound_radius = {
-    en = "Distance from standard arc",
-    ["zh-cn"] = "与原版圆弧之间的距离",
-  },
-  hound_distance = {
-    en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）",
-    },
   burster_colour = {
     en = "Colour for Burster warning",
     ["zh-cn"] = "爆破手警告颜色",
   },
-  burster_active = {
-    en = "Show indicator",
-    ["zh-cn"] = "显示指示器",
+  flamer_colour = {
+    en = "Colour for Flamer warning",
+    ["zh-cn"] = "",
   },
-  burster_only_behind = {
-    en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
-    },
-  burster_front_opacity = {
-    en = "Foreground Opacity",
-    ["zh-cn"] = "前景不透明度",
-  },
-  burster_front_colour = {
-    en = "Foreground Colour",
-    ["zh-cn"] = "前景颜色",
-    },
-  burster_back_opacity= {
-    en = "Background Opacity",
-    ["zh-cn"] = "背景不透明度",
-  },
-  burster_back_colour = {
-    en = "Background Colour",
-    ["zh-cn"] = "背景颜色",
-  },
-  burster_radius = {
-  en = "Distance from standard arc",
-  ["zh-cn"] = "与原版圆弧之间的距离",
-  },
-  burster_distance = {
-    en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）",
-  },
-   grenadier_colour = {
+  grenadier_colour = {
     en = "Colour for Grenadier warning",
     ["zh-cn"] = "轰炸者警告颜色",
-  },
-  grenadier_active = {
-    en = "Show indicator",
-    ["zh-cn"] = "显示指示器",
-  },
-  grenadier_only_behind = {
-    en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
-    },
-  grenadier_front_opacity = {
-    en = "Foreground Opacity",
-    ["zh-cn"] = "前景不透明度",
-  },
-  grenadier_front_colour = {
-    en = "Foreground Colour",
-    ["zh-cn"] = "前景颜色",
-    },
-  grenadier_back_opacity= {
-    en = "Background Opacity",
-    ["zh-cn"] = "背景不透明度",
-  },
-  grenadier_back_colour = {
-    en = "Background Colour",
-    ["zh-cn"] = "背景颜色",
-  },
-  grenadier_radius = {
-  en = "Distance from standard arc",
-  ["zh-cn"] = "与原版圆弧之间的距离",
-  },
-  grenadier_distance = {
-    en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）",
   },
   sniper_colour = {
     en = "Colour for Sniper warning",
     ["zh-cn"] = "狙击手警告颜色",
   },
-  sniper_active = {
-    en = "Show indicator",
-    ["zh-cn"] = "显示指示器",
-  },
-  sniper_only_behind = {
-    en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
-    },
-  sniper_front_opacity = {
-    en = "Foreground Opacity",
-    ["zh-cn"] = "前景不透明度",
-  },
-  sniper_front_colour = {
-    en = "Foreground Colour",
-    ["zh-cn"] = "前景颜色",
-    },
-  sniper_back_opacity= {
-    en = "Background Opacity",
-    ["zh-cn"] = "背景不透明度",
-  },
-  sniper_back_colour = {
-    en = "Background Colour",
-    ["zh-cn"] = "背景颜色",
-  },
-  sniper_radius = {
-  en = "Distance from standard arc",
-  ["zh-cn"] = "与原版圆弧之间的距离",
-  },
-  sniper_distance = {
-    en = "Detection range (m)",
-    ["zh-cn"] = "检测距离（米）",
-    },
   backstab_colour = {
     en = "Colour for Backstab warning",
     ["zh-cn"] = "背刺警告颜色",
   },
-  backstab_active = {
+  barrel_colour = {
+    en = "Colour for Barrel warning",
+    ["zh-cn"] = "",
+  }  
+}
+
+local function addLocalisation(localisations, typeName)
+  localisations[typeName .. "_active"] = {
     en = "Show indicator",
     ["zh-cn"] = "显示指示器",
-    },
-  backstab_front_opacity = {
+  }
+  localisations[typeName .. "_only_behind"] = {
+    en = "Show indicator only if behind you",    
+    ["zh-cn"] = "仅在背后时显示指示器",
+    }
+  localisations[typeName .. "_front_opacity"] = {
     en = "Foreground Opacity",
     ["zh-cn"] = "前景不透明度",
-  },
-  backstab_front_colour = {
+  }
+  localisations[typeName .. "_front_colour"] = {
     en = "Foreground Colour",
     ["zh-cn"] = "前景颜色",
-    },
-  backstab_back_opacity= {
+    }
+  localisations[typeName .. "_back_opacity"]= {
     en = "Background Opacity",
     ["zh-cn"] = "背景不透明度",
-  },
-  backstab_back_colour = {
+  }
+  localisations[typeName .. "_back_colour"] = {
     en = "Background Colour",
     ["zh-cn"] = "背景颜色",
-  },
-  backstab_radius = {
+  }
+  localisations[typeName .. "_radius"] = {
     en = "Distance from standard arc",
     ["zh-cn"] = "与原版圆弧之间的距离",
+  }
+  localisations[typeName .. "_distance"] = {
+    en = "Detection range (m)",
+    ["zh-cn"] = "检测距离（米）",
     }
-}
+end
+
 
 local function readable(text)
   local readable_string = ""
@@ -273,6 +101,17 @@ for i, color_name in ipairs(color_names) do
     en = text
   }
 end
+
+addLocalisation(localizations, "backstab")
+addLocalisation(localizations, "barrel")
+addLocalisation(localizations, "burster")
+addLocalisation(localizations, "flamer")
+addLocalisation(localizations, "grenadier")
+addLocalisation(localizations, "hound")
+addLocalisation(localizations, "mutant")
+addLocalisation(localizations, "sniper")
+addLocalisation(localizations, "trapper")
+
 
 
 return localizations
