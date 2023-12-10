@@ -135,7 +135,7 @@ table.insert(options.options.widgets,
             default_value = "ui_terminal",
             options = get_color_options()
           },
-        }
-      })
+        },      
+      })  
 
 return options

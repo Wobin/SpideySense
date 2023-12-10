@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 09/12/2023
 Repository: https://github.com/Wobin/SpideySense
-Version: 1.3
+Version: 1.3.1
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -238,13 +238,7 @@ mod.hook_monster = function(sound_type, sound_name, _, unit)
             
   end
 
-  if unit == nil then    
-    mod:echo(get_userdata_type(unit))
-    mod:echo(sound_name)
-    mod:echo(extract_locals(1))
-    mod:echo("Target is nil. Please submit an console_log to the Nexus page")
-    return
-  end
+  if unit == nil then return end
 
   if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator") then
     mod:create_indicator(unit, "backstab")

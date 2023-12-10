@@ -42,7 +42,7 @@ local localizations =
   barrel_colour = {
     en = "Colour for Barrel warning",
     ["zh-cn"] = "爆炸桶警告颜色",
-  }  
+  },
 }
 
 local function addLocalisation(localisations, typeName)
