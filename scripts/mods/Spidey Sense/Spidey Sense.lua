@@ -7,53 +7,11 @@ Version: 1.3.1
 --]]
 
 local mod = get_mod("Spidey Sense")
-local HudElementDamageIndicatorSettings = require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
+local HudElementDamageIndicatorSettings =
+	require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
-local HEDI = CLASS.HudElementDamageIndicator
 
-local Audio
-local incomingIndicators = {}
-
-local function extract_locals(level_base)
-	local level = level_base
-	local res = ""
-
-	while debug.getinfo(level) ~= nil do
-		res = string.format("%s\n[%i] ", res, level - level_base + 1)
-		local v = 1
-
-		while true do
-			local name, value = debug.getlocal(level, v)
-
-			if not name then
-				break
-			end
-
-			local var = string.format("%s = %s; ", name, value)
-			res = res .. var
-			v = v + 1
-		end
-
-		level = level + 1
-	end
-
-	return res
-end
-
-local function getlocalvalue(level, targetName)
-  local v = 1
-  while true do
-			local name, value = debug.getlocal(level, v)
-      if name == targetName then return value end
-			if not name then
-				break
-			end
-      v = v + 1
-  end
-  return nil
-end
-
-local get_userdata_type = function(userdata)
+local function get_userdata_type(userdata)
 	if type(userdata) ~= "userdata" then
 		return nil
 	end
@@ -67,15 +25,43 @@ local get_userdata_type = function(userdata)
 	end
 end
 
-local _get_player_direction_angle = function()
+local function findlocalvalue(targets)
+	local level = 1
 
-  local player =  Managers.player:local_player(1)  
+	while debug.getinfo(level) ~= nil do
+		local v = 1
+
+		while true do
+			local name, value = debug.getlocal(level, v)
+
+			if not name then
+				break
+			end
+
+			for _, target in ipairs(targets) do
+				local targetName = target[1]
+				local targetUserdataType = target[2]
+
+				if name == targetName and get_userdata_type(value) == targetUserdataType then
+					-- mod:echo("Found " .. targetName .. " at level " .. level .. " : " .. tostring(value))
+					return value
+				end
+			end
+			v = v + 1
+		end
+
+		level = level + 1
+	end
+end
+
+local function get_player_direction_angle()
+	local player = Managers.player:local_player(1)
 
 	local world_viewport_name = player.viewport_name
-	
+
 	local camera_manager = Managers.state.camera
 	local camera = camera_manager:camera(world_viewport_name)
-	
+
 	if not camera then
 		return
 	end
@@ -89,12 +75,11 @@ local _get_player_direction_angle = function()
 	local forward_dot_dir = Vector3.dot(camera_forward, direction)
 	local right_dot_dir = Vector3.dot(camera_right, -direction)
 	local angle = math.atan2(right_dot_dir, forward_dot_dir)
-	
+
 	return angle + math.pi
 end
 
-
-local listener_position_rotation = function()
+local function listener_position_rotation()
 	local player = Managers.player and Managers.player:local_player_safe(1)
 
 	if not player then
@@ -108,11 +93,10 @@ local listener_position_rotation = function()
 	return lister_position, lister_rotation
 end
 
+mod._indicators = {}
 
-mod._indicators = incomingIndicators
-
-mod:hook_safe(HEDI, "_draw_indicators", function (self, dt, t, ui_renderer)  
-	local indicators = incomingIndicators
+mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
+	local indicators = mod._indicators
 	local num_indicators = #indicators
 
 	if num_indicators < 1 then
@@ -149,10 +133,17 @@ mod:hook_safe(HEDI, "_draw_indicators", function (self, dt, t, ui_renderer)
 			local angle = player_angle - indicator.angle
 			background_style.angle = angle
 			front_style.angle = angle
-			local attack_result = indicator.attack_result
-      background_style.color = Color[mod:get(indicator.target_type.."_back_colour")](mod:get(indicator.target_type.."_back_opacity"), true)
-      front_style.color = Color[mod:get(indicator.target_type.."_front_colour")](mod:get(indicator.target_type.."_front_opacity"), true)      
-			local distance = center_distance + mod:get(indicator.target_type.."_radius") - (pulse_distance - pulse_distance * hit_progress)
+			background_style.color = Color[mod:get(indicator.target_type .. "_back_colour")](
+				mod:get(indicator.target_type .. "_back_opacity"),
+				true
+			)
+			front_style.color = Color[mod:get(indicator.target_type .. "_front_colour")](
+				mod:get(indicator.target_type .. "_front_opacity"),
+				true
+			)
+			local distance = center_distance
+				+ mod:get(indicator.target_type .. "_radius")
+				- (pulse_distance - pulse_distance * hit_progress)
 			widget_offset[2] = -distance + size[2] * 0.5
 			widget_offset[3] = math.min(i, 50)
 			background_pivot[2] = distance
@@ -165,156 +156,183 @@ mod:hook_safe(HEDI, "_draw_indicators", function (self, dt, t, ui_renderer)
 	end
 end)
 
-mod.create_indicator = function(self, unit_or_position, target_type, extra_duration)
-    local input_type = get_userdata_type(unit_or_position)
-    local position
-    
-    if input_type == "Unit" then
-      position = Unit.local_position(unit_or_position, 1) or Vector3.zero()
-    elseif input_type == "Vector3" then
-      position = unit_or_position
-    else
-      mod:echo("Input Type = ".. (input_type and input_type or "nil") )
-      return
-    end
-    
-    local listener_position, listener_rotation = listener_position_rotation()    
-    local direction = position - listener_position
-    local directionRotated = Quaternion.rotate(Quaternion.inverse(listener_rotation), direction)
-    local directionRotatedNormalized = Vector3.normalize(directionRotated)
-    local angle = math.atan2(directionRotatedNormalized.x, directionRotatedNormalized.y)    
-    
-    local distance = Vector3.distance(position, listener_position)        
-    if distance < (mod:get(target_type .. "_distance") or 40) then      
-      if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
-        mod:spawn_indicator(angle, target_type, extra_duration)
-      end
-    end
-    
+function mod:create_indicator(unit_or_position, target_type, extra_duration)
+	local input_type = get_userdata_type(unit_or_position)
+	local position
+
+	if input_type == "Unit" then
+		position = Unit.local_position(unit_or_position, 1) or Vector3.zero()
+	elseif input_type == "Vector3" then
+		position = unit_or_position
+	else
+		mod:echo("Input Type = " .. (input_type and input_type or "nil"))
+		mod:echo("Target Type = " .. (target_type and target_type or "nil"))
+		mod:echo(unit_or_position)
+		return
+	end
+
+	local listener_position, listener_rotation = listener_position_rotation()
+	local direction = position - listener_position
+	local directionRotated = Quaternion.rotate(Quaternion.inverse(listener_rotation), direction)
+	local directionRotatedNormalized = Vector3.normalize(directionRotated)
+	local angle = math.atan2(directionRotatedNormalized.x, directionRotatedNormalized.y)
+
+	local distance = Vector3.distance(position, listener_position)
+	if distance < (mod:get(target_type .. "_distance") or 40) then
+		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
+			mod:spawn_indicator(angle, target_type, extra_duration)
+		end
+	end
 end
 
-mod.spawn_indicator = function (self, angle, target_type, extra_duration)
+function mod:spawn_indicator(angle, target_type, extra_duration)
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
-	local player_angle = _get_player_direction_angle()
+	local player_angle = get_player_direction_angle()
 	self._indicators[#self._indicators + 1] = {
 		angle = player_angle + angle,
 		time = t + duration,
-		duration = duration,		
-    target_type = target_type
+		duration = duration,
+		target_type = target_type,
 	}
 end
 
-local getlocal = debug.getlocal
-local value      
 local throttle = {}
 
-mod.hook_monster = function(sound_type, sound_name, _, unit)
-  --ignore monster spawn
-  if sound_name:match("_spawn") then return end
-  
-  -- throttle half a second on each type
-  local lastCall = throttle[sound_name] or 0
-  local delta = Managers.time:time("main") - lastCall  
-  if delta < 0.5 then return end
-  throttle[sound_name] = Managers.time:time("main")
-  
-  -- differentiate between trapper and sniper footsteps
-  local breed = ""
-  if sound_name:match("footsteps") then
-    breed = getlocalvalue(5,"breed").name        
-  end
-    
-  local unitType  = get_userdata_type(unit) or "nil"
- 
-  
-  -- try to pull the unit from higher in the callstack
-  if unitType ~= "Unit" and (sound_type == "source_sound" or sound_type == "start_stop_event") then
-    unit =  getlocalvalue(5, "unit") or 
-            getlocalvalue(6, "attacking_unit") or 
-            getlocalvalue(12, "attacking_unit") or 
-            getlocalvalue(8, "position") or
-            getlocalvalue(8, "parent_unit") 
-            
-  end
+function mod:hook_monster(sound_name, unit_or_position)
+	--ignore monster spawn
+	if sound_name:match("_spawn") then
+		return
+	end
 
-  if unit == nil then return end
+	-- throttle half a second on each type
+	local lastCall = throttle[sound_name] or 0
+	local delta = Managers.time:time("main") - lastCall
+	if delta < 0.5 then
+		return
+	end
+	throttle[sound_name] = Managers.time:time("main")
 
-  if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator") then
-    mod:create_indicator(unit, "backstab")
-  end 
-   
-  if mod:get("burster_active") and (
-    sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber") or 
-    sound_name:match("wwise/events/minions/play_enemy_combat_poxwalker_bomber")
-    ) then
-    mod:create_indicator(unit, "burster")
-  end  
-  if mod:get("hound_active") and (
-    sound_name:match("wwise/events/minions/play_enemy_chaos_hound") or 
-    sound_name:match("wwise/events/minions/play_fly_swarm")
-    ) then
-    mod:create_indicator(unit, "hound")
-  end  
-  
-  if mod:get("mutant_active") and sound_name:match("wwise/events/minions/play_enemy_mutant_charger") then
-    mod:create_indicator(unit, "mutant")
-  end
-  if mod:get("trapper_active") and (
-    sound_name:match("wwise/events/minions/play_netgunner_run_foley_special") or
-    sound_name:match("wwise/events/minions/play_netgunner_reload") 
-    ) then
-    mod:create_indicator(unit, "trapper")
-  end  
-  if mod:get("sniper_active") and (
-    sound_name:match("wwise/events/weapon/play_combat_weapon_las_sniper") or 
-    sound_name:match("wwise/events/weapon/play_special_sniper_flash") or
-    (breed:match("sniper") and sound_name:match("wwise/events/minions/play_netgunner"))
-    ) then    
-    mod:create_indicator(unit, "sniper")
-  end
-  if mod:get("grenadier_active") and (
-    (breed:match("grenadier") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
-    ) then                       
-    mod:create_indicator(unit, "grenadier")
-  end
-  if mod:get("barrel_active") and sound_name:match("wwise/events/weapon/play_explosion_fuse") then
-    mod:create_indicator(unit, "barrel", 3)
-  end
-  if mod:get("flamer_active") and (
-    sound_name:match("wwise/events/minions/play_enemy_cultist_flamer_foley_tank") or
-    sound_name:match("wwise/events/weapon/play_aoe_liquid_fire_loop") or
-    sound_name:match("wwise/events/minions/play_cultist_flamer_foley_gas_loop") or
-    sound_name:match("wwise/events/weapon/play_minion_flamethrower_green_wind_up") or
-    sound_name:match("wwise/events/weapon/play_minion_flamethrower_start") or
-    (breed:match("flamer") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
-    ) then
-    mod:create_indicator(unit, "flamer")
-  end
-  
+	local userDataType = get_userdata_type(unit_or_position)
+
+	-- if the unit_or_position is nil or a number,
+	-- try to pull the unit or position from higher in the callstack
+	if userDataType ~= "Unit" and userDataType ~= "Vector3" then
+		unit_or_position = findlocalvalue({
+			{ "attacking_unit", "Unit" },
+			{ "position", "Vector3" },
+			{ "parent_unit", "Unit" },
+			{ "unit", "Unit" },
+		})
+	end
+
+	if unit_or_position == nil then
+		return
+	end
+
+	local breed_name = ""
+	if sound_name:match("footsteps") then
+		local unit_data_extension = ScriptUnit.extension(unit_or_position, "unit_data_system")
+		local breed = unit_data_extension and unit_data_extension:breed()
+		breed_name = breed and breed.name or ""
+	end
+
+	if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator") then
+		mod:create_indicator(unit_or_position, "backstab")
+		return
+	end
+
+	if
+		mod:get("burster_active")
+		and (
+			sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber")
+			or sound_name:match("wwise/events/minions/play_enemy_combat_poxwalker_bomber")
+		)
+	then
+		mod:create_indicator(unit_or_position, "burster")
+	end
+	if
+		mod:get("hound_active")
+		and (
+			sound_name:match("wwise/events/minions/play_enemy_chaos_hound")
+			or sound_name:match("wwise/events/minions/play_fly_swarm")
+		)
+	then
+		mod:create_indicator(unit_or_position, "hound")
+	end
+
+	if mod:get("mutant_active") and sound_name:match("wwise/events/minions/play_enemy_mutant_charger") then
+		mod:create_indicator(unit_or_position, "mutant")
+	end
+	if
+		mod:get("trapper_active")
+		and (
+			sound_name:match("wwise/events/minions/play_netgunner_run_foley_special")
+			or sound_name:match("wwise/events/minions/play_netgunner_reload")
+		)
+	then
+		mod:create_indicator(unit_or_position, "trapper")
+	end
+	if
+		mod:get("sniper_active")
+		and (
+			sound_name:match("wwise/events/weapon/play_combat_weapon_las_sniper")
+			or sound_name:match("wwise/events/weapon/play_special_sniper_flash")
+			or (breed_name:match("sniper") and sound_name:match("wwise/events/minions/play_netgunner"))
+		)
+	then
+		mod:create_indicator(unit_or_position, "sniper")
+	end
+	if
+		mod:get("grenadier_active")
+		and (breed_name:match("grenadier") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
+	then
+		mod:create_indicator(unit_or_position, "grenadier")
+	end
+	if mod:get("barrel_active") and sound_name:match("wwise/events/weapon/play_explosion_fuse") then
+		mod:create_indicator(unit_or_position, "barrel", 3)
+	end
+	if
+		mod:get("flamer_active")
+		and (
+			sound_name:match("wwise/events/minions/play_enemy_cultist_flamer_foley_tank")
+			or sound_name:match("wwise/events/weapon/play_aoe_liquid_fire_loop")
+			or sound_name:match("wwise/events/minions/play_cultist_flamer_foley_gas_loop")
+			or sound_name:match("wwise/events/weapon/play_minion_flamethrower_green_wind_up")
+			or sound_name:match("wwise/events/weapon/play_minion_flamethrower_start")
+			or (breed_name:match("flamer") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
+		)
+	then
+		mod:create_indicator(unit_or_position, "flamer")
+	end
 end
 
-mod.on_all_mods_loaded = function()
- Audio = get_mod("Audio")    
- 
- Audio.hook_sound("wwise/events/minions/play_enemy_mutant_charger", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_netgunner_footsteps", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_netgunner_run_foley_special", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_netgunner_reload", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_enemy_chaos_hound", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_fly_swarm", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_minion_poxwalker_bomber", mod.hook_monster) 
- Audio.hook_sound("wwise/events/minions/play_enemy_combat_poxwalker_bomber", mod.hook_monster)
- Audio.hook_sound("wwise/events/player/play_backstab_indicator", mod.hook_monster)
- Audio.hook_sound("wwise/events/weapon/play_special_sniper_flash", mod.hook_monster)
- Audio.hook_sound("wwise/events/weapon/play_combat_weapon_las_sniper", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_traitor_guard_grenadier", mod.hook_monster)
- Audio.hook_sound("wwise/events/weapon/play_explosion_fuse", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_enemy_cultist_flamer_foley_tank", mod.hook_monster)
- Audio.hook_sound("wwise/events/weapon/play_aoe_liquid_fire_loop", mod.hook_monster)
- Audio.hook_sound("wwise/events/weapon/play_minion_flamethrower_green_wind_up", mod.hook_monster)
- Audio.hook_sound("wwise/events/minions/play_cultist_flamer_foley_gas_loop", mod.hook_monster)
- Audio.hook_sound("wwise/events/weapon/play_minion_flamethrower_start", mod.hook_monster)
- 
- 
-end
+local hooked_sounds = {
+	"wwise/events/minions/play_enemy_mutant_charger",
+	"wwise/events/minions/play_netgunner_footsteps",
+	"wwise/events/minions/play_netgunner_run_foley_special",
+	"wwise/events/minions/play_netgunner_reload",
+	"wwise/events/minions/play_enemy_chaos_hound",
+	"wwise/events/minions/play_fly_swarm",
+	"wwise/events/minions/play_minion_poxwalker_bomber",
+	"wwise/events/minions/play_enemy_combat_poxwalker_bomber",
+	"wwise/events/player/play_backstab_indicator",
+	"wwise/events/weapon/play_special_sniper_flash",
+	"wwise/events/weapon/play_combat_weapon_las_sniper",
+	"wwise/events/minions/play_traitor_guard_grenadier",
+	"wwise/events/weapon/play_explosion_fuse",
+	"wwise/events/minions/play_enemy_cultist_flamer_foley_tank",
+	"wwise/events/weapon/play_aoe_liquid_fire_loop",
+	"wwise/events/weapon/play_minion_flamethrower_green_wind_up",
+	"wwise/events/minions/play_cultist_flamer_foley_gas_loop",
+	"wwise/events/weapon/play_minion_flamethrower_start",
+}
+
+mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)
+	for _, sound_name in ipairs(hooked_sounds) do
+		if wwise_event_name:match(sound_name) then
+			mod:hook_monster(wwise_event_name, unit_or_position_or_id)
+			return
+		end
+	end
+end)
