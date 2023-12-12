@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 12/12/2023
 Repository: https://github.com/Wobin/SpideySense
-Version: 2.0
+Version: 2.1
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -11,7 +11,7 @@ local HudElementDamageIndicatorSettings =
 	require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 
-[[--
+--[[
 local function extract_locals(level_base)
 	local level = level_base
 	local res = ""
@@ -37,7 +37,10 @@ local function extract_locals(level_base)
 
 	return res
 end
+
 --]]
+
+
 local function get_userdata_type(userdata)
 	if type(userdata) ~= "userdata" then
 		return nil
