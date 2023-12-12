@@ -200,6 +200,11 @@ end
 local throttle = {}
 
 mod.hook_monster = function(sound_name, unit_or_position)
+	--ignore monster spawn
+	if sound_name:match("_spawn") then
+		return
+	end
+
 	-- throttle half a second on each type
 	local lastCall = throttle[sound_name] or 0
 	local delta = Managers.time:time("main") - lastCall
