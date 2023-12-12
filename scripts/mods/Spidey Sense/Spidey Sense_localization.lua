@@ -45,11 +45,12 @@ local localizations =
   },
   crusher_colour = {
     en = "Colour for Crusher warning",
+    ["zh-cn"] = "粉碎者警告颜色",
     
   },
   mauler_colour = {
     en = "Colour for Mauler warning",
-    
+    ["zh-cn"] = "重锤兵警告颜色",
   },
 }
 
