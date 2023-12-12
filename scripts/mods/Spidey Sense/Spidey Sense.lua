@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 09/12/2023
 Repository: https://github.com/Wobin/SpideySense
-Version: 1.3.1
+Version: 1.4
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -11,6 +11,33 @@ local HudElementDamageIndicatorSettings =
 	require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 
+[[--
+local function extract_locals(level_base)
+	local level = level_base
+	local res = ""
+
+	while debug.getinfo(level) ~= nil do
+		res = string.format("%s\n[%i] ", res, level - level_base + 1)
+		local v = 1
+
+		while true do
+			local name, value = debug.getlocal(level, v)
+
+			if not name then
+				break
+			end
+
+			local var = string.format("%s = %s; ", name, value)
+			res = res .. var
+			v = v + 1
+		end
+
+		level = level + 1
+	end
+
+	return res
+end
+--]]
 local function get_userdata_type(userdata)
 	if type(userdata) ~= "userdata" then
 		return nil
@@ -87,10 +114,10 @@ local function listener_position_rotation()
 	end
 
 	local listener_pose = Managers.state.camera:listener_pose(player.viewport_name)
-	local lister_position = listener_pose and Matrix4x4.translation(listener_pose) or Vector3.zero()
-	local lister_rotation = listener_pose and Matrix4x4.rotation(listener_pose) or Quaternion.identity()
+	local listener_position = listener_pose and Matrix4x4.translation(listener_pose) or Vector3.zero()
+	local listener_rotation = listener_pose and Matrix4x4.rotation(listener_pose) or Quaternion.identity()
 
-	return lister_position, lister_rotation
+	return listener_position, listener_rotation
 end
 
 mod._indicators = {}
@@ -165,9 +192,9 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	elseif input_type == "Vector3" then
 		position = unit_or_position
 	else
-		mod:echo("Input Type = " .. (input_type and input_type or "nil"))
-		mod:echo("Target Type = " .. (target_type and target_type or "nil"))
-		mod:echo(unit_or_position)
+		--mod:echo("Input Type = " .. (input_type and input_type or "nil"))
+		--mod:echo("Target Type = " .. (target_type and target_type or "nil"))
+		--mod:echo(unit_or_position)
 		return
 	end
 
@@ -238,62 +265,51 @@ function mod:hook_monster(sound_name, unit_or_position)
 	end
 
 	if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator") then
-		mod:create_indicator(unit_or_position, "backstab")
-		return
+		mod:create_indicator(unit_or_position, "backstab")		
 	end
 
-	if
-		mod:get("burster_active")
+	if mod:get("burster_active")
 		and (
 			sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber")
 			or sound_name:match("wwise/events/minions/play_enemy_combat_poxwalker_bomber")
 		)
-	then
-		mod:create_indicator(unit_or_position, "burster")
-	end
-	if
-		mod:get("hound_active")
+	then mod:create_indicator(unit_or_position, "burster") end
+	if mod:get("hound_active")
 		and (
 			sound_name:match("wwise/events/minions/play_enemy_chaos_hound")
 			or sound_name:match("wwise/events/minions/play_fly_swarm")
 		)
-	then
-		mod:create_indicator(unit_or_position, "hound")
-	end
+	then mod:create_indicator(unit_or_position, "hound") end
 
 	if mod:get("mutant_active") and sound_name:match("wwise/events/minions/play_enemy_mutant_charger") then
 		mod:create_indicator(unit_or_position, "mutant")
 	end
-	if
-		mod:get("trapper_active")
+  
+	if mod:get("trapper_active")
 		and (
 			sound_name:match("wwise/events/minions/play_netgunner_run_foley_special")
 			or sound_name:match("wwise/events/minions/play_netgunner_reload")
 		)
-	then
-		mod:create_indicator(unit_or_position, "trapper")
-	end
-	if
-		mod:get("sniper_active")
+	then mod:create_indicator(unit_or_position, "trapper") end
+  
+	if mod:get("sniper_active")
 		and (
 			sound_name:match("wwise/events/weapon/play_combat_weapon_las_sniper")
 			or sound_name:match("wwise/events/weapon/play_special_sniper_flash")
 			or (breed_name:match("sniper") and sound_name:match("wwise/events/minions/play_netgunner"))
 		)
 	then
-		mod:create_indicator(unit_or_position, "sniper")
-	end
-	if
-		mod:get("grenadier_active")
+		mod:create_indicator(unit_or_position, "sniper") end
+    
+	if mod:get("grenadier_active")
 		and (breed_name:match("grenadier") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
-	then
-		mod:create_indicator(unit_or_position, "grenadier")
-	end
+	then mod:create_indicator(unit_or_position, "grenadier") end
+  
 	if mod:get("barrel_active") and sound_name:match("wwise/events/weapon/play_explosion_fuse") then
 		mod:create_indicator(unit_or_position, "barrel", 3)
 	end
-	if
-		mod:get("flamer_active")
+  
+	if mod:get("flamer_active")
 		and (
 			sound_name:match("wwise/events/minions/play_enemy_cultist_flamer_foley_tank")
 			or sound_name:match("wwise/events/weapon/play_aoe_liquid_fire_loop")
@@ -302,9 +318,20 @@ function mod:hook_monster(sound_name, unit_or_position)
 			or sound_name:match("wwise/events/weapon/play_minion_flamethrower_start")
 			or (breed_name:match("flamer") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
 		)
-	then
-		mod:create_indicator(unit_or_position, "flamer")
-	end
+	then mod:create_indicator(unit_or_position, "flamer")	end
+  
+  if mod:get("crusher_active")
+    and (
+       sound_name:match("wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__special_attack_vce")      
+     or sound_name:match("wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__running_breath_vce")      
+    )
+  then mod:create_indicator(unit_or_position, "crusher") end
+  if mod:get("mauler_active")
+    and (
+      sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run")
+      or sound_name:match("wwise/events/minions/play_shared_elite_executor_cleave_warning")
+      )
+  then mod:create_indicator(unit_or_position, "mauler") end
 end
 
 local hooked_sounds = {
@@ -326,6 +353,10 @@ local hooked_sounds = {
 	"wwise/events/weapon/play_minion_flamethrower_green_wind_up",
 	"wwise/events/minions/play_cultist_flamer_foley_gas_loop",
 	"wwise/events/weapon/play_minion_flamethrower_start",
+  "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__running_breath_vce",
+  "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__special_attack_vce",
+  "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run",
+  "wwise/events/minions/play_shared_elite_executor_cleave_warning"
 }
 
 mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)

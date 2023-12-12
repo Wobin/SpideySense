@@ -37,7 +37,7 @@ local function create_option_set(typeName, defaultColour1, defaultColour2)
           setting_id = typeName .."_radius",
           type = "numeric",
 					default_value = 50,
-					range = {0, 200},
+					range = {-125, 200},
 					decimals_number = 0
         },
           {
@@ -86,9 +86,11 @@ end
 
 table.insert(options.options.widgets, create_option_set("burster", "sienna", "ui_red_medium"))
 table.insert(options.options.widgets, create_option_set("barrel", "sienna", "ui_red_medium"))
+table.insert(options.options.widgets, create_option_set("crusher", "sienna", "ui_red_medium"))
 table.insert(options.options.widgets, create_option_set("flamer", "online_green", "medium_violet_red"))
 table.insert(options.options.widgets, create_option_set("grenadier", "sandy_brown", "ui_interaction_pickup"))
 table.insert(options.options.widgets, create_option_set("hound", "turquoise", "ui_blue_light"))
+table.insert(options.options.widgets, create_option_set("mauler", "turquoise", "ui_blue_light"))
 table.insert(options.options.widgets, create_option_set("mutant", "ui_green_light", "spring_green"))
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
 table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_overcharge_medium", "ui_hud_overcharge_low"))

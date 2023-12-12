@@ -43,6 +43,14 @@ local localizations =
     en = "Colour for Barrel warning",
     ["zh-cn"] = "爆炸桶警告颜色",
   },
+  crusher_colour = {
+    en = "Colour for Crusher warning",
+    
+  },
+  mauler_colour = {
+    en = "Colour for Mauler warning",
+    
+  },
 }
 
 local function addLocalisation(localisations, typeName)
@@ -105,9 +113,11 @@ end
 addLocalisation(localizations, "backstab")
 addLocalisation(localizations, "barrel")
 addLocalisation(localizations, "burster")
+addLocalisation(localizations, "crusher")
 addLocalisation(localizations, "flamer")
 addLocalisation(localizations, "grenadier")
 addLocalisation(localizations, "hound")
+addLocalisation(localizations, "mauler")
 addLocalisation(localizations, "mutant")
 addLocalisation(localizations, "sniper")
 addLocalisation(localizations, "trapper")
