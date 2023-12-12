@@ -230,9 +230,12 @@ function mod:hook_monster(sound_name, unit_or_position)
 		return
 	end
 
-	local unit_data_extension = ScriptUnit.extension(unit_or_position, "unit_data_system")
-	local breed = unit_data_extension and unit_data_extension:breed()
-	local breed_name = breed and breed.name or ""
+	local breed_name = ""
+	if sound_name:match("footsteps") then
+		local unit_data_extension = ScriptUnit.extension(unit_or_position, "unit_data_system")
+		local breed = unit_data_extension and unit_data_extension:breed()
+		breed_name = breed and breed.name or ""
+	end
 
 	if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator") then
 		mod:create_indicator(unit_or_position, "backstab")
