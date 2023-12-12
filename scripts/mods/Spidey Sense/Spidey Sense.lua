@@ -156,7 +156,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	end
 end)
 
-mod.create_indicator = function(_self, unit_or_position, target_type, extra_duration)
+function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	local input_type = get_userdata_type(unit_or_position)
 	local position
 
@@ -185,7 +185,7 @@ mod.create_indicator = function(_self, unit_or_position, target_type, extra_dura
 	end
 end
 
-mod.spawn_indicator = function(self, angle, target_type, extra_duration)
+function mod:spawn_indicator(angle, target_type, extra_duration)
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
 	local player_angle = get_player_direction_angle()
@@ -199,7 +199,7 @@ end
 
 local throttle = {}
 
-mod.hook_monster = function(sound_name, unit_or_position)
+function mod:hook_monster(sound_name, unit_or_position)
 	--ignore monster spawn
 	if sound_name:match("_spawn") then
 		return
@@ -328,7 +328,7 @@ local hooked_sounds = {
 mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)
 	for _, sound_name in ipairs(hooked_sounds) do
 		if wwise_event_name:match(sound_name) then
-			mod.hook_monster(wwise_event_name, unit_or_position_or_id)
+			mod:hook_monster(wwise_event_name, unit_or_position_or_id)
 			return
 		end
 	end
