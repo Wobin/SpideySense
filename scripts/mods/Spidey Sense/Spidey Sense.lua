@@ -167,7 +167,6 @@ mod.create_indicator = function(_self, unit_or_position, target_type, extra_dura
 	else
 		mod:echo("Input Type = " .. (input_type and input_type or "nil"))
 		mod:echo("Target Type = " .. (target_type and target_type or "nil"))
-
 		mod:echo(unit_or_position)
 		return
 	end
@@ -251,7 +250,6 @@ mod.hook_monster = function(sound_name, unit_or_position)
 			or sound_name:match("wwise/events/minions/play_fly_swarm")
 		)
 	then
-		mod:echo(sound_name)
 		mod:create_indicator(unit_or_position, "hound")
 	end
 
