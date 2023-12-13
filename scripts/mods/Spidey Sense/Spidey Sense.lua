@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 12/12/2023
+Date: 13/12/2023
 Repository: https://github.com/Wobin/SpideySense
-Version: 2.1
+Version: 2.2
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -331,7 +331,7 @@ function mod:hook_monster(sound_name, unit_or_position)
   then mod:create_indicator(unit_or_position, "crusher") end
   if mod:get("mauler_active")
     and (
-      sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run")
+      (breed_name:match("renegade_executor") and sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run"))
       or sound_name:match("wwise/events/minions/play_shared_elite_executor_cleave_warning")
       )
   then mod:create_indicator(unit_or_position, "mauler") end
