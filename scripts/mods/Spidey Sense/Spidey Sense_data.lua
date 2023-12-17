@@ -1,6 +1,6 @@
 local mod = get_mod("Spidey Sense")
 local options = {
-	name = "Spidey Sense",
+	name = mod:localize("mod_name"),
 	description = mod:localize("mod_description"),
 	is_togglable = true,
   options = {
