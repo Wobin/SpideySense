@@ -45,12 +45,26 @@ local localizations =
   },
   crusher_colour = {
     en = "Colour for Crusher warning",
-    ["zh-cn"] = "粉碎者警告颜色",
-    
+    ["zh-cn"] = "粉碎者警告颜色",    
   },
   mauler_colour = {
     en = "Colour for Mauler warning",
     ["zh-cn"] = "重锤兵警告颜色",
+  },
+  daemonhost_colour = {
+    en  = "Colour for Daemonhost",
+  },
+  rager_colour = {
+   en = "Colour for Ragers",
+  },
+  core_options = {
+    en = "Core Options",
+  },
+  active_range = {
+    en ="Active Range Indicator"
+  },
+  active_range_tooltip = {
+    en = "This option will move the arc closer to the centre from the 'Distance from standard arc' range, as the target gets closer"
   },
 }
 
@@ -115,11 +129,13 @@ addLocalisation(localizations, "backstab")
 addLocalisation(localizations, "barrel")
 addLocalisation(localizations, "burster")
 addLocalisation(localizations, "crusher")
+addLocalisation(localizations, "daemonhost")
 addLocalisation(localizations, "flamer")
 addLocalisation(localizations, "grenadier")
 addLocalisation(localizations, "hound")
 addLocalisation(localizations, "mauler")
 addLocalisation(localizations, "mutant")
+addLocalisation(localizations, "rager")
 addLocalisation(localizations, "sniper")
 addLocalisation(localizations, "trapper")
 

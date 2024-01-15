@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 13/12/2023
+Date: 16/01/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 2.2
+Version: 3.0
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -172,7 +172,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				true
 			)
 			local distance = center_distance
-				+ mod:get(indicator.target_type .. "_radius")
+				+ indicator.distance
 				- (pulse_distance - pulse_distance * hit_progress)
 			widget_offset[2] = -distance + size[2] * 0.5
 			widget_offset[3] = math.min(i, 50)
@@ -210,12 +210,13 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	local distance = Vector3.distance(position, listener_position)
 	if distance < (mod:get(target_type .. "_distance") or 40) then
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
-			mod:spawn_indicator(angle, target_type, extra_duration)
+      local active_distance = not mod:get("active_range") and mod:get(target_type .."_radius") or (((distance / (mod:get(target_type .. "_distance") or 40)) * 250) - 150)      
+			mod:spawn_indicator(angle, target_type, extra_duration, active_distance)
 		end
 	end
 end
 
-function mod:spawn_indicator(angle, target_type, extra_duration)
+function mod:spawn_indicator(angle, target_type, extra_duration, distance)
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
 	local player_angle = get_player_direction_angle()
@@ -224,6 +225,7 @@ function mod:spawn_indicator(angle, target_type, extra_duration)
 		time = t + duration,
 		duration = duration,
 		target_type = target_type,
+    distance = distance
 	}
 end
 
@@ -253,6 +255,7 @@ function mod:hook_monster(sound_name, unit_or_position)
 			{ "position", "Vector3" },
 			{ "parent_unit", "Unit" },
 			{ "unit", "Unit" },
+      { "dialogue_actor_unit", "Unit"},
 		})
 	end
 
@@ -331,10 +334,27 @@ function mod:hook_monster(sound_name, unit_or_position)
   then mod:create_indicator(unit_or_position, "crusher") end
   if mod:get("mauler_active")
     and (
-      (breed_name:match("renegade_executor") and sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run"))
-      or sound_name:match("wwise/events/minions/play_shared_elite_executor_cleave_warning")
-      )
+      (breed_name:match("renegade_executor") and (sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run") or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy")))
+      or sound_name:match("wwise/events/minions/play_shared_elite_executor_cleave_warning"))
   then mod:create_indicator(unit_or_position, "mauler") end
+  
+  if mod:get("daemonhost_active")
+  and (sound_name:match("wwise/events/minions/play_enemy_daemonhost") 
+    or sound_name:match("wwise/events/vo/play_sfx_es_daemonhost_vo")
+    or sound_name:match("wwise/externals/loc_enemy_daemonhost"))
+    then       
+      mod:create_indicator(unit_or_position, "daemonhost") end
+  
+  if mod:get("rager_active")
+  and (breed_name:match("berzerker") and (
+         sound_name:match("wwise/events/minions/play_shared_foley_elite_run") 
+      or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy") 
+      or sound_name:match("wwise/events/minions/play_minion_footsteps_wrapped_feet_specials") 
+      or sound_name:match("wwise/events/minions/play_enemy_traitor_berzerker")
+      or sound_name:match("wwise/events/minions/play_enemy_cultist_berzerker")
+      or sound_name:match("wwise/events/minions/play_shared_foley_chaos_cultist_light_run")
+      ))
+    then mod:create_indicator(unit_or_position, "rager") end
 end
 
 local hooked_sounds = {
@@ -358,15 +378,33 @@ local hooked_sounds = {
 	"wwise/events/weapon/play_minion_flamethrower_start",
   "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__running_breath_vce",
   "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__special_attack_vce",
-  "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run",
-  "wwise/events/minions/play_shared_elite_executor_cleave_warning"
+  "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run", 
+  "wwise/events/minions/play_minion_footsteps_boots_heavy",
+  "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
+  "wwise/events/minions/play_enemy_daemonhost",  
+  "wwise/events/minions/play_enemy_cultist_berzerker",
+  "wwise/events/minions/play_enemy_traitor_berzerker",
+  "wwise/events/minions/play_shared_foley_chaos_cultist_light_run",  
+  "wwise/events/minions/play_minion_footsteps_wrapped_feet_specials",
 }
 
-mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)
-	for _, sound_name in ipairs(hooked_sounds) do
-		if wwise_event_name:match(sound_name) then
+local hooked_external_sounds = {
+  "es_daemonhost_vo",  
+  }
+
+mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)    
+	for _, sound_name in ipairs(hooked_sounds) do    
+		if wwise_event_name:match(sound_name) then      
 			mod:hook_monster(wwise_event_name, unit_or_position_or_id)
 			return
 		end
 	end
+end)
+
+mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_world, sound_event, sound_source, file_path, file_format, wwise_source_id)
+    for _, speaker in ipairs(hooked_external_sounds) do
+      if sound_source:match(speaker) then        
+        mod:hook_monster(file_path, wwise_source_id)
+      end
+    end
 end)

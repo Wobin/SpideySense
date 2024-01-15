@@ -5,6 +5,19 @@ local options = {
 	is_togglable = true,
   options = {
     widgets = {
+        {
+        setting_id = "core_options",
+        type = "group",
+        sub_widgets = 
+          {
+            {
+              setting_id = "active_range",
+              type = "checkbox",
+              tooltip = "active_range_tooltip",
+              default_value = false
+            },
+          }
+        }
       }
     }    
   }
@@ -84,14 +97,16 @@ end
 
 
 
-table.insert(options.options.widgets, create_option_set("burster", "sienna", "ui_red_medium"))
-table.insert(options.options.widgets, create_option_set("barrel", "sienna", "ui_red_medium"))
+table.insert(options.options.widgets, create_option_set("burster", "burly_wood", "citadel_averland_sunset"))
+table.insert(options.options.widgets, create_option_set("barrel", "cheeseburger", "citadel_balthasar_gold"))
 table.insert(options.options.widgets, create_option_set("crusher", "sienna", "ui_red_medium"))
+table.insert(options.options.widgets, create_option_set("daemonhost", "teal", "blue_violet"))
 table.insert(options.options.widgets, create_option_set("flamer", "online_green", "medium_violet_red"))
 table.insert(options.options.widgets, create_option_set("grenadier", "sandy_brown", "ui_interaction_pickup"))
-table.insert(options.options.widgets, create_option_set("hound", "turquoise", "ui_blue_light"))
+table.insert(options.options.widgets, create_option_set("hound", "chart_reuse", "cadet_blue"))
 table.insert(options.options.widgets, create_option_set("mauler", "turquoise", "ui_blue_light"))
 table.insert(options.options.widgets, create_option_set("mutant", "ui_green_light", "spring_green"))
+table.insert(options.options.widgets, create_option_set("rager", "medium_spring_green", "midnight_blue"))
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
 table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_overcharge_medium", "ui_hud_overcharge_low"))
 table.insert(options.options.widgets, 
@@ -110,7 +125,14 @@ table.insert(options.options.widgets,
             default_value = 50,
             range = {0, 200},
             decimals_number = 0
-          },               
+          },
+          {
+          setting_id = "backstab_distance",
+          type = "numeric",
+					default_value = 40,
+					range = {0, 40},
+					decimals_number = 0
+        },              
           {
             setting_id = "backstab_front_opacity",
             type = "numeric",
