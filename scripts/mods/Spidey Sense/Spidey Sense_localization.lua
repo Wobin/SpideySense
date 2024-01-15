@@ -71,22 +71,27 @@ local localizations =
   daemonhost_colour = {
     en  = "Colour for Daemonhost",
     ["zh-cn"] = "恶魔宿主颜色",
+    ru = "Цвет для Демонхоста",
   },
   rager_colour = {
    en = "Colour for Ragers",
     ["zh-cn"] = "狂暴者颜色",
+    ru = "Цвет для Берсерков",
   },
   core_options = {
     en = "Core Options",
     ["zh-cn"] = "核心选项",
+    ru = "Основные опции",
   },
   active_range = {
     en ="Active Range Indicator",
     ["zh-cn"] = "动态距离指示器",
+    ru = "Активный индикатор расстояния",
   },
   active_range_tooltip = {
     en = "This option will move the arc closer to the centre from the 'Distance from standard arc' range, as the target gets closer",
     ["zh-cn"] = "启用此选项后，当目标靠近时，圆弧会比“与原版圆弧之间的距离”更靠近中心",
+    ru = "Эта опция переместит индикатор ближе к центру от «Расстояния от стандартной дуги» по мере приближения цели.",
   },
 }
 
