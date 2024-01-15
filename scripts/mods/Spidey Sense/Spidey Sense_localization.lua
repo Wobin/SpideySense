@@ -3,53 +3,69 @@ local InputUtils = require("scripts/managers/input/input_utils")
 
 local localizations = 
 {
+	mod_name = {
+		en = "Spidey Sense",
+		ru = "Паучье Чутьё",
+	},
 	mod_description = {
 		en = "Offers a coloured arc indicator for the direction of sound cues for certain special units",
 		["zh-cn"] = "为某些特殊单位的音效提供彩色的方向圆弧指示器。",
+		ru = "Spidey Sense - Добавляет цветной дуговой индикатор, показывающий направление звуковых сигналов для определённых врагов.",
 	},
   mutant_colour = {
     en = "Colour for Mutant warning",
     ["zh-cn"] = "变种人警告颜色",
+    ru = "Цвет предупреждения о мутантах",
   },  
   trapper_colour = {
     en = "Colour for Trapper warning",
     ["zh-cn"] = "陷阱手警告颜色",
+    ru = "Цвет предупреждения о ловушечниках",
   },
   hound_colour = {
     en = "Colour for Hound warning",
     ["zh-cn"] = "猎犬警告颜色",
+    ru = "Цвет предупреждения о гончих",
   },
   burster_colour = {
     en = "Colour for Burster warning",
     ["zh-cn"] = "爆破手警告颜色",
+    ru = "Цвет предупреждения о взрывунах",
   },
   flamer_colour = {
     en = "Colour for Flamer warning",
     ["zh-cn"] = "火焰兵警告颜色",
+    ru = "Цвет предупреждения о огнемётчиках",
   },
   grenadier_colour = {
     en = "Colour for Grenadier warning",
     ["zh-cn"] = "轰炸者警告颜色",
+    ru = "Цвет предупреждения о гренадёрах",
   },
   sniper_colour = {
     en = "Colour for Sniper warning",
     ["zh-cn"] = "狙击手警告颜色",
+    ru = "Цвет предупреждения о снайперах",
   },
   backstab_colour = {
     en = "Colour for Backstab warning",
     ["zh-cn"] = "背刺警告颜色",
+    ru = "Цвет предупреждения об ударах в спину",
   },
   barrel_colour = {
     en = "Colour for Barrel warning",
     ["zh-cn"] = "爆炸桶警告颜色",
+    ru = "Цвет предупреждения о взрывающихся бочках",
   },
   crusher_colour = {
     en = "Colour for Crusher warning",
-    ["zh-cn"] = "粉碎者警告颜色",    
+    ["zh-cn"] = "粉碎者警告颜色",
+    ru = "Цвет предупреждения о дробителях",
   },
   mauler_colour = {
     en = "Colour for Mauler warning",
     ["zh-cn"] = "重锤兵警告颜色",
+    ru = "Цвет предупреждения о палачах",
   },
   daemonhost_colour = {
     en  = "Colour for Daemonhost",
@@ -72,34 +88,42 @@ local function addLocalisation(localisations, typeName)
   localisations[typeName .. "_active"] = {
     en = "Show indicator",
     ["zh-cn"] = "显示指示器",
+    ru = "Показывать индикатор",
   }
   localisations[typeName .. "_only_behind"] = {
     en = "Show indicator only if behind you",    
     ["zh-cn"] = "仅在背后时显示指示器",
+    ru = "Показывать только индикатор ударов ссзади",
     }
   localisations[typeName .. "_front_opacity"] = {
     en = "Foreground Opacity",
     ["zh-cn"] = "前景不透明度",
+    ru = "Прозрачность переднего плана",
   }
   localisations[typeName .. "_front_colour"] = {
     en = "Foreground Colour",
     ["zh-cn"] = "前景颜色",
+    ru = "Цвет переднего плана",
     }
   localisations[typeName .. "_back_opacity"]= {
     en = "Background Opacity",
     ["zh-cn"] = "背景不透明度",
+    ru = "Прозрачность заднего плана",
   }
   localisations[typeName .. "_back_colour"] = {
     en = "Background Colour",
     ["zh-cn"] = "背景颜色",
+    ru = "Цвет заднего плана",
   }
   localisations[typeName .. "_radius"] = {
     en = "Distance from standard arc",
     ["zh-cn"] = "与原版圆弧之间的距离",
+    ru = "Расстояние от стандартной дуги",
   }
   localisations[typeName .. "_distance"] = {
     en = "Detection range (m)",
     ["zh-cn"] = "检测距离（米）",
+    ru = "Дистанция обнаружения (м)",
     }
 end
 
