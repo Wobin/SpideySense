@@ -5,6 +5,7 @@ local localizations =
 {
 	mod_name = {
 		en = "Spidey Sense",
+		["zh-cn"] = "蜘蛛感应",
 		ru = "Паучье Чутьё",
 	},
 	mod_description = {
@@ -69,18 +70,23 @@ local localizations =
   },
   daemonhost_colour = {
     en  = "Colour for Daemonhost",
+    ["zh-cn"] = "恶魔宿主颜色",
   },
   rager_colour = {
    en = "Colour for Ragers",
+    ["zh-cn"] = "狂暴者颜色",
   },
   core_options = {
     en = "Core Options",
+    ["zh-cn"] = "核心选项",
   },
   active_range = {
-    en ="Active Range Indicator"
+    en ="Active Range Indicator",
+    ["zh-cn"] = "动态距离指示器",
   },
   active_range_tooltip = {
-    en = "This option will move the arc closer to the centre from the 'Distance from standard arc' range, as the target gets closer"
+    en = "This option will move the arc closer to the centre from the 'Distance from standard arc' range, as the target gets closer",
+    ["zh-cn"] = "启用此选项后，当目标靠近时，圆弧会比“与原版圆弧之间的距离”更靠近中心",
   },
 }
 
@@ -92,7 +98,7 @@ local function addLocalisation(localisations, typeName)
   }
   localisations[typeName .. "_only_behind"] = {
     en = "Show indicator only if behind you",    
-    ["zh-cn"] = "仅在背后时显示指示器",
+    ["zh-cn"] = "仅当目标在背后时显示指示器",
     ru = "Показывать только индикатор ударов ссзади",
     }
   localisations[typeName .. "_front_opacity"] = {
