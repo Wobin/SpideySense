@@ -80,7 +80,7 @@ local localizations =
   },
   toxbomber_colour = {
    en = "Colour for Tox Grenadiers",
-    ["zh-cn"] = "",
+    ["zh-cn"] = "剧毒轰炸者颜色",
     ru = "Цвет для Токс гренадёров",
   },
   core_options = {
@@ -143,7 +143,7 @@ local function addLocalisation(localisations, typeName)
   }
     localisations[typeName .. "_arrow_distance"] = {
     en = "Proximity Alert Range (m)",
-    ["zh-cn"] = "（米）",
+    ["zh-cn"] = "接近警告距离（米）",
     ru = "Дистанция оповещения о приближении (м)",
     }
 end
