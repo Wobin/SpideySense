@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 17/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.1
+Version: 3.1.1
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -181,7 +181,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 				},
 		},
     visibility_function = function (content) 
-        local alert = mod:get(content.target_type .."_arrow_distance")
+        local alert = content.target_type and mod:get(content.target_type .."_arrow_distance") or nil
                 return (content.distance and alert) and
                 (alert > 0 and
                 content.distance < alert or false) 
