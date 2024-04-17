@@ -15,7 +15,7 @@ local options = {
               type = "checkbox",
               tooltip = "active_range_tooltip",
               default_value = false
-            },
+            },            
           }
         }
       }
@@ -60,6 +60,13 @@ local function create_option_set(typeName, defaultColour1, defaultColour2)
 					range = {0, 40},
 					decimals_number = 0
         },    
+                  {
+          setting_id = typeName .."_arrow_distance",
+          type = "numeric",
+					default_value = 0,
+					range = {0, 40},
+					decimals_number = 0
+        },  
           {
             setting_id = typeName .."_only_behind",
             type = "checkbox",
@@ -109,6 +116,7 @@ table.insert(options.options.widgets, create_option_set("mutant", "ui_green_ligh
 table.insert(options.options.widgets, create_option_set("rager", "medium_spring_green", "midnight_blue"))
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
 table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_overcharge_medium", "ui_hud_overcharge_low"))
+table.insert(options.options.widgets, create_option_set("toxbomber", "chart_reuse", "citadel_bieltan_green"))
 table.insert(options.options.widgets, 
       {
 				setting_id = "backstab_colour",

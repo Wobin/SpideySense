@@ -1,15 +1,16 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 16/01/2024
+Date: 17/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.0
+Version: 3.1
 --]]
 
 local mod = get_mod("Spidey Sense")
 local HudElementDamageIndicatorSettings =
 	require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
+local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 
 --[[
 local function extract_locals(level_base)
@@ -39,7 +40,6 @@ local function extract_locals(level_base)
 end
 
 --]]
-
 
 local function get_userdata_type(userdata)
 	if type(userdata) ~= "userdata" then
@@ -124,6 +124,76 @@ local function listener_position_rotation()
 end
 
 mod._indicators = {}
+mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_definitions", function(definitions)
+    
+    local center_distance = HudElementDamageIndicatorSettings.center_distance
+    local size = HudElementDamageIndicatorSettings.size
+    local indicator = UIWidget.create_definition({
+	{
+		value = "content/ui/materials/hud/damage_indicators/hit_indicator_bg",
+		style_id = "background",
+		pass_type = "rotated_texture",
+		style = {
+			angle = 0,
+			pivot = {
+				size[1] * 0.5,
+				center_distance
+			},
+			color = UIHudSettings.color_tint_alert_3
+		}
+	},
+	{
+		value = "content/ui/materials/hud/damage_indicators/hit_indicator_fg",
+		style_id = "front",
+		pass_type = "rotated_texture",
+		style = {
+			angle = 0,
+			pivot = {
+				size[1] * 0.5,
+				center_distance
+			},
+			color = UIHudSettings.color_tint_alert_1,
+			offset = {
+				0,
+				0,
+				1
+			}
+		}
+	},
+  {
+		value = "content/ui/materials/hud/interactions/icons/enemy_priority",
+		style_id = "arrow",
+		pass_type = "rotated_texture",
+		style = {
+			angle = 0,
+      size = {
+        45,45
+        },
+			pivot = {
+				size[1] * 0.5,
+				center_distance
+			},
+			color = UIHudSettings.color_tint_alert_1,
+			offset = {
+					0,
+					0,
+					6
+				},
+		},
+    visibility_function = function (content) 
+        local alert = mod:get(content.target_type .."_arrow_distance")
+                return (content.distance and alert) and
+                (alert > 0 and
+                content.distance < alert or false) 
+                or false
+                end,
+	}
+}, "indicator")
+
+
+  definitions.indicator_definition = indicator
+  end)
+
 
 mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
 	local indicators = mod._indicators
@@ -133,18 +203,21 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 		return
 	end
 
-	local widget = self._indicator_widget
+	local widget = self._indicator_widget  
 	local widget_offset = widget.offset
 	local background_style = widget.style.background
 	local background_pivot = background_style.pivot
 	local front_style = widget.style.front
 	local front_pivot = front_style.pivot
+  local arrow_style = widget.style.arrow
+  local arrow_pivot = arrow_style.pivot
+  
 	local center_distance = HudElementDamageIndicatorSettings.center_distance
 	local pulse_distance = HudElementDamageIndicatorSettings.pulse_distance
 	local pulse_speed_multiplier = HudElementDamageIndicatorSettings.pulse_speed_multiplier
 	local size = HudElementDamageIndicatorSettings.size
 	local player_angle = self:_get_player_direction_angle()
-
+    
 	for i = num_indicators, 1, -1 do
 		local indicator = indicators[i]
 
@@ -158,11 +231,13 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 			local duration = indicator.duration
 			local progress = (time - t) / duration
 			local anim_progress = math.ease_out_exp(1 - progress)
-			local hit_progress = math.clamp(anim_progress * pulse_speed_multiplier, 0, 1)
-			widget.alpha_multiplier = progress
-			local angle = player_angle - indicator.angle
+			local hit_progress = math.clamp(anim_progress * pulse_speed_multiplier, 0, 1)			
+			local angle = player_angle - indicator.angle      
 			background_style.angle = angle
 			front_style.angle = angle
+      arrow_style.angle = angle
+      widget.alpha_multiplier = progress
+      
 			background_style.color = Color[mod:get(indicator.target_type .. "_back_colour")](
 				mod:get(indicator.target_type .. "_back_opacity"),
 				true
@@ -171,15 +246,24 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				mod:get(indicator.target_type .. "_front_opacity"),
 				true
 			)
+      arrow_style.color = Color[mod:get(indicator.target_type .. "_front_colour")](
+				mod:get(indicator.target_type .. "_front_opacity"),
+				true)
+      
 			local distance = center_distance
-				+ indicator.distance
+				+ (mod:get("active_range") and indicator.distance or 0)
 				- (pulse_distance - pulse_distance * hit_progress)
+        
 			widget_offset[2] = -distance + size[2] * 0.5
 			widget_offset[3] = math.min(i, 50)
 			background_pivot[2] = distance
 			front_pivot[2] = distance
+      arrow_pivot[2] = distance
+            
+      widget.content.distance = not mod:get("active_range") and indicator.actual_distance or nil
+      widget.content.target_type = indicator.target_type
 
-			UIWidget.draw(widget, ui_renderer)
+			UIWidget.draw(widget, ui_renderer) 
 		else
 			table.remove(indicators, i)
 		end
@@ -211,12 +295,12 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	if distance < (mod:get(target_type .. "_distance") or 40) then
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
       local active_distance = not mod:get("active_range") and mod:get(target_type .."_radius") or (((distance / (mod:get(target_type .. "_distance") or 40)) * 250) - 150)      
-			mod:spawn_indicator(angle, target_type, extra_duration, active_distance)
+			mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance)
 		end
 	end
 end
 
-function mod:spawn_indicator(angle, target_type, extra_duration, distance)
+function mod:spawn_indicator(angle, target_type, extra_duration, distance, actual_distance)
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
 	local player_angle = get_player_direction_angle()
@@ -225,7 +309,8 @@ function mod:spawn_indicator(angle, target_type, extra_duration, distance)
 		time = t + duration,
 		duration = duration,
 		target_type = target_type,
-    distance = distance
+    distance = distance,
+    actual_distance = actual_distance
 	}
 end
 
@@ -355,6 +440,10 @@ function mod:hook_monster(sound_name, unit_or_position)
       or sound_name:match("wwise/events/minions/play_shared_foley_chaos_cultist_light_run")
       ))
     then mod:create_indicator(unit_or_position, "rager") end
+  if mod:get("toxbomber_active")
+    and (sound_name:match("wwise/events/minions/play_cultist_grenadier"))
+    then mod:create_indicator(unit_or_position, "toxbomber") end
+  
 end
 
 local hooked_sounds = {
@@ -386,6 +475,7 @@ local hooked_sounds = {
   "wwise/events/minions/play_enemy_traitor_berzerker",
   "wwise/events/minions/play_shared_foley_chaos_cultist_light_run",  
   "wwise/events/minions/play_minion_footsteps_wrapped_feet_specials",
+  "wwise/events/minions/play_cultist_grenadier"
 }
 
 local hooked_external_sounds = {

@@ -78,6 +78,11 @@ local localizations =
     ["zh-cn"] = "狂暴者颜色",
     ru = "Цвет для Берсерков",
   },
+  toxbomber_colour = {
+   en = "Colour for Tox Grenadiers",
+    ["zh-cn"] = "",
+    ru = "",
+  },
   core_options = {
     en = "Core Options",
     ["zh-cn"] = "核心选项",
@@ -135,6 +140,11 @@ local function addLocalisation(localisations, typeName)
     en = "Detection range (m)",
     ["zh-cn"] = "检测距离（米）",
     ru = "Дистанция обнаружения (м)",
+  }
+    localisations[typeName .. "_arrow_distance"] = {
+    en = "Proximity Alert Range (m)",
+    ["zh-cn"] = "（米）",
+    ru = "(м)",
     }
 end
 
@@ -173,6 +183,7 @@ addLocalisation(localizations, "mutant")
 addLocalisation(localizations, "rager")
 addLocalisation(localizations, "sniper")
 addLocalisation(localizations, "trapper")
+addLocalisation(localizations, "toxbomber")
 
 
 
