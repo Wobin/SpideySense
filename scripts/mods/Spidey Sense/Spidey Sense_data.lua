@@ -5,23 +5,10 @@ local options = {
 	is_togglable = true,
   options = {
     widgets = {
-        {
-        setting_id = "core_options",
-        type = "group",
-        sub_widgets = 
-          {
-            {
-              setting_id = "active_range",
-              type = "checkbox",
-              tooltip = "active_range_tooltip",
-              default_value = false
-            },            
-          }
-        }
-      }
+        
     }    
   }
-  
+}
 local color_options = {}
 for i, color_name in ipairs(Color.list) do
   table.insert(color_options, {
@@ -53,6 +40,12 @@ local function create_option_set(typeName, defaultColour1, defaultColour2)
 					range = {-125, 200},
 					decimals_number = 0
         },
+         {
+              setting_id = typeName .. "_active_range",
+              type = "checkbox",
+              tooltip = "active_range_tooltip",
+              default_value = false
+            },            
           {
           setting_id = typeName .."_distance",
           type = "numeric",

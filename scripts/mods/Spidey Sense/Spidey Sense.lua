@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 17/04/2024
+Date: 21/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.1.1
+Version: 3.2
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -123,12 +123,14 @@ local function listener_position_rotation()
 	return listener_position, listener_rotation
 end
 
+local arrowpng = "https://wobin.github.io/SpideySense/images/arrow.png"
+
 mod._indicators = {}
 mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_definitions", function(definitions)
     
     local center_distance = HudElementDamageIndicatorSettings.center_distance
     local size = HudElementDamageIndicatorSettings.size
-    local indicator = UIWidget.create_definition({
+    local indicator_definition = {
 	{
 		value = "content/ui/materials/hud/damage_indicators/hit_indicator_bg",
 		style_id = "background",
@@ -160,15 +162,14 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 			}
 		}
 	},
-  {
-		value = "content/ui/materials/hud/interactions/icons/enemy_priority",
+  {		
+    size = size,
 		style_id = "arrow",
 		pass_type = "rotated_texture",
+    vertical_alignment = "center",
+				horizontal_alignment = "center",
 		style = {
 			angle = 0,
-      size = {
-        45,45
-        },
 			pivot = {
 				size[1] * 0.5,
 				center_distance
@@ -181,6 +182,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 				},
 		},
     visibility_function = function (content) 
+        if not content.target_type then return false end
         local alert = content.target_type and mod:get(content.target_type .."_arrow_distance") or nil
                 return (content.distance and alert) and
                 (alert > 0 and
@@ -188,12 +190,17 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
                 or false
                 end,
 	}
-}, "indicator")
-
+}
+    
+	
+  local indicator = UIWidget.create_definition(indicator_definition, "indicator")
 
   definitions.indicator_definition = indicator
+  Managers.url_loader:load_texture(arrowpng):next(function(data)
+      if not indicator.style.arrow.material_values then indicator.style.arrow.material_values = {} end
+    indicator.style.arrow.material_values.texture_map = data.texture    
   end)
-
+end)
 
 mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
 	local indicators = mod._indicators
@@ -251,7 +258,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				true)
       
 			local distance = center_distance
-				+ (mod:get("active_range") and indicator.distance or 0)
+				+ (mod:get(indicator.target_type .."_active_range") and indicator.distance or 0)
 				- (pulse_distance - pulse_distance * hit_progress)
         
 			widget_offset[2] = -distance + size[2] * 0.5
@@ -259,8 +266,8 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 			background_pivot[2] = distance
 			front_pivot[2] = distance
       arrow_pivot[2] = distance
-            
-      widget.content.distance = not mod:get("active_range") and indicator.actual_distance or nil
+    
+      widget.content.distance = indicator.actual_distance or nil
       widget.content.target_type = indicator.target_type
 
 			UIWidget.draw(widget, ui_renderer) 
@@ -294,7 +301,9 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	local distance = Vector3.distance(position, listener_position)
 	if distance < (mod:get(target_type .. "_distance") or 40) then
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
-      local active_distance = not mod:get("active_range") and mod:get(target_type .."_radius") or (((distance / (mod:get(target_type .. "_distance") or 40)) * 250) - 150)      
+      local active_distance = mod:get(target_type .. "_active_range") and ((distance / mod:get(target_type .. "_distance")) * 325) - 125
+          or mod:get(target_type .."_radius")
+      --if target_type == "hound" then mod:echo(active_distance) end
 			mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance)
 		end
 	end
