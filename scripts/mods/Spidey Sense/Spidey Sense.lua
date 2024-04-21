@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 21/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.2
+Version: 3.2.1
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -125,6 +125,13 @@ end
 
 local arrowpng = "https://wobin.github.io/SpideySense/images/arrow.png"
 
+local load_arrow = function(indicator)
+   return Managers.url_loader:load_texture(arrowpng):next(function(data)
+      if not indicator.style.arrow.material_values then indicator.style.arrow.material_values = {} end    
+    indicator.style.arrow.material_values.texture_map = data.texture        
+  end)
+end
+
 mod._indicators = {}
 mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_definitions", function(definitions)
     
@@ -163,6 +170,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 		}
 	},
   {		
+    texture = nil,
     size = size,
 		style_id = "arrow",
 		pass_type = "rotated_texture",
@@ -195,11 +203,11 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 	
   local indicator = UIWidget.create_definition(indicator_definition, "indicator")
 
-  definitions.indicator_definition = indicator
-  Managers.url_loader:load_texture(arrowpng):next(function(data)
-      if not indicator.style.arrow.material_values then indicator.style.arrow.material_values = {} end
-    indicator.style.arrow.material_values.texture_map = data.texture    
-  end)
+  definitions.indicator_definition = indicator 
+end)
+
+mod:hook_safe("HudElementDamageIndicator", "init", function(self)
+  mod.hudElement = self._indicator_widget 
 end)
 
 mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
@@ -209,7 +217,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	if num_indicators < 1 then
 		return
 	end
-
+  
 	local widget = self._indicator_widget  
 	local widget_offset = widget.offset
 	local background_style = widget.style.background
@@ -224,7 +232,9 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	local pulse_speed_multiplier = HudElementDamageIndicatorSettings.pulse_speed_multiplier
 	local size = HudElementDamageIndicatorSettings.size
 	local player_angle = self:_get_player_direction_angle()
-    
+  
+  
+  
 	for i = num_indicators, 1, -1 do
 		local indicator = indicators[i]
 
@@ -269,7 +279,6 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
     
       widget.content.distance = indicator.actual_distance or nil
       widget.content.target_type = indicator.target_type
-
 			UIWidget.draw(widget, ui_renderer) 
 		else
 			table.remove(indicators, i)
@@ -303,8 +312,13 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
       local active_distance = mod:get(target_type .. "_active_range") and ((distance / mod:get(target_type .. "_distance")) * 325) - 125
           or mod:get(target_type .."_radius")
-      --if target_type == "hound" then mod:echo(active_distance) end
-			mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance)
+      mod:dump(mod.hudElement,"element",2)
+      if not mod.hudElement.style.arrow.material_values then
+        load_arrow(mod.hudElement):next(
+          function() mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance) end)
+      else
+        mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance)
+      end			
 		end
 	end
 end
