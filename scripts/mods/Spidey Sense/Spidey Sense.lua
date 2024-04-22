@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 21/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.2.1
+Version: 3.2.2
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -268,7 +268,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				true)
       
 			local distance = center_distance
-				+ (mod:get(indicator.target_type .."_active_range") and indicator.distance or 0)
+				+ (indicator.distance and indicator.distance or 0)
 				- (pulse_distance - pulse_distance * hit_progress)
         
 			widget_offset[2] = -distance + size[2] * 0.5
@@ -311,9 +311,8 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	if distance < (mod:get(target_type .. "_distance") or 40) then
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
       local active_distance = mod:get(target_type .. "_active_range") and ((distance / mod:get(target_type .. "_distance")) * 325) - 125
-          or mod:get(target_type .."_radius")
-      mod:dump(mod.hudElement,"element",2)
-      if not mod.hudElement.style.arrow.material_values then
+          or mod:get(target_type .."_radius")            
+      if mod.hudElement and not mod.hudElement.style.arrow.material_values then
         load_arrow(mod.hudElement):next(
           function() mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance) end)
       else
