@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 30/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.3
+Version: 3.3.1
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -354,8 +354,10 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
     local buffs = buff_ext and buff_ext:buffs()    
     nurgled[unit_or_position] = false
     if buffs then
-      for _, buff in ipairs(buffs) do
-        nurgled[unit_or_position] = true
+      for _, buff in ipairs(buffs) do        
+        if buff:template_name() == "mutator_minion_nurgle_blessing_tougher" then
+          nurgled[unit_or_position] = true
+        end
       end    
     end
   else
