@@ -85,17 +85,17 @@ local localizations =
   },
   plague_ogryn_colour = {
    en = "Colour for Plague Ogryn",
-    ["zh-cn"] = "警告颜色",
+    ["zh-cn"] = "瘟疫欧格林警告颜色",
     ru = "Цвет для ",
   },
   chaos_spawn_colour = {
    en = "Colour for Chaos Spawn",
-    ["zh-cn"] = "警告颜色",
+    ["zh-cn"] = "混沌魔物警告颜色",
     ru = "Цвет для ",
   },
   beast_of_nurgle_colour = {
    en = "Colour for Beast of Nurgle",
-    ["zh-cn"] = "警告颜色",
+    ["zh-cn"] = "纳垢兽警告颜色",
     ru = "Цвет для ",
   },
   core_options = {
@@ -167,7 +167,8 @@ local function addLocalisation(localisations, typeName)
     ru = "Активный индикатор расстояния",
   }
   localisations[typeName .. "_nurgle_blessed"] = {
-    en = "Indicate Nurgle Blessed"
+    en = "Indicate Nurgle Blessed",
+    ["zh-cn"] = "指示纳垢赐福敌人",
   }
 end
 
