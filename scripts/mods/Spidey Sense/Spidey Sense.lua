@@ -124,11 +124,16 @@ local function listener_position_rotation()
 end
 
 local arrowpng = "https://wobin.github.io/SpideySense/images/arrow.png"
+local arrow2png = "https://wobin.github.io/SpideySense/images/arrow2.png"
 
 local load_arrow = function(indicator)
    return Managers.url_loader:load_texture(arrowpng):next(function(data)
       if not indicator.style.arrow.material_values then indicator.style.arrow.material_values = {} end    
-    indicator.style.arrow.material_values.texture_map = data.texture        
+    indicator.style.arrow.material_values.texture_map = data.texture    
+    Managers.url_loader:load_texture(arrow2png):next(function(data)
+          if not indicator.style.arrow2.material_values then indicator.style.arrow2.material_values = {} end    
+          indicator.style.arrow2.material_values.texture_map = data.texture    
+        end)
   end)
 end
 
@@ -182,7 +187,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 				size[1] * 0.5,
 				center_distance
 			},
-			color = UIHudSettings.color_tint_alert_1,
+			color = Color["black"](255,true),
 			offset = {
 					0,
 					0,
@@ -197,6 +202,31 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
                 content.distance < alert or false) 
                 or false
                 end,
+	},
+  {		
+    texture = nil,
+    size = size,
+		style_id = "arrow2",
+		pass_type = "rotated_texture",
+    vertical_alignment = "center",
+				horizontal_alignment = "center",
+		style = {
+			angle = 0,
+			pivot = {
+				size[1] * 0.5,
+				center_distance
+			},
+			color = UIHudSettings.ui_hud_green_super_light,
+			offset = {
+					0,
+					0,
+					6
+				},
+		},
+    visibility_function = function (content) 
+        if not content.target_type then return false end
+        return content.is_nurgled
+    end,
 	}
 }
     
@@ -225,7 +255,9 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	local front_style = widget.style.front
 	local front_pivot = front_style.pivot
   local arrow_style = widget.style.arrow
+  local arrow2_style = widget.style.arrow2
   local arrow_pivot = arrow_style.pivot
+  local arrow2_pivot = arrow2_style.pivot
   
 	local center_distance = HudElementDamageIndicatorSettings.center_distance
 	local pulse_distance = HudElementDamageIndicatorSettings.pulse_distance
@@ -253,6 +285,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 			background_style.angle = angle
 			front_style.angle = angle
       arrow_style.angle = angle
+      arrow2_style.angle = angle
       widget.alpha_multiplier = progress
       
 			background_style.color = Color[mod:get(indicator.target_type .. "_back_colour")](
@@ -267,6 +300,16 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				mod:get(indicator.target_type .. "_front_opacity"),
 				true)
       
+      
+      if indicator.is_nurgled and arrow_style.color then
+        if arrow_style.color[3] > arrow_style.color[2] and arrow_style.color[3] > arrow_style.color[4] then
+          arrow2_style.color = Color["yellow"](255, true)
+        else
+          arrow2_style.color = Color["lime"](255, true)
+        end
+      end
+      
+      
 			local distance = center_distance
 				+ (indicator.distance and indicator.distance or 0)
 				- (pulse_distance - pulse_distance * hit_progress)
@@ -276,15 +319,20 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 			background_pivot[2] = distance
 			front_pivot[2] = distance
       arrow_pivot[2] = distance
+      arrow2_pivot[2] = distance
     
       widget.content.distance = indicator.actual_distance or nil
       widget.content.target_type = indicator.target_type
+      widget.content.is_nurgled = indicator.is_nurgled
 			UIWidget.draw(widget, ui_renderer) 
 		else
 			table.remove(indicators, i)
 		end
 	end
 end)
+
+
+local nurgled = {}
 
 function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	local input_type = get_userdata_type(unit_or_position)
@@ -300,8 +348,21 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 		--mod:echo(unit_or_position)
 		return
 	end
-
-	local listener_position, listener_rotation = listener_position_rotation()
+  
+  if mod:get(target_type .."_nurgle_blessed") then
+    local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")    
+    local buffs = buff_ext and buff_ext:buffs()    
+    nurgled[unit_or_position] = false
+    if buffs then
+      for _, buff in ipairs(buffs) do
+        nurgled[unit_or_position] = true
+      end    
+    end
+  else
+    nurgled[unit_or_position] = false
+  end
+  
+  local listener_position, listener_rotation = listener_position_rotation()
 	local direction = position - listener_position
 	local directionRotated = Quaternion.rotate(Quaternion.inverse(listener_rotation), direction)
 	local directionRotatedNormalized = Vector3.normalize(directionRotated)
@@ -314,15 +375,15 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
           or mod:get(target_type .."_radius")            
       if mod.hudElement and not mod.hudElement.style.arrow.material_values then
         load_arrow(mod.hudElement):next(
-          function() mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance) end)
+          function() mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance, nurgled[unit_or_position]) end)
       else
-        mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance)
+        mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance, nurgled[unit_or_position])
       end			
 		end
 	end
 end
 
-function mod:spawn_indicator(angle, target_type, extra_duration, distance, actual_distance)
+function mod:spawn_indicator(angle, target_type, extra_duration, distance, actual_distance, is_nurgled)
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
 	local player_angle = get_player_direction_angle()
@@ -332,7 +393,8 @@ function mod:spawn_indicator(angle, target_type, extra_duration, distance, actua
 		duration = duration,
 		target_type = target_type,
     distance = distance,
-    actual_distance = actual_distance
+    actual_distance = actual_distance,
+    is_nurgled = mod:get(target_type .."_nurgle_blessed") and is_nurgled
 	}
 end
 
@@ -340,7 +402,7 @@ local throttle = {}
 
 function mod:hook_monster(sound_name, unit_or_position)
 	--ignore monster spawn
-	if sound_name:match("_spawn") then
+	if sound_name:match("_spawn") and not sound_name:match("chaos_spawn") then
 		return
 	end
 
@@ -389,8 +451,7 @@ function mod:hook_monster(sound_name, unit_or_position)
 	then mod:create_indicator(unit_or_position, "burster") end
 	if mod:get("hound_active")
 		and (
-			sound_name:match("wwise/events/minions/play_enemy_chaos_hound")
-			or sound_name:match("wwise/events/minions/play_fly_swarm")
+			sound_name:match("wwise/events/minions/play_enemy_chaos_hound")    
 		)
 	then mod:create_indicator(unit_or_position, "hound") end
 
@@ -466,6 +527,17 @@ function mod:hook_monster(sound_name, unit_or_position)
     and (sound_name:match("wwise/events/minions/play_cultist_grenadier"))
     then mod:create_indicator(unit_or_position, "toxbomber") end
   
+  if mod:get("plague_ogryn_active")
+    and sound_name:match("plague_ogryn") 
+    then mod:create_indicator(unit_or_position, "plague_ogryn") end    
+  
+  if mod:get("chaos_spawn_active")
+    and sound_name:match("chaos_spawn") 
+    then mod:create_indicator(unit_or_position, "chaos_spawn") end
+  
+  if mod:get("beast_of_nurgle_active")
+    and sound_name:match("beast_of_nurgle") 
+    then mod:create_indicator(unit_or_position, "beast_of_nurgle") end
 end
 
 local hooked_sounds = {
@@ -497,7 +569,12 @@ local hooked_sounds = {
   "wwise/events/minions/play_enemy_traitor_berzerker",
   "wwise/events/minions/play_shared_foley_chaos_cultist_light_run",  
   "wwise/events/minions/play_minion_footsteps_wrapped_feet_specials",
-  "wwise/events/minions/play_cultist_grenadier"
+  "wwise/events/minions/play_cultist_grenadier",
+  "wwise/events/minions/play_enemy_character_foley_plague_ogryn",
+  "wwise/events/minions/play_enemy_plague_ogryn",
+  "wwise/events/minions/play_footstep_boots_heavy_plague_ogryn",
+  "wwise/events/minions/play_chaos_spawn",  
+  "wwise/events/minions/play_beast_of_nurgle"
 }
 
 local hooked_external_sounds = {

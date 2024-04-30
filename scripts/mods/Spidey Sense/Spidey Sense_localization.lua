@@ -83,6 +83,21 @@ local localizations =
     ["zh-cn"] = "剧毒轰炸者颜色",
     ru = "Цвет для Токс гренадёров",
   },
+  plague_ogryn_colour = {
+   en = "Colour for Plague Ogryn",
+    ["zh-cn"] = "警告颜色",
+    ru = "Цвет для ",
+  },
+  chaos_spawn_colour = {
+   en = "Colour for Chaos Spawn",
+    ["zh-cn"] = "警告颜色",
+    ru = "Цвет для ",
+  },
+  beast_of_nurgle_colour = {
+   en = "Colour for Beast of Nurgle",
+    ["zh-cn"] = "警告颜色",
+    ru = "Цвет для ",
+  },
   core_options = {
     en = "Core Options",
     ["zh-cn"] = "核心选项",
@@ -151,6 +166,9 @@ local function addLocalisation(localisations, typeName)
     ["zh-cn"] = "动态距离指示器",
     ru = "Активный индикатор расстояния",
   }
+  localisations[typeName .. "_nurgle_blessed"] = {
+    en = "Indicate Nurgle Blessed"
+  }
 end
 
 
@@ -177,14 +195,17 @@ end
 
 addLocalisation(localizations, "backstab")
 addLocalisation(localizations, "barrel")
+addLocalisation(localizations, "beast_of_nurgle")
 addLocalisation(localizations, "burster")
 addLocalisation(localizations, "crusher")
+addLocalisation(localizations, "chaos_spawn")
 addLocalisation(localizations, "daemonhost")
 addLocalisation(localizations, "flamer")
 addLocalisation(localizations, "grenadier")
 addLocalisation(localizations, "hound")
 addLocalisation(localizations, "mauler")
 addLocalisation(localizations, "mutant")
+addLocalisation(localizations, "plague_ogryn")
 addLocalisation(localizations, "rager")
 addLocalisation(localizations, "sniper")
 addLocalisation(localizations, "trapper")

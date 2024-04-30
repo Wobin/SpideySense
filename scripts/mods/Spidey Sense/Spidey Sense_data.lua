@@ -46,6 +46,12 @@ local function create_option_set(typeName, defaultColour1, defaultColour2)
               tooltip = "active_range_tooltip",
               default_value = false
             },            
+            {
+              setting_id = typeName .. "_nurgle_blessed",
+              type = "checkbox",
+              tooltip = "active_range_tooltip",
+              default_value = false
+            },            
           {
           setting_id = typeName .."_distance",
           type = "numeric",
@@ -99,13 +105,16 @@ end
 
 table.insert(options.options.widgets, create_option_set("burster", "burly_wood", "citadel_averland_sunset"))
 table.insert(options.options.widgets, create_option_set("barrel", "cheeseburger", "citadel_balthasar_gold"))
+table.insert(options.options.widgets, create_option_set("beast_of_nurgle", "citadel_dorn_yellow", "citadel_balthasar_gold"))
 table.insert(options.options.widgets, create_option_set("crusher", "sienna", "ui_red_medium"))
+table.insert(options.options.widgets, create_option_set("chaos_spawn", "cheeseburger", "ui_red_medium"))
 table.insert(options.options.widgets, create_option_set("daemonhost", "teal", "blue_violet"))
 table.insert(options.options.widgets, create_option_set("flamer", "online_green", "medium_violet_red"))
 table.insert(options.options.widgets, create_option_set("grenadier", "sandy_brown", "ui_interaction_pickup"))
 table.insert(options.options.widgets, create_option_set("hound", "chart_reuse", "cadet_blue"))
 table.insert(options.options.widgets, create_option_set("mauler", "turquoise", "ui_blue_light"))
 table.insert(options.options.widgets, create_option_set("mutant", "ui_green_light", "spring_green"))
+table.insert(options.options.widgets, create_option_set("plague_ogryn", "powder_blue", "citadel_bieltan_green"))
 table.insert(options.options.widgets, create_option_set("rager", "medium_spring_green", "midnight_blue"))
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
 table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_overcharge_medium", "ui_hud_overcharge_low"))
