@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 21/04/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.2.2
+Version: 3.3
 --]]
 
 local mod = get_mod("Spidey Sense")
