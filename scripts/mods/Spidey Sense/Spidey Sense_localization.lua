@@ -16,37 +16,37 @@ local localizations =
   mutant_colour = {
     en = "Colour for Mutant warning",
     ["zh-cn"] = "变种人警告颜色",
-    ru = "Цвет предупреждения о мутантах",
+    ru = "Цвет предупреждения о Мутантах",
   },  
   trapper_colour = {
     en = "Colour for Trapper warning",
     ["zh-cn"] = "陷阱手警告颜色",
-    ru = "Цвет предупреждения о ловушечниках",
+    ru = "Цвет предупреждения о Ловушечниках",
   },
   hound_colour = {
     en = "Colour for Hound warning",
     ["zh-cn"] = "猎犬警告颜色",
-    ru = "Цвет предупреждения о гончих",
+    ru = "Цвет предупреждения о Гончих",
   },
   burster_colour = {
     en = "Colour for Burster warning",
     ["zh-cn"] = "爆破手警告颜色",
-    ru = "Цвет предупреждения о взрывунах",
+    ru = "Цвет предупреждения о Взрывунах",
   },
   flamer_colour = {
     en = "Colour for Flamer warning",
     ["zh-cn"] = "火焰兵警告颜色",
-    ru = "Цвет предупреждения о огнемётчиках",
+    ru = "Цвет предупреждения об Огнемётчиках",
   },
   grenadier_colour = {
     en = "Colour for Grenadier warning",
     ["zh-cn"] = "轰炸者警告颜色",
-    ru = "Цвет предупреждения о гренадёрах",
+    ru = "Цвет предупреждения о Скаб гренадёрах",
   },
   sniper_colour = {
     en = "Colour for Sniper warning",
     ["zh-cn"] = "狙击手警告颜色",
-    ru = "Цвет предупреждения о снайперах",
+    ru = "Цвет предупреждения о Снайперах",
   },
   backstab_colour = {
     en = "Colour for Backstab warning",
@@ -61,12 +61,12 @@ local localizations =
   crusher_colour = {
     en = "Colour for Crusher warning",
     ["zh-cn"] = "粉碎者警告颜色",
-    ru = "Цвет предупреждения о дробителях",
+    ru = "Цвет предупреждения о Дробителях",
   },
   mauler_colour = {
     en = "Colour for Mauler warning",
     ["zh-cn"] = "重锤兵警告颜色",
-    ru = "Цвет предупреждения о палачах",
+    ru = "Цвет предупреждения о Палачах",
   },
   daemonhost_colour = {
     en  = "Colour for Daemonhost",
@@ -86,17 +86,17 @@ local localizations =
   plague_ogryn_colour = {
    en = "Colour for Plague Ogryn",
     ["zh-cn"] = "瘟疫欧格林警告颜色",
-    ru = "Цвет для ",
+    ru = "Цвет для Чумного Огрина",
   },
   chaos_spawn_colour = {
    en = "Colour for Chaos Spawn",
     ["zh-cn"] = "混沌魔物警告颜色",
-    ru = "Цвет для ",
+    ru = "Цвет для Отродья Хаоса",
   },
   beast_of_nurgle_colour = {
    en = "Colour for Beast of Nurgle",
     ["zh-cn"] = "纳垢兽警告颜色",
-    ru = "Цвет для ",
+    ru = "Цвет для Зверя Нургла",
   },
   core_options = {
     en = "Core Options",
@@ -169,6 +169,7 @@ local function addLocalisation(localisations, typeName)
   localisations[typeName .. "_nurgle_blessed"] = {
     en = "Indicate Nurgle Blessed",
     ["zh-cn"] = "指示纳垢赐福敌人",
+    ru = "Показывать благословенных Нурглом",
   }
 end
 
