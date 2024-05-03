@@ -114,41 +114,53 @@ local localizations =
     ru = "Эта опция переместит индикатор ближе к центру от «Расстояния от стандартной дуги» по мере приближения цели.",
   },
   crusher_text_warnings = {
-    en = "Crusher/Mauler Text Warnings"
+    en = "Crusher/Mauler Text Warnings",
+    ["zh-cn"] = "粉碎者/重锤兵文字警告",
   },
   trapper_text_warnings = {
-    en = "Trapper Text Warnings"
+    en = "Trapper Text Warnings",
+    ["zh-cn"] = "陷阱手文字警告",
     },
   cleave_text = {
-    en = "CLEAVE!!"
+    en = "CLEAVE!!",
+    ["zh-cn"] = "劈砍！！",
   },
   net_text = {
-    en = "NET!!"
+    en = "NET!!",
+    ["zh-cn"] = "网！！",
     },
   render_trapper_warning = {
-    en = "Show NET!! indicator when trapper winds up"
+    en = "Show NET!! indicator when trapper winds up",
+    ["zh-cn"] = "当陷阱手发动攻击时，显示“网！！”警告",
   },
   render_crusher_warning = {
-    en = "Show CLEAVE!! indicator when Crusher or Mauler winds up"
+    en = "Show CLEAVE!! indicator when Crusher or Mauler winds up",
+    ["zh-cn"] = "当粉碎者或重锤兵发动攻击时，显示“劈砍！！”警告",
   },
   font_size_cleave = {
-    en = "Font Size"
+    en = "Font Size",
+    ["zh-cn"] = "字体大小",
   },
   font_size_net = {
-    en = "Font Size"
+    en = "Font Size",
+    ["zh-cn"] = "字体大小",
   },
   font_name_cleave = {
-    en = "Font Name"
+    en = "Font Name",
+    ["zh-cn"] = "字体名称",
   },
   font_name_net = {
-    en = "Font Name"
+    en = "Font Name",
+    ["zh-cn"] = "字体名称",
   },
   
   font_color_cleave = {
-    en = "Font Color"
+    en = "Font Color",
+    ["zh-cn"] = "字体颜色",
   },
   font_color_net = {
-    en = "Font Color"
+    en = "Font Color",
+    ["zh-cn"] = "字体颜色",
   },
     arial = { en = "Arial"},
 		itc_novarese_medium = { en = "Novarese Medium"},
@@ -159,9 +171,8 @@ local localizations =
 		friz_quadrata = { en = "Fritz Quadrata"}, -- this is also default Russian font
 		rexlia = { en = "Rexila"},
 		machine_medium  = { en = "Machine Medium"},
-    noto_sans_sc_black = { ["zh-cn"] = "" },
-    noto_sans_sc_bold  = { ["zh-cn"] = "" },
-    noto_sans_sc_black = { ["zh-cn"] = "" },  
+    noto_sans_sc_black = { ["zh-cn"] = "Noto Sans SC Black" },
+    noto_sans_sc_bold  = { ["zh-cn"] = "Noto Sans SC Bold" },
 }
 
 local function addLocalisation(localisations, typeName)
@@ -212,6 +223,7 @@ local function addLocalisation(localisations, typeName)
   }
   localisations[typeName .. "_arrow_colour"] ={
     en = "Proximity Alert Colour",
+    ["zh-cn"] = "接近警告颜色",
     }
   localisations[typeName .. "_active_range"] = {
     en ="Active Range Indicator",

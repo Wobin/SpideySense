@@ -10,7 +10,6 @@ local getFonts = function()
   if locale == "zh-cn" then
     table.insert(options, { text = "noto_sans_sc_black", value = "noto_sans_sc_black"})
     table.insert(options, { text = "noto_sans_sc_bold" , value = "noto_sans_sc_bold" })
-    table.insert(options, { text = "noto_sans_sc_black", value = "noto_sans_sc_black"})
   end
   return options
 end
