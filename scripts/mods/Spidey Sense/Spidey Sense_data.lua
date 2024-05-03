@@ -83,6 +83,12 @@ local function create_option_set(typeName, defaultColour1, defaultColour2)
 					range = {0, 40},
 					decimals_number = 0
         },  
+           {
+            setting_id = typeName .."_arrow_colour",
+            type = "dropdown",
+            default_value = defaultColour1,
+            options = get_color_options()
+          },
           {
             setting_id = typeName .."_only_behind",
             type = "checkbox",

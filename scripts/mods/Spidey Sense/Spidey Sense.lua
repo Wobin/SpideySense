@@ -297,9 +297,8 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				mod:get(indicator.target_type .. "_front_opacity"),
 				true
 			)
-      arrow_style.color = Color[mod:get(indicator.target_type .. "_front_colour")](
-				mod:get(indicator.target_type .. "_front_opacity"),
-				true)
+      arrow_style.color = Color[mod:get(indicator.target_type .. "_arrow_colour")](
+				255, true)
       
       
       if indicator.is_nurgled and arrow_style.color then

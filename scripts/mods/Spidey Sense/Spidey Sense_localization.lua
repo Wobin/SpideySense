@@ -205,6 +205,9 @@ local function addLocalisation(localisations, typeName)
     ["zh-cn"] = "接近警告距离（米）",
     ru = "Дистанция оповещения о приближении (м)",
   }
+  localisations[typeName .. "_arrow_colour"] ={
+    en = "Proximity Alert Colour",
+    }
   localisations[typeName .. "_active_range"] = {
     en ="Active Range Indicator",
     ["zh-cn"] = "动态距离指示器",
