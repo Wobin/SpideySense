@@ -1,12 +1,29 @@
 local mod = get_mod("Spidey Sense")
+local FontDefinitions = require("scripts/managers/ui/ui_fonts_definitions")
+
+local getFonts = function()
+  local options = {}
+  for i,v in pairs(FontDefinitions.fonts) do
+    table.insert(options, {text = i, value = i})
+  end
+  local current_locale = Managers.localization and Managers.localization:language()
+  if locale == "zh-cn" then
+    table.insert(options, { text = "noto_sans_sc_black", value = "noto_sans_sc_black"})
+    table.insert(options, { text = "noto_sans_sc_bold" , value = "noto_sans_sc_bold" })
+    table.insert(options, { text = "noto_sans_sc_black", value = "noto_sans_sc_black"})
+  end
+  return options
+end
+
+
 local options = {
 	name = mod:localize("mod_name"),
 	description = mod:localize("mod_description"),
 	is_togglable = true,
   options = {
     widgets = {
-        
-    }    
+          
+    }
   }
 }
 local color_options = {}
@@ -142,7 +159,7 @@ table.insert(options.options.widgets,
 					default_value = 40,
 					range = {0, 40},
 					decimals_number = 0
-        },              
+          },              
           {
             setting_id = "backstab_front_opacity",
             type = "numeric",
@@ -168,8 +185,64 @@ table.insert(options.options.widgets,
             type = "dropdown",
             default_value = "ui_terminal",
             options = get_color_options()
+          }
+        }})
+ table.insert(options.options.widgets, 
+        {
+          setting_id = "crusher_text_warnings",
+          type = "group",
+          sub_widgets = {
+           {
+            setting_id = "render_crusher_warning",
+            type = "checkbox",
+            default_value = false
           },
-        },      
-      })  
+          {
+            setting_id = "font_size_cleave",
+            type = "numeric",
+            default_value = 28,
+            range = {28, 125},
+          },
+          {
+            setting_id = "font_name_cleave",
+            type = "dropdown",
+            default_value = "proxima_nova_light",
+            options = getFonts()
+          },
+          {
+            setting_id = "font_color_cleave",
+            type = "dropdown",
+            default_value = "ui_terminal",
+            options = get_color_options()},
+          }})
+table.insert(options.options.widgets,     
+          {
+          setting_id = "trapper_text_warnings",
+          type = "group",
+          sub_widgets = {
+            {
+              setting_id = "render_trapper_warning",
+              type = "checkbox",
+              default_value = false
+            },
+                  {
+              setting_id = "font_size_net",
+              type = "numeric",
+              default_value = 28,
+              range = {28, 125},
+            },
+            {
+              setting_id = "font_name_net",
+              type = "dropdown",
+              default_value = "proxima_nova_light",
+              options = getFonts()
+            },
+          {
+            setting_id = "font_color_net",
+            type = "dropdown",
+            default_value = "ui_terminal",
+            options = get_color_options()},          
+          }
+        })  
 
 return options

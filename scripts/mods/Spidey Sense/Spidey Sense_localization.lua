@@ -113,6 +113,50 @@ local localizations =
     ["zh-cn"] = "启用此选项后，当目标靠近时，圆弧会比“与原版圆弧之间的距离”更靠近中心",
     ru = "Эта опция переместит индикатор ближе к центру от «Расстояния от стандартной дуги» по мере приближения цели.",
   },
+  crusher_text_warnings = {
+    en = "Crusher/Mauler Text Warnings"
+  },
+  trapper_text_warnings = {
+    en = "Trapper Text Warnings"
+    },
+
+  render_trapper_warning = {
+    en = "Show NET!! indicator when trapper winds up"
+  },
+  render_crusher_warning = {
+    en = "Show CLEAVE!! indicator when Crusher or Mauler winds up"
+  },
+  font_size_cleave = {
+    en = "Font Size"
+  },
+  font_size_net = {
+    en = "Font Size"
+  },
+  font_name_cleave = {
+    en = "Font Name"
+  },
+  font_name_net = {
+    en = "Font Name"
+  },
+  
+  font_color_cleave = {
+    en = "Font Color"
+  },
+  font_color_net = {
+    en = "Font Color"
+  },
+    arial = { en = "Arial"},
+		itc_novarese_medium = { en = "Novarese Medium"},
+		itc_novarese_bold = { en = "Novarese Bold"},
+		proxima_nova_light = { en = "Proxima Nova Light"},
+		proxima_nova_medium = { en = "Proxima Nova Medium"},
+		proxima_nova_bold = { en = "Proxima Nova Bold"},
+		friz_quadrata = { en = "Fritz Quadrata"}, -- this is also default Russian font
+		rexlia = { en = "Rexila"},
+		machine_medium  = { en = "Machine Medium"},
+    noto_sans_sc_black = { ["zh-cn"] = "" },
+    noto_sans_sc_bold  = { ["zh-cn"] = "" },
+    noto_sans_sc_black = { ["zh-cn"] = "" },
 }
 
 local function addLocalisation(localisations, typeName)

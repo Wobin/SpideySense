@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 30/04/2024
+Date: 4/05/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 3.3.1
+Version: 4.0
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -11,7 +11,9 @@ local HudElementDamageIndicatorSettings =
 	require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
-
+local FontManager = require("scripts/managers/ui/ui_font_manager")
+mod.showCleave = false
+mod.showNet = false
 --[[
 local function extract_locals(level_base)
 	local level = level_base
@@ -72,8 +74,7 @@ local function findlocalvalue(targets)
 				local targetName = target[1]
 				local targetUserdataType = target[2]
 
-				if name == targetName and get_userdata_type(value) == targetUserdataType then
-					-- mod:echo("Found " .. targetName .. " at level " .. level .. " : " .. tostring(value))
+				if name == targetName and get_userdata_type(value) == targetUserdataType then					
 					return value
 				end
 			end
@@ -334,8 +335,8 @@ end)
 
 local nurgled = {}
 
-function mod:create_indicator(unit_or_position, target_type, extra_duration)
-	local input_type = get_userdata_type(unit_or_position)
+local get_position = function(unit_or_position)
+   local input_type = get_userdata_type(unit_or_position)
 	local position
 
 	if input_type == "Unit" then
@@ -343,11 +344,32 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 	elseif input_type == "Vector3" then
 		position = unit_or_position
 	else
-		--mod:echo("Input Type = " .. (input_type and input_type or "nil"))
-		--mod:echo("Target Type = " .. (target_type and target_type or "nil"))
-		--mod:echo(unit_or_position)
 		return
 	end
+  return position
+end
+
+function mod:indicate_warning(unit_or_position, target_type)
+  local position = get_position(unit_or_position)
+
+	local listener_position, listener_rotation = listener_position_rotation()
+ 	local distance = Vector3.distance(position, listener_position)
+  
+  if target_type == "cleave" then
+    -- 5 m feels like melee range
+    if distance > 5 then return end
+    
+    mod.showCleave = true
+    Promise.delay(2):next(function() mod.showCleave = false end)
+  elseif target_type == "trap" then
+    if distance > 13 then return end
+    mod.showNet = true
+    Promise.delay(2):next(function() mod.showNet = false end)
+  end
+end
+
+function mod:create_indicator(unit_or_position, target_type, extra_duration)	
+	local position = get_position(unit_or_position)
   
   if mod:get(target_type .."_nurgle_blessed") then
     local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")    
@@ -399,6 +421,7 @@ function mod:spawn_indicator(angle, target_type, extra_duration, distance, actua
     is_nurgled = mod:get(target_type .."_nurgle_blessed") and is_nurgled
 	}
 end
+
 
 local throttle = {}
 
@@ -498,8 +521,9 @@ function mod:hook_monster(sound_name, unit_or_position)
   
   if mod:get("crusher_active")
     and (
-       sound_name:match("wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__special_attack_vce")      
-     or sound_name:match("wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__running_breath_vce")      
+       sound_name:match("play_minion_footsteps_chaos_ogryn") or 
+       sound_name:match("play_enemy_chaos_ogryn_armoured_executor") or 
+       sound_name:match("play_shared_foley_chaos_ogryn_elites")      
     )
   then mod:create_indicator(unit_or_position, "crusher") end
   if mod:get("mauler_active")
@@ -540,6 +564,13 @@ function mod:hook_monster(sound_name, unit_or_position)
   if mod:get("beast_of_nurgle_active")
     and sound_name:match("beast_of_nurgle") 
     then mod:create_indicator(unit_or_position, "beast_of_nurgle") end
+    
+    if mod:get("render_crusher_warning") and sound_name:match("cleave") then 
+      mod:indicate_warning(unit_or_position, "cleave")
+    end
+    if mod:get("render_trapper_warning") and sound_name:match("play_weapon_netgunner_wind_up") then 
+      mod:indicate_warning(unit_or_position, "trap")
+    end
 end
 
 local hooked_sounds = {
@@ -561,11 +592,11 @@ local hooked_sounds = {
 	"wwise/events/weapon/play_minion_flamethrower_green_wind_up",
 	"wwise/events/minions/play_cultist_flamer_foley_gas_loop",
 	"wwise/events/weapon/play_minion_flamethrower_start",
-  "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__running_breath_vce",
-  "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a__special_attack_vce",
-  "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run", 
-  "wwise/events/minions/play_minion_footsteps_boots_heavy",
-  "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
+  "wwise/events/minions/play_enemy_chaos_ogryn_armoured_executor_a",
+  "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run",   
+  "wwise/events/minions/play_shared_foley_chaos_ogryn_elites_heavy_run",
+  "wwise/events/minions/play_minion_footsteps_chaos_ogryn",
+  "wwise/events/minions/play_minion_footsteps_boots_heavy",  
   "wwise/events/minions/play_enemy_daemonhost",  
   "wwise/events/minions/play_enemy_cultist_berzerker",
   "wwise/events/minions/play_enemy_traitor_berzerker",
@@ -576,7 +607,9 @@ local hooked_sounds = {
   "wwise/events/minions/play_enemy_plague_ogryn",
   "wwise/events/minions/play_footstep_boots_heavy_plague_ogryn",
   "wwise/events/minions/play_chaos_spawn",  
-  "wwise/events/minions/play_beast_of_nurgle"
+  "wwise/events/minions/play_beast_of_nurgle",
+  "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
+  "wwise/events/minions/play_weapon_netgunner_wind_up",  
 }
 
 local hooked_external_sounds = {
@@ -599,3 +632,21 @@ mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_wor
       end
     end
 end)
+
+
+mod:register_hud_element({
+  class_name = "SpideySenseUINetWarning",
+  filename = "Spidey Sense/scripts/mods/Spidey Sense/NetWarning",
+  use_hud_scale = true,
+  visibility_groups = {
+    "alive"
+  },
+})
+mod:register_hud_element({
+  class_name = "SpideySenseUICleaveWarning",
+  filename = "Spidey Sense/scripts/mods/Spidey Sense/CleaveWarning",
+  use_hud_scale = true,
+  visibility_groups = {
+    "alive"
+  },
+})
