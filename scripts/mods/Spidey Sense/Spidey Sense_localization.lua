@@ -119,7 +119,12 @@ local localizations =
   trapper_text_warnings = {
     en = "Trapper Text Warnings"
     },
-
+  cleave_text = {
+    en = "CLEAVE!!"
+  },
+  net_text = {
+    en = "NET!!"
+    },
   render_trapper_warning = {
     en = "Show NET!! indicator when trapper winds up"
   },
@@ -156,7 +161,7 @@ local localizations =
 		machine_medium  = { en = "Machine Medium"},
     noto_sans_sc_black = { ["zh-cn"] = "" },
     noto_sans_sc_bold  = { ["zh-cn"] = "" },
-    noto_sans_sc_black = { ["zh-cn"] = "" },
+    noto_sans_sc_black = { ["zh-cn"] = "" },  
 }
 
 local function addLocalisation(localisations, typeName)

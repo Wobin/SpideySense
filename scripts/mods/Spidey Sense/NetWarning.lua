@@ -17,7 +17,7 @@ local Definitions = {
   widget_definitions = {
     alert = UIWidget.create_definition({
       {
-        value = "NET!!",
+        value = mod:get("net_text"),
         pass_type = "text",        
         value_id = "text_value",
         style_id = "text_style",
