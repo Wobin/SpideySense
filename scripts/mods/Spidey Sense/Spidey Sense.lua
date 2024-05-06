@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 4/05/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 4.0
+Version: 4.2
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -354,14 +354,13 @@ function mod:indicate_warning(unit_or_position, target_type)
 	local listener_position, listener_rotation = listener_position_rotation()
  	local distance = Vector3.distance(position, listener_position)
   
-  if target_type == "cleave" then
-    -- 5 m feels like melee range
-    if distance > 5 then return end
+  if target_type == "cleave" then    
+    if distance > mod:get("crusher_range_max") then return end
     
     mod.showCleave = true
     Promise.delay(2):next(function() mod.showCleave = false end)
   elseif target_type == "trap" then
-    if distance > 13 then return end
+    if distance > mod:get("trapper_range_max") then return end
     mod.showNet = true
     Promise.delay(2):next(function() mod.showNet = false end)
   end
