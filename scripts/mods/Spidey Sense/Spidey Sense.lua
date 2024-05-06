@@ -226,7 +226,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 		},
     visibility_function = function (content) 
         if not content.target_type then return false end
-        return content.is_nurgled
+        return mod:get(content.target_type .."_nurgle_blessed") and content.is_nurgled
     end,
 	}
 }
@@ -297,9 +297,9 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 				mod:get(indicator.target_type .. "_front_opacity"),
 				true
 			)
-      arrow_style.color = Color[mod:get(indicator.target_type .. "_arrow_colour")](
-				255, true)
-      
+      if mod:get(indicator.target_type .. "_arrow_colour") then
+        arrow_style.color = Color[mod:get(indicator.target_type .. "_arrow_colour")](255,true)
+      end
       
       if indicator.is_nurgled and arrow_style.color then
         if arrow_style.color[3] > arrow_style.color[2] and arrow_style.color[3] > arrow_style.color[4] then

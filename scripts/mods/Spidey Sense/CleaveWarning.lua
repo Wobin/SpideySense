@@ -17,7 +17,7 @@ local Definitions = {
   widget_definitions = {
     alert = UIWidget.create_definition({
       {
-        value = mod:get("cleave_text"),
+        value = mod:localize("cleave_text"),
         pass_type = "text",        
         value_id = "text",
         style_id = "text",
