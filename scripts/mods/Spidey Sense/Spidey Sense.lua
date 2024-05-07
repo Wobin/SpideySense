@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 4/05/2024
+Date: 7/05/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 4.2
+Version: 4.1
 --]]
 
 local mod = get_mod("Spidey Sense")
