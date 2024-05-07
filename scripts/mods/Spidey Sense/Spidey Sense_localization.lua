@@ -13,7 +13,8 @@ local localizations = {
         ru = "Spidey Sense - Добавляет цветной дуговой индикатор, показывающий направление звуковых сигналов для определённых врагов."
     },
     none_name = {
-        en = "None"
+        en = "None",
+        ["zh-cn"] = "无",
     },
     mutant_colour = {
         en = "Colour for Mutant warning",
@@ -147,7 +148,7 @@ local localizations = {
     },
     toxbomber_name = {
         en = "Tox Grenadier",
-        ["zh-cn"] = "剧毒轰炸",
+        ["zh-cn"] = "剧毒轰炸者",
         ru = "Токс гренадёров"
     },
     plague_ogryn_colour = {
@@ -204,13 +205,16 @@ local localizations = {
         ["zh-cn"] = "陷阱手文字警告"
     },
     crusher_range_max = {
-        en = "Maximum distance for Crusher warning"
+        en = "Maximum distance for Crusher warning",
+        ["zh-cn"] = "粉碎者最大警告距离",
     },
     trapper_range_max = {
-        en = "Maximum distance for Trapper warning"
+        en = "Maximum distance for Trapper warning",
+        ["zh-cn"] = "陷阱手最大警告距离",
     },
     copy_from = {
         en = "Copy From...",
+        ["zh-cn"] = "复制自…",
     },
     cleave_text = {
         en = "CLEAVE!!",
