@@ -40,7 +40,7 @@ local Definitions = {
 local Warning = class("SpideySenseUINetWarning", "HudElementBase")
 
 function Warning:init(parent, draw_layer, start_scale)  
-  Warning.super.init(self, parent, draw_layer, start_scale, Definitions)
+  Warning.super.init(self, parent, draw_layer, start_scale, Definitions)  
 end
 
 return Warning

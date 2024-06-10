@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 7/05/2024
+Date: 10/06/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 4.1
+Version: 4.3
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -14,7 +14,7 @@ local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
 mod.showCleave = false
 mod.showNet = false
---[[
+--[[ 
 local function extract_locals(level_base)
 	local level = level_base
 	local res = ""
@@ -25,7 +25,6 @@ local function extract_locals(level_base)
 
 		while true do
 			local name, value = debug.getlocal(level, v)
-
 			if not name then
 				break
 			end
@@ -73,8 +72,8 @@ local function findlocalvalue(targets)
 			for _, target in ipairs(targets) do
 				local targetName = target[1]
 				local targetUserdataType = target[2]
-
-				if name == targetName and get_userdata_type(value) == targetUserdataType then					
+        
+        if name == targetName and get_userdata_type(value) == targetUserdataType then		          
 					return value
 				end
 			end
@@ -133,7 +132,7 @@ local load_arrow = function(indicator)
     indicator.style.arrow.material_values.texture_map = data.texture    
     Managers.url_loader:load_texture(arrow2png):next(function(data)
           if not indicator.style.arrow2.material_values then indicator.style.arrow2.material_values = {} end    
-          indicator.style.arrow2.material_values.texture_map = data.texture    
+          indicator.style.arrow2.material_values.texture_map = data.texture              
         end)
   end)
 end
@@ -349,20 +348,21 @@ local get_position = function(unit_or_position)
 end
 
 function mod:indicate_warning(unit_or_position, target_type)
-  local position = get_position(unit_or_position)
-
+  local position = get_position(unit_or_position)  
 	local listener_position, listener_rotation = listener_position_rotation()
- 	local distance = Vector3.distance(position, listener_position)
-  
+ 	local distance = Vector3.distance(position, listener_position)  
   if target_type == "cleave" then    
     if distance > mod:get("crusher_range_max") then return end
-    
     mod.showCleave = true
-    Promise.delay(2):next(function() mod.showCleave = false end)
-  elseif target_type == "trap" then
-    if distance > mod:get("trapper_range_max") then return end
+    Promise.delay(2):next(function() 
+        mod.showCleave = false 
+        end)
+  elseif target_type == "trap" then    
+    if distance > mod:get("trapper_range_max") then return end    )
     mod.showNet = true
-    Promise.delay(2):next(function() mod.showNet = false end)
+    Promise.delay(2):next(function() 
+        mod.showNet = false 
+        end)
   end
 end
 
@@ -420,10 +420,28 @@ function mod:spawn_indicator(angle, target_type, extra_duration, distance, actua
 	}
 end
 
+mod.replay_warning = function(self, wwise_event_name_or_loc, unit)
+  local world = Managers.ui:world()
+	local wwise_world = Managers.world:wwise_world(world)
+
+	if string.starts_with(wwise_event_name_or_loc, "wwise/events") then    
+		return wwise_world:trigger_resource_event(
+			"wwise/events/minions/play_traitor_captain_shield_overload",
+			Managers.player:local_player(1).player_unit,
+			nil
+		)
+	end
+end
+
+function mod:getTrapper()  
+  local name,value = debug.getlocal(8, 1)  
+  return value._unit
+end
 
 local throttle = {}
 
 function mod:hook_monster(sound_name, unit_or_position)
+  
 	--ignore monster spawn
 	if sound_name:match("_spawn") and not sound_name:match("chaos_spawn") then
 		return
@@ -436,24 +454,28 @@ function mod:hook_monster(sound_name, unit_or_position)
 		return
 	end
 	throttle[sound_name] = Managers.time:time("main")
-
+  
 	local userDataType = get_userdata_type(unit_or_position)
-
 	-- if the unit_or_position is nil or a number,
 	-- try to pull the unit or position from higher in the callstack
 	if userDataType ~= "Unit" and userDataType ~= "Vector3" then
 		unit_or_position = findlocalvalue({
 			{ "attacking_unit", "Unit" },
-			{ "position", "Vector3" },
+			{ "position", "Vector3" },      
 			{ "parent_unit", "Unit" },
 			{ "unit", "Unit" },
-      { "dialogue_actor_unit", "Unit"},
+      { "dialogue_actor_unit", "Unit"},      
 		})
 	end
-
+  -- Naturally netters aren't as straight forward as we hoped, we need to pull the unit from the event extension
+  if sound_name:match("wwise/events/minions/play_weapon_netgunner_wind_up") then 
+    unit_or_position = mod:getTrapper()    
+  end
+  
 	if unit_or_position == nil then
 		return
 	end
+    
 
 	local breed_name = ""
 	if sound_name:match("footsteps") then
@@ -467,36 +489,28 @@ function mod:hook_monster(sound_name, unit_or_position)
 	end
 
 	if mod:get("burster_active")
-		and (
-			sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber")
-			or sound_name:match("wwise/events/minions/play_enemy_combat_poxwalker_bomber")
-		)
+		and (sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber")
+			or sound_name:match("wwise/events/minions/play_enemy_combat_poxwalker_bomber"))
 	then mod:create_indicator(unit_or_position, "burster") end
+  
 	if mod:get("hound_active")
-		and (
-			sound_name:match("wwise/events/minions/play_enemy_chaos_hound")    
-		)
+		and (sound_name:match("wwise/events/minions/play_enemy_chaos_hound"))
 	then mod:create_indicator(unit_or_position, "hound") end
 
-	if mod:get("mutant_active") and sound_name:match("wwise/events/minions/play_enemy_mutant_charger") then
-		mod:create_indicator(unit_or_position, "mutant")
-	end
+	if mod:get("mutant_active") 
+    and sound_name:match("wwise/events/minions/play_enemy_mutant_charger") 
+  then mod:create_indicator(unit_or_position, "mutant")	end
   
 	if mod:get("trapper_active")
-		and (
-			sound_name:match("wwise/events/minions/play_netgunner_run_foley_special")
-			or sound_name:match("wwise/events/minions/play_netgunner_reload")
-		)
+		and (sound_name:match("wwise/events/minions/play_netgunner_run_foley_special")
+			or sound_name:match("wwise/events/minions/play_netgunner_reload"))
 	then mod:create_indicator(unit_or_position, "trapper") end
   
 	if mod:get("sniper_active")
-		and (
-			sound_name:match("wwise/events/weapon/play_combat_weapon_las_sniper")
+		and (sound_name:match("wwise/events/weapon/play_combat_weapon_las_sniper")
 			or sound_name:match("wwise/events/weapon/play_special_sniper_flash")
-			or (breed_name:match("sniper") and sound_name:match("wwise/events/minions/play_netgunner"))
-		)
-	then
-		mod:create_indicator(unit_or_position, "sniper") end
+			or (breed_name:match("sniper") and sound_name:match("wwise/events/minions/play_netgunner")))
+	then mod:create_indicator(unit_or_position, "sniper") end
     
 	if mod:get("grenadier_active")
 		and (breed_name:match("grenadier") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
@@ -507,46 +521,43 @@ function mod:hook_monster(sound_name, unit_or_position)
 	end
   
 	if mod:get("flamer_active")
-		and (
-			sound_name:match("wwise/events/minions/play_enemy_cultist_flamer_foley_tank")
+		and (sound_name:match("wwise/events/minions/play_enemy_cultist_flamer_foley_tank")
 			or sound_name:match("wwise/events/weapon/play_aoe_liquid_fire_loop")
 			or sound_name:match("wwise/events/minions/play_cultist_flamer_foley_gas_loop")
 			or sound_name:match("wwise/events/weapon/play_minion_flamethrower_green_wind_up")
 			or sound_name:match("wwise/events/weapon/play_minion_flamethrower_start")
-			or (breed_name:match("flamer") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
-		)
+			or (breed_name:match("flamer") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier")))
 	then mod:create_indicator(unit_or_position, "flamer")	end
   
   if mod:get("crusher_active")
-    and (
-       sound_name:match("play_minion_footsteps_chaos_ogryn") or 
-       sound_name:match("play_enemy_chaos_ogryn_armoured_executor") or 
-       sound_name:match("play_shared_foley_chaos_ogryn_elites")      
-    )
+    and (sound_name:match("play_minion_footsteps_chaos_ogryn") 
+      or sound_name:match("play_enemy_chaos_ogryn_armoured_executor") 
+      or sound_name:match("play_shared_foley_chaos_ogryn_elites"))
   then mod:create_indicator(unit_or_position, "crusher") end
+  
   if mod:get("mauler_active")
-    and (
-      (breed_name:match("renegade_executor") and (sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run") or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy")))
+      and ((breed_name:match("renegade_executor") 
+      and (sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run") 
+      or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy")))
       or sound_name:match("wwise/events/minions/play_shared_elite_executor_cleave_warning"))
   then mod:create_indicator(unit_or_position, "mauler") end
   
   if mod:get("daemonhost_active")
-  and (sound_name:match("wwise/events/minions/play_enemy_daemonhost") 
+    and (sound_name:match("wwise/events/minions/play_enemy_daemonhost") 
     or sound_name:match("wwise/events/vo/play_sfx_es_daemonhost_vo")
     or sound_name:match("wwise/externals/loc_enemy_daemonhost"))
-    then       
-      mod:create_indicator(unit_or_position, "daemonhost") end
+  then mod:create_indicator(unit_or_position, "daemonhost") end
   
   if mod:get("rager_active")
-  and (breed_name:match("berzerker") and (
-         sound_name:match("wwise/events/minions/play_shared_foley_elite_run") 
-      or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy") 
-      or sound_name:match("wwise/events/minions/play_minion_footsteps_wrapped_feet_specials") 
-      or sound_name:match("wwise/events/minions/play_enemy_traitor_berzerker")
-      or sound_name:match("wwise/events/minions/play_enemy_cultist_berzerker")
-      or sound_name:match("wwise/events/minions/play_shared_foley_chaos_cultist_light_run")
-      ))
-    then mod:create_indicator(unit_or_position, "rager") end
+    and (breed_name:match("berzerker") 
+    and (sound_name:match("wwise/events/minions/play_shared_foley_elite_run") 
+    or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy") 
+    or sound_name:match("wwise/events/minions/play_minion_footsteps_wrapped_feet_specials") 
+    or sound_name:match("wwise/events/minions/play_enemy_traitor_berzerker")
+    or sound_name:match("wwise/events/minions/play_enemy_cultist_berzerker")
+    or sound_name:match("wwise/events/minions/play_shared_foley_chaos_cultist_light_run")))
+  then mod:create_indicator(unit_or_position, "rager") end
+  
   if mod:get("toxbomber_active")
     and (sound_name:match("wwise/events/minions/play_cultist_grenadier"))
     then mod:create_indicator(unit_or_position, "toxbomber") end
@@ -563,12 +574,17 @@ function mod:hook_monster(sound_name, unit_or_position)
     and sound_name:match("beast_of_nurgle") 
     then mod:create_indicator(unit_or_position, "beast_of_nurgle") end
     
-    if mod:get("render_crusher_warning") and sound_name:match("cleave") then 
-      mod:indicate_warning(unit_or_position, "cleave")
-    end
-    if mod:get("render_trapper_warning") and sound_name:match("play_weapon_netgunner_wind_up") then 
-      mod:indicate_warning(unit_or_position, "trap")
-    end
+  if mod:get("render_crusher_warning") and sound_name:match("cleave") then       
+    mod:indicate_warning(unit_or_position, "cleave")
+  end
+  
+  if mod:get("render_trapper_warning") 
+    and (sound_name:match("play_weapon_netgunner_wind_up")) then       
+    mod:indicate_warning(unit_or_position, "trap")     
+  --[[  if mod:get("netboomer") then
+      mod:replay_warning("wwise/events/minions/play_weapon_netgunner_wind_up")      
+    end --]]
+  end
 end
 
 local hooked_sounds = {
@@ -607,18 +623,20 @@ local hooked_sounds = {
   "wwise/events/minions/play_chaos_spawn",  
   "wwise/events/minions/play_beast_of_nurgle",
   "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
-  "wwise/events/minions/play_weapon_netgunner_wind_up",  
+  "play_weapon_netgunner_wind_up",    
+  "wwise/events/minions/play_netgunner_proximity_warning"
 }
 
 local hooked_external_sounds = {
-  "es_daemonhost_vo",  
-  }
+  "es_daemonhost_vo", 
+}
 
-mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)    
+mod.on_all_mods_loaded = function()
+mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)        
 	for _, sound_name in ipairs(hooked_sounds) do    
-		if wwise_event_name:match(sound_name) then      
+		if wwise_event_name:match(sound_name) then            
 			mod:hook_monster(wwise_event_name, unit_or_position_or_id)
-			return
+      return
 		end
 	end
 end)
@@ -630,7 +648,6 @@ mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_wor
       end
     end
 end)
-
 
 mod:register_hud_element({
   class_name = "SpideySenseUINetWarning",
@@ -648,3 +665,4 @@ mod:register_hud_element({
     "alive"
   },
 })
+end

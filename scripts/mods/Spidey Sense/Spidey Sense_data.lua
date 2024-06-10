@@ -132,8 +132,8 @@ end
 mod.on_setting_changed = function(setting_id)
     if not setting_id:match("_copy_from") then
         return
-    end
-    local typeName = string.sub(setting_id, string.find(setting_id, "([^_]+)"))
+    end    
+    local typeName = string.sub(setting_id, 1, string.find(setting_id, "_copy_from") - 1)    
     local new_value = mod:get(setting_id)
     mod:set(typeName .. "_active", mod:get(new_value .. "_active"), false)
     mod:set(typeName .. "_radius", mod:get(new_value .. "_radius"), false)
@@ -229,6 +229,7 @@ table.insert(
             {
                 setting_id = "render_crusher_warning",
                 type = "checkbox",
+                tooltip = "render_crusher_warning_description",
                 default_value = false
             },
             {
@@ -267,8 +268,15 @@ table.insert(
             {
                 setting_id = "render_trapper_warning",
                 type = "checkbox",
+                tooltip = "render_trapper_warning_description",
                 default_value = false
             },
+--[[            {
+                setting_id = "netboomer",
+                tooltip = "netboomer_tooltip",
+                type = "checkbox",                
+                default_value = false
+            },--]]
             {
                 setting_id = "trapper_range_max",
                 type = "numeric",
