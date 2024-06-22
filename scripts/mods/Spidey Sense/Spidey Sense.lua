@@ -3,7 +3,7 @@ Title: Spidey Sense
 Author: Wobin
 Date: 10/06/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 4.3
+Version: 4.4
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -211,6 +211,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
     vertical_alignment = "center",
 				horizontal_alignment = "center",
 		style = {
+      size = size,
 			angle = 0,
 			pivot = {
 				size[1] * 0.5,
@@ -220,7 +221,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 			offset = {
 					0,
 					0,
-					6
+					5
 				},
 		},
     visibility_function = function (content) 
@@ -358,7 +359,7 @@ function mod:indicate_warning(unit_or_position, target_type)
         mod.showCleave = false 
         end)
   elseif target_type == "trap" then    
-    if distance > mod:get("trapper_range_max") then return end    )
+    if distance > mod:get("trapper_range_max") then return end    
     mod.showNet = true
     Promise.delay(2):next(function() 
         mod.showNet = false 
