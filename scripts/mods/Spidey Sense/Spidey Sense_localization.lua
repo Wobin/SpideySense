@@ -207,6 +207,9 @@ local localizations = {
         ["zh-cn"] = "陷阱手文字警告",
         ru = "Текст предупреждения для Ловушечников",
     },
+    pogryn_text_warnings = {
+        en = "Plague Ogryn Text Warnings",
+     },    
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
         ["zh-cn"] = "粉碎者最大警告距离",
@@ -216,6 +219,12 @@ local localizations = {
         en = "Maximum distance for Trapper warning",
         ["zh-cn"] = "陷阱手最大警告距离",
         ru = "Максимальная дистанция для предупреждения о Ловушечниках",
+    },
+    pogryn_range_max = {
+      en = "Maximum distance for Plague Ogryn Warning"
+    },
+    pogryn_range_max_description ={
+      en = "NB: triggers on initial yell",
     },
     copy_from = {
         en = "Copy From...",
@@ -231,6 +240,9 @@ local localizations = {
         en = "NET!!",
         ["zh-cn"] = "网！！",
         ru = "СЕТЬ!!",
+    },
+    charge_text = {
+        en = "CHARGE!!",
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -252,12 +264,23 @@ local localizations = {
         ["zh-cn"] = "当粉碎者或重锤兵发动攻击时，显示“劈砍！！”警告",
         ru = "Показывает индикатор «УДАР СВЕРХУ!!» на экране, когда Дробитель или Палач собирается нанести неотражаемый удар сверху",
     },
+    render_pogryn_warning = {
+      en = "\"CHARGE!!\" indicator",
+    },
+    render_pogryn_warning_description = {
+      en = "Shows CHARGE!! indicator when Plague Ogryn begins to charge",
+    },
     font_size_cleave = {
         en = "Font Size",
         ["zh-cn"] = "字体大小",
         ru = "Размер шрифта",
     },
     font_size_net = {
+        en = "Font Size",
+        ["zh-cn"] = "字体大小",
+        ru = "Размер шрифта",
+    },
+    font_size_charge = {      
         en = "Font Size",
         ["zh-cn"] = "字体大小",
         ru = "Размер шрифта",
@@ -272,6 +295,11 @@ local localizations = {
         ["zh-cn"] = "字体名称",
         ru = "Название шрифта",
     },
+    font_name_charge = {
+        en = "Font Name",
+        ["zh-cn"] = "字体名称",
+        ru = "Название шрифта",
+    },
     font_color_cleave = {
         en = "Font Color",
         ["zh-cn"] = "字体颜色",
@@ -282,6 +310,12 @@ local localizations = {
         ["zh-cn"] = "字体颜色",
         ru = "Цвет шрифта",
     },
+    font_color_charge = {
+        en = "Font Color",
+        ["zh-cn"] = "字体颜色",
+        ru = "Цвет шрифта",
+    },
+
     arial = {en = "Arial"},
     itc_novarese_medium = {en = "Novarese Medium"},
     itc_novarese_bold = {en = "Novarese Bold"},

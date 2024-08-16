@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 10/06/2024
+Date: 17/08/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 4.4
+Version: 4.5
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -12,9 +12,12 @@ local HudElementDamageIndicatorSettings =
 local UIWidget = require("scripts/managers/ui/ui_widget")
 local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
+
+mod.version = "4.5"
+
 mod.showCleave = false
 mod.showNet = false
---[[ 
+--[[
 local function extract_locals(level_base)
 	local level = level_base
 	local res = ""
@@ -123,17 +126,17 @@ local function listener_position_rotation()
 	return listener_position, listener_rotation
 end
 
-local arrowpng = "https://wobin.github.io/SpideySense/images/arrow.png"
+local arrowpng =  "https://wobin.github.io/SpideySense/images/arrow.png"
 local arrow2png = "https://wobin.github.io/SpideySense/images/arrow2.png"
 
 local load_arrow = function(indicator)
-   return Managers.url_loader:load_texture(arrowpng):next(function(data)
-      if not indicator.style.arrow.material_values then indicator.style.arrow.material_values = {} end    
-    indicator.style.arrow.material_values.texture_map = data.texture    
-    Managers.url_loader:load_texture(arrow2png):next(function(data)
-          if not indicator.style.arrow2.material_values then indicator.style.arrow2.material_values = {} end    
-          indicator.style.arrow2.material_values.texture_map = data.texture              
-        end)
+   return Managers.backend:authenticate():next(function()
+      Managers.url_loader:load_texture(arrowpng):next(function(data)                  
+        indicator.style.arrow.material_values.texture_map = data.texture
+      end)
+      Managers.url_loader:load_texture(arrow2png):next(function(data)          
+        indicator.style.arrow2.material_values.texture_map = data.texture              
+      end)
   end)
 end
 
@@ -188,6 +191,9 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 				center_distance
 			},
 			color = Color["black"](255,true),
+      material_values = {
+            texture_map = nil
+          },
 			offset = {
 					0,
 					0,
@@ -218,6 +224,9 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 				center_distance
 			},
 			color = UIHudSettings.ui_hud_green_super_light,
+       material_values = {
+            texture_map = nil
+          },  
 			offset = {
 					0,
 					0,
@@ -363,7 +372,13 @@ function mod:indicate_warning(unit_or_position, target_type)
     mod.showNet = true
     Promise.delay(2):next(function() 
         mod.showNet = false 
-        end)
+      end)
+  elseif target_type == "charge" then
+    if distance > mod:get("pogryn_range_max") then return end    
+    mod.showCharge = true
+    Promise.delay(3):next(function() 
+        mod.showCharge = false 
+      end)    
   end
 end
 
@@ -396,7 +411,7 @@ function mod:create_indicator(unit_or_position, target_type, extra_duration)
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
       local active_distance = mod:get(target_type .. "_active_range") and ((distance / mod:get(target_type .. "_distance")) * 325) - 125
           or mod:get(target_type .."_radius")            
-      if mod.hudElement and not mod.hudElement.style.arrow.material_values then
+      if mod.hudElement and (not mod.hudElement.style.arrow.material_values.texture_map or not mod.hudElement.style.arrow2.material_values.texture_map) then
         load_arrow(mod.hudElement):next(
           function() mod:spawn_indicator(angle, target_type, extra_duration, active_distance, distance, nurgled[unit_or_position]) end)
       else
@@ -421,19 +436,6 @@ function mod:spawn_indicator(angle, target_type, extra_duration, distance, actua
 	}
 end
 
-mod.replay_warning = function(self, wwise_event_name_or_loc, unit)
-  local world = Managers.ui:world()
-	local wwise_world = Managers.world:wwise_world(world)
-
-	if string.starts_with(wwise_event_name_or_loc, "wwise/events") then    
-		return wwise_world:trigger_resource_event(
-			"wwise/events/minions/play_traitor_captain_shield_overload",
-			Managers.player:local_player(1).player_unit,
-			nil
-		)
-	end
-end
-
 function mod:getTrapper()  
   local name,value = debug.getlocal(8, 1)  
   return value._unit
@@ -441,7 +443,7 @@ end
 
 local throttle = {}
 
-function mod:hook_monster(sound_name, unit_or_position)
+function mod:hook_monster(sound_name, unit_or_position, check_unit)
   
 	--ignore monster spawn
 	if sound_name:match("_spawn") and not sound_name:match("chaos_spawn") then
@@ -455,29 +457,34 @@ function mod:hook_monster(sound_name, unit_or_position)
 		return
 	end
 	throttle[sound_name] = Managers.time:time("main")
+  if check_unit == nil then
+    local userDataType = get_userdata_type(unit_or_position)
+    -- if the unit_or_position is nil or a number,
+    -- try to pull the unit or position from higher in the callstack
+    if userDataType ~= "Unit" and userDataType ~= "Vector3" then
+      unit_or_position = findlocalvalue({
+        { "attacking_unit", "Unit" },
+        { "position", "Vector3" },      
+        { "parent_unit", "Unit" },
+        { "unit", "Unit" },
+        { "dialogue_actor_unit", "Unit"},      
+      })
+    end
+  else
+    unit_or_position = check_unit  
+  end
   
-	local userDataType = get_userdata_type(unit_or_position)
-	-- if the unit_or_position is nil or a number,
-	-- try to pull the unit or position from higher in the callstack
-	if userDataType ~= "Unit" and userDataType ~= "Vector3" then
-		unit_or_position = findlocalvalue({
-			{ "attacking_unit", "Unit" },
-			{ "position", "Vector3" },      
-			{ "parent_unit", "Unit" },
-			{ "unit", "Unit" },
-      { "dialogue_actor_unit", "Unit"},      
-		})
-	end
   -- Naturally netters aren't as straight forward as we hoped, we need to pull the unit from the event extension
   if sound_name:match("wwise/events/minions/play_weapon_netgunner_wind_up") then 
     unit_or_position = mod:getTrapper()    
   end
   
-	if unit_or_position == nil then
-		return
-	end
-    
-
+  if unit_or_position == nil then
+    --mod:echo("Cannot match unit on ".. sound_name)
+    --mod:dump(extract_locals(1))
+    return
+  end
+  
 	local breed_name = ""
 	if sound_name:match("footsteps") then
 		local unit_data_extension = ScriptUnit.extension(unit_or_position, "unit_data_system")
@@ -582,9 +589,11 @@ function mod:hook_monster(sound_name, unit_or_position)
   if mod:get("render_trapper_warning") 
     and (sound_name:match("play_weapon_netgunner_wind_up")) then       
     mod:indicate_warning(unit_or_position, "trap")     
-  --[[  if mod:get("netboomer") then
-      mod:replay_warning("wwise/events/minions/play_weapon_netgunner_wind_up")      
-    end --]]
+  end
+  
+  if mod:get("render_pogryn_warning")
+    and (sound_name:match("play_enemy_plague_ogryn_vce_charge")) then
+        mod:indicate_warning(unit_or_position, "charge")
   end
 end
 
@@ -625,7 +634,7 @@ local hooked_sounds = {
   "wwise/events/minions/play_beast_of_nurgle",
   "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
   "play_weapon_netgunner_wind_up",    
-  "wwise/events/minions/play_netgunner_proximity_warning"
+  "wwise/events/minions/play_netgunner_proximity_warning",  
 }
 
 local hooked_external_sounds = {
@@ -636,7 +645,7 @@ mod.on_all_mods_loaded = function()
 mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)        
 	for _, sound_name in ipairs(hooked_sounds) do    
 		if wwise_event_name:match(sound_name) then            
-			mod:hook_monster(wwise_event_name, unit_or_position_or_id)
+			mod:hook_monster(wwise_event_name, unit_or_position_or_id, Application.flow_callback_context_unit())
       return
 		end
 	end
@@ -645,7 +654,7 @@ end)
 mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_world, sound_event, sound_source, file_path, file_format, wwise_source_id)
     for _, speaker in ipairs(hooked_external_sounds) do
       if sound_source:match(speaker) then        
-        mod:hook_monster(file_path, wwise_source_id)
+        mod:hook_monster(file_path, wwise_source_id, Application.flow_callback_context_unit())
       end
     end
 end)
@@ -661,6 +670,14 @@ mod:register_hud_element({
 mod:register_hud_element({
   class_name = "SpideySenseUICleaveWarning",
   filename = "Spidey Sense/scripts/mods/Spidey Sense/CleaveWarning",
+  use_hud_scale = true,
+  visibility_groups = {
+    "alive"
+  },
+})
+mod:register_hud_element({
+  class_name = "SpideySenseUIChargeWarning",
+  filename = "Spidey Sense/scripts/mods/Spidey Sense/ChargeWarning",
   use_hud_scale = true,
   visibility_groups = {
     "alive"

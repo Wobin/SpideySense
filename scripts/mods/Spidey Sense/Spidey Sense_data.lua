@@ -271,12 +271,6 @@ table.insert(
                 tooltip = "render_trapper_warning_description",
                 default_value = false
             },
---[[            {
-                setting_id = "netboomer",
-                tooltip = "netboomer_tooltip",
-                type = "checkbox",                
-                default_value = false
-            },--]]
             {
                 setting_id = "trapper_range_max",
                 type = "numeric",
@@ -304,5 +298,45 @@ table.insert(
         }
     }
 )
+table.insert(
+    options.options.widgets,
+    {
+        setting_id = "pogryn_text_warnings",
+        type = "group",
+        sub_widgets = {
+            {
+                setting_id = "render_pogryn_warning",
+                type = "checkbox",
+                tooltip = "render_pogryn_warning_description",
+                default_value = false
+            },
+            {
+                setting_id = "pogryn_range_max",
+                tooltip = "pogryn_range_max_description",
+                type = "numeric",
+                default_value = 15,
+                range = {15, 35}
+            },
+            {
+                setting_id = "font_size_charge",
+                type = "numeric",
+                default_value = 28,
+                range = {28, 125}
+            },
+            {
+                setting_id = "font_name_charge",
+                type = "dropdown",
+                default_value = "proxima_nova_light",
+                options = getFonts()
+            },
+            {
+                setting_id = "font_color_charge",
+                type = "dropdown",
+                default_value = "ui_terminal",
+                options = get_color_options()
+            }
+        }
+      }
+    )
 
 return options
