@@ -210,6 +210,7 @@ local localizations = {
     pogryn_text_warnings = {
         en = "Plague Ogryn Text Warnings",
         ["zh-cn"] = "瘟疫欧格林文字警告",
+        ru = "Текст предупреждения для Чумного огрина",
      },    
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
@@ -222,12 +223,14 @@ local localizations = {
         ru = "Максимальная дистанция для предупреждения о Ловушечниках",
     },
     pogryn_range_max = {
-      en = "Maximum distance for Plague Ogryn Warning",
-      ["zh-cn"] = "瘟疫欧格林最大警告距离",
+        en = "Maximum distance for Plague Ogryn Warning",
+        ["zh-cn"] = "瘟疫欧格林最大警告距离",
+        ru = "Максимальная дистанция для предупреждения о Чумных огринах",
     },
     pogryn_range_max_description ={
-      en = "NB: triggers on initial yell",
-      ["zh-cn"] = "注：在第一次吼声时触发",
+        en = "NB: triggers on initial yell",
+        ["zh-cn"] = "注：在第一次吼声时触发",
+        ru = "Примечание: срабатывает при первом крике",
     },
     copy_from = {
         en = "Copy From...",
@@ -247,6 +250,7 @@ local localizations = {
     charge_text = {
         en = "CHARGE!!",
         ["zh-cn"] = "冲撞！！",
+        ru = "БЕЖИТ!!",
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -269,12 +273,14 @@ local localizations = {
         ru = "Показывает индикатор «УДАР СВЕРХУ!!» на экране, когда Дробитель или Палач собирается нанести неотражаемый удар сверху",
     },
     render_pogryn_warning = {
-      en = "\"CHARGE!!\" indicator",
+        en = "\"CHARGE!!\" indicator",
         ["zh-cn"] = "“冲撞！！”警告语",
+        ru = "Индикатор «БЕЖИТ!!»",
     },
     render_pogryn_warning_description = {
-      en = "Shows CHARGE!! indicator when Plague Ogryn begins to charge",
-      ["zh-cn"] = "当瘟疫欧格林开始冲撞时，显示“冲撞！！”警告",
+        en = "Shows CHARGE!! indicator when Plague Ogryn begins to charge",
+        ["zh-cn"] = "当瘟疫欧格林开始冲撞时，显示“冲撞！！”警告",
+        ru = "Показывает индикатор «БЕЖИТ!!» на экране, когда Чумной огрин разбегается для удара головой",
     },
     font_size_cleave = {
         en = "Font Size",
