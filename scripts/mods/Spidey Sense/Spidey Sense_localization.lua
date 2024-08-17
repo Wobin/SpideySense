@@ -209,6 +209,7 @@ local localizations = {
     },
     pogryn_text_warnings = {
         en = "Plague Ogryn Text Warnings",
+        ["zh-cn"] = "瘟疫欧格林文字警告",
      },    
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
@@ -221,10 +222,12 @@ local localizations = {
         ru = "Максимальная дистанция для предупреждения о Ловушечниках",
     },
     pogryn_range_max = {
-      en = "Maximum distance for Plague Ogryn Warning"
+      en = "Maximum distance for Plague Ogryn Warning",
+      ["zh-cn"] = "瘟疫欧格林最大警告距离",
     },
     pogryn_range_max_description ={
       en = "NB: triggers on initial yell",
+      ["zh-cn"] = "注：在第一次吼声时触发",
     },
     copy_from = {
         en = "Copy From...",
@@ -243,6 +246,7 @@ local localizations = {
     },
     charge_text = {
         en = "CHARGE!!",
+        ["zh-cn"] = "冲撞！！",
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -266,9 +270,11 @@ local localizations = {
     },
     render_pogryn_warning = {
       en = "\"CHARGE!!\" indicator",
+        ["zh-cn"] = "“冲撞！！”警告语",
     },
     render_pogryn_warning_description = {
       en = "Shows CHARGE!! indicator when Plague Ogryn begins to charge",
+      ["zh-cn"] = "当瘟疫欧格林开始冲撞时，显示“冲撞！！”警告",
     },
     font_size_cleave = {
         en = "Font Size",
