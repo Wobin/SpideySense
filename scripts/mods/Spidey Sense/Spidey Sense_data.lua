@@ -220,123 +220,57 @@ table.insert(
         }
     }
 )
-table.insert(
+
+local add_warning = function(typeName, attackName)
+  table.insert(
     options.options.widgets,
     {
-        setting_id = "crusher_text_warnings",
+        setting_id = typeName.."_text_warnings",
         type = "group",
         sub_widgets = {
             {
-                setting_id = "render_crusher_warning",
+                setting_id = "render_".. typeName .."_warning",
                 type = "checkbox",
-                tooltip = "render_crusher_warning_description",
+                tooltip = "render_".. typeName .."_warning_description",
                 default_value = false
             },
             {
-                setting_id = "crusher_range_max",
-                type = "numeric",
+                setting_id = typeName .."_range_max",
+                type = "numeric",                
+                --tooltip = "render_".. typeName .."_warning_description",
                 default_value = 10,
                 range = {5, 20}
             },
             {
-                setting_id = "font_size_cleave",
+                setting_id = "font_size_".. attackName,
                 type = "numeric",
                 default_value = 28,
                 range = {28, 125}
             },
             {
-                setting_id = "font_name_cleave",
+                setting_id = "font_name_".. attackName,
                 type = "dropdown",
                 default_value = "proxima_nova_light",
                 options = getFonts()
             },
             {
-                setting_id = "font_color_cleave",
+                setting_id = "font_colour_".. attackName,
                 type = "dropdown",
                 default_value = "ui_terminal",
                 options = get_color_options()
             }
         }
     }
-)
-table.insert(
-    options.options.widgets,
-    {
-        setting_id = "trapper_text_warnings",
-        type = "group",
-        sub_widgets = {
-            {
-                setting_id = "render_trapper_warning",
-                type = "checkbox",
-                tooltip = "render_trapper_warning_description",
-                default_value = false
-            },
-            {
-                setting_id = "trapper_range_max",
-                type = "numeric",
-                default_value = 15,
-                range = {15, 35}
-            },
-            {
-                setting_id = "font_size_net",
-                type = "numeric",
-                default_value = 28,
-                range = {28, 125}
-            },
-            {
-                setting_id = "font_name_net",
-                type = "dropdown",
-                default_value = "proxima_nova_light",
-                options = getFonts()
-            },
-            {
-                setting_id = "font_color_net",
-                type = "dropdown",
-                default_value = "ui_terminal",
-                options = get_color_options()
-            }
-        }
-    }
-)
-table.insert(
-    options.options.widgets,
-    {
-        setting_id = "pogryn_text_warnings",
-        type = "group",
-        sub_widgets = {
-            {
-                setting_id = "render_pogryn_warning",
-                type = "checkbox",
-                tooltip = "render_pogryn_warning_description",
-                default_value = false
-            },
-            {
-                setting_id = "pogryn_range_max",
-                tooltip = "pogryn_range_max_description",
-                type = "numeric",
-                default_value = 15,
-                range = {15, 35}
-            },
-            {
-                setting_id = "font_size_charge",
-                type = "numeric",
-                default_value = 28,
-                range = {28, 125}
-            },
-            {
-                setting_id = "font_name_charge",
-                type = "dropdown",
-                default_value = "proxima_nova_light",
-                options = getFonts()
-            },
-            {
-                setting_id = "font_color_charge",
-                type = "dropdown",
-                default_value = "ui_terminal",
-                options = get_color_options()
-            }
-        }
-      }
-    )
+  )
+end
+
+add_warning("crusher", "cleave")
+add_warning("trapper", "net")
+add_warning("pogryn", "charge")
+add_warning("shotgun", "shot")
+
+local _, pogryn = table.find_by_key(options.options.widgets, "setting_id", "pogryn_text_warnings")
+local _, subwidget = table.find_by_key(pogryn.sub_widgets, "setting_id", "pogryn_range_max")
+subwidget.tooltip = "render_pogryn_warning_description"
 
 return options

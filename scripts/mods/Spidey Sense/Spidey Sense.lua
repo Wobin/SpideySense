@@ -1,9 +1,9 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 17/08/2024
+Date: 19/08/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 4.5
+Version: 4.6
 --]]
 
 local mod = get_mod("Spidey Sense")
@@ -13,10 +13,13 @@ local UIWidget = require("scripts/managers/ui/ui_widget")
 local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
 
-mod.version = "4.5"
+mod.version = "4.6"
 
 mod.showCleave = false
 mod.showNet = false
+mod.showCharge = false
+mod.showShot = false
+
 --[[
 local function extract_locals(level_base)
 	local level = level_base
@@ -357,29 +360,25 @@ local get_position = function(unit_or_position)
   return position
 end
 
+local show_indicator = function(distance, attacker, indicate, delay)     
+    if distance > mod:get(attacker .."_range_max") then return end    
+    mod["show"..indicate] = true
+    Promise.delay(delay):next(function() 
+        mod["show"..indicate] = false 
+    end)
+end
+
+local warnings = {}
+warnings["cleave"] = { "crusher", "Cleave", 2 }
+warnings["trap"] = { "trapper", "Net", 2 }
+warnings["charge"] = { "pogryn", "Charge", 3 }
+warnings["shot"] = {"shotgun", "Shot", 1}
+
 function mod:indicate_warning(unit_or_position, target_type)
   local position = get_position(unit_or_position)  
 	local listener_position, listener_rotation = listener_position_rotation()
  	local distance = Vector3.distance(position, listener_position)  
-  if target_type == "cleave" then    
-    if distance > mod:get("crusher_range_max") then return end
-    mod.showCleave = true
-    Promise.delay(2):next(function() 
-        mod.showCleave = false 
-        end)
-  elseif target_type == "trap" then    
-    if distance > mod:get("trapper_range_max") then return end    
-    mod.showNet = true
-    Promise.delay(2):next(function() 
-        mod.showNet = false 
-      end)
-  elseif target_type == "charge" then
-    if distance > mod:get("pogryn_range_max") then return end    
-    mod.showCharge = true
-    Promise.delay(3):next(function() 
-        mod.showCharge = false 
-      end)    
-  end
+  show_indicator(distance, unpack(warnings[target_type]))
 end
 
 function mod:create_indicator(unit_or_position, target_type, extra_duration)	
@@ -595,6 +594,11 @@ function mod:hook_monster(sound_name, unit_or_position, check_unit)
     and (sound_name:match("play_enemy_plague_ogryn_vce_charge")) then
         mod:indicate_warning(unit_or_position, "charge")
   end
+  
+  if mod:get("render_shotgun_warning")
+    and (sound_name:match("play_minion_shotgun_pump")) then
+      mod:indicate_warning(unit_or_position, "shot")
+  end
 end
 
 local hooked_sounds = {
@@ -635,6 +639,7 @@ local hooked_sounds = {
   "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
   "play_weapon_netgunner_wind_up",    
   "wwise/events/minions/play_netgunner_proximity_warning",  
+  "wwise/events/weapon/play_minion_shotgun_pump",
 }
 
 local hooked_external_sounds = {
@@ -678,6 +683,15 @@ mod:register_hud_element({
 mod:register_hud_element({
   class_name = "SpideySenseUIChargeWarning",
   filename = "Spidey Sense/scripts/mods/Spidey Sense/ChargeWarning",
+  use_hud_scale = true,
+  visibility_groups = {
+    "alive"
+  },
+})
+
+mod:register_hud_element({
+  class_name = "SpideySenseUIShotWarning",
+  filename = "Spidey Sense/scripts/mods/Spidey Sense/ShotWarning",
   use_hud_scale = true,
   visibility_groups = {
     "alive"

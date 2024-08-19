@@ -212,6 +212,9 @@ local localizations = {
         ["zh-cn"] = "瘟疫欧格林文字警告",
         ru = "Текст предупреждения для Чумного огрина",
      },    
+    shotgun_text_warnings = {
+      en = "Shotgunner Text Warnings",
+    },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
         ["zh-cn"] = "粉碎者最大警告距离",
@@ -232,6 +235,9 @@ local localizations = {
         ["zh-cn"] = "注：在第一次吼声时触发",
         ru = "Примечание: срабатывает при первом крике",
     },
+    shotgun_range_max = {
+        en = "Maximum distance for Shotgunner warning",
+    },
     copy_from = {
         en = "Copy From...",
         ["zh-cn"] = "复制自…",
@@ -251,6 +257,9 @@ local localizations = {
         en = "CHARGE!!",
         ["zh-cn"] = "冲撞！！",
         ru = "БЕЖИТ!!",
+    },
+    shot_text = {
+        en = "SHOT!!"
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -282,52 +291,13 @@ local localizations = {
         ["zh-cn"] = "当瘟疫欧格林开始冲撞时，显示“冲撞！！”警告",
         ru = "Показывает индикатор «БЕЖИТ!!» на экране, когда Чумной огрин разбегается для удара головой",
     },
-    font_size_cleave = {
-        en = "Font Size",
-        ["zh-cn"] = "字体大小",
-        ru = "Размер шрифта",
+    render_shotgun_warning = {
+      en = "\"SHOT!!\" indicator",
     },
-    font_size_net = {
-        en = "Font Size",
-        ["zh-cn"] = "字体大小",
-        ru = "Размер шрифта",
+    render_shotgun_warning_description = {
+      en = "Shows SHOT!! indicator when the Shotgunner pumps their gun",
     },
-    font_size_charge = {      
-        en = "Font Size",
-        ["zh-cn"] = "字体大小",
-        ru = "Размер шрифта",
-    },
-    font_name_cleave = {
-        en = "Font Name",
-        ["zh-cn"] = "字体名称",
-        ru = "Название шрифта",
-    },
-    font_name_net = {
-        en = "Font Name",
-        ["zh-cn"] = "字体名称",
-        ru = "Название шрифта",
-    },
-    font_name_charge = {
-        en = "Font Name",
-        ["zh-cn"] = "字体名称",
-        ru = "Название шрифта",
-    },
-    font_color_cleave = {
-        en = "Font Color",
-        ["zh-cn"] = "字体颜色",
-        ru = "Цвет шрифта",
-    },
-    font_color_net = {
-        en = "Font Color",
-        ["zh-cn"] = "字体颜色",
-        ru = "Цвет шрифта",
-    },
-    font_color_charge = {
-        en = "Font Color",
-        ["zh-cn"] = "字体颜色",
-        ru = "Цвет шрифта",
-    },
-
+    
     arial = {en = "Arial"},
     itc_novarese_medium = {en = "Novarese Medium"},
     itc_novarese_bold = {en = "Novarese Bold"},
@@ -338,11 +308,32 @@ local localizations = {
     rexlia = {en = "Rexila"},
     machine_medium = {en = "Machine Medium"},
     noto_sans_sc_black = {["zh-cn"] = "Noto Sans SC Black"},
-    noto_sans_sc_bold = {["zh-cn"] = "Noto Sans SC Bold"} ,
-    netboomer = { en = "Local Boom" },
-    netboomer_tooltip = { en = "Testing toggle for localised boom on net windup" }
+    noto_sans_sc_bold = {["zh-cn"] = "Noto Sans SC Bold"} ,    
 }
 mod.typeList = {{text = "none_name", value = "none"}}
+
+local function addFont(localisations, attack)
+  localisations["font_size_"..attack] = {
+    en = "Font Size",
+    ["zh-cn"] = "字体大小",
+    ru = "Размер шрифта",
+  }
+  localisations["font_colour_"..attack] = {
+    en = "Font Color",
+    ["zh-cn"] = "字体颜色",
+    ru = "Цвет шрифта",
+  }
+  localisations["font_name_"..attack] = {
+    en = "Font Name",
+    ["zh-cn"] = "字体名称",
+    ru = "Название шрифта",
+  }
+end
+
+addFont(localizations, "cleave")
+addFont(localizations, "net")
+addFont(localizations, "charge")
+addFont(localizations, "shot")
 
 local function addLocalisation(localisations, typeName)
     if typeName ~= "backstab" then
