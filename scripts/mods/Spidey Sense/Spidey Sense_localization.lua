@@ -214,6 +214,7 @@ local localizations = {
      },    
     shotgun_text_warnings = {
       en = "Shotgunner Text Warnings",
+      ["zh-cn"] = "霰弹枪手文字警告",
     },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
@@ -237,6 +238,7 @@ local localizations = {
     },
     shotgun_range_max = {
         en = "Maximum distance for Shotgunner warning",
+        ["zh-cn"] = "霰弹枪手最大警告距离",
     },
     copy_from = {
         en = "Copy From...",
@@ -259,7 +261,8 @@ local localizations = {
         ru = "БЕЖИТ!!",
     },
     shot_text = {
-        en = "SHOT!!"
+        en = "SHOT!!",
+        ["zh-cn"] = "喷！！",
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -293,9 +296,11 @@ local localizations = {
     },
     render_shotgun_warning = {
       en = "\"SHOT!!\" indicator",
+      ["zh-cn"] = "“喷！！”警告语",
     },
     render_shotgun_warning_description = {
       en = "Shows SHOT!! indicator when the Shotgunner pumps their gun",
+      ["zh-cn"] = "当霰弹枪手上膛时，显示“喷！！”警告",
     },
     
     arial = {en = "Arial"},
