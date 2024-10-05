@@ -323,7 +323,7 @@ local function addFont(localisations, attack)
     ["zh-cn"] = "字体大小",
     ru = "Размер шрифта",
   }
-  localisations["font_colour_"..attack] = {
+  localisations["font_color_"..attack] = {
     en = "Font Color",
     ["zh-cn"] = "字体颜色",
     ru = "Цвет шрифта",

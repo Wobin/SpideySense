@@ -254,7 +254,7 @@ local add_warning = function(typeName, attackName)
                 options = getFonts()
             },
             {
-                setting_id = "font_colour_".. attackName,
+                setting_id = "font_color_".. attackName,
                 type = "dropdown",
                 default_value = "ui_terminal",
                 options = get_color_options()
