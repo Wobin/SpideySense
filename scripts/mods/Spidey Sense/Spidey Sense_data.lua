@@ -129,6 +129,60 @@ local function create_option_set(typeName, defaultColour1, defaultColour2)
     }
 end
 
+local function create_backstab_option_set(typeName, defaultFrontColour, defaultBackColour)
+    return {
+        setting_id = typeName .. "_backstab_colour",
+        type = "group",
+        sub_widgets = {
+            {
+                setting_id = typeName .. "_backstab_active",
+                type = "checkbox",
+                default_value = true
+            },
+            {
+                setting_id = typeName .. "_backstab_radius",
+                type = "numeric",
+                default_value = 50,
+                range = {0, 200},
+                decimals_number = 0
+            },
+            {
+                setting_id = typeName .. "_backstab_distance",
+                type = "numeric",
+                default_value = 40,
+                range = {0, 40},
+                decimals_number = 0
+            },
+            {
+                setting_id = typeName .. "_backstab_front_opacity",
+                type = "numeric",
+                default_value = 255,
+                range = {0, 255},
+                decimals_number = 0
+            },
+            {
+                setting_id = typeName .. "_backstab_front_colour",
+                type = "dropdown",
+                default_value = defaultFrontColour,
+                options = get_color_options()
+            },
+            {
+                setting_id = typeName .. "_backstab_back_opacity",
+                type = "numeric",
+                default_value = 255,
+                range = {0, 255},
+                decimals_number = 0
+            },
+            {
+                setting_id = typeName .. "_backstab_back_colour",
+                type = "dropdown",
+                default_value = defaultBackColour,
+                options = get_color_options()
+            }
+        }
+    }
+end
+
 mod.on_setting_changed = function(setting_id)
     if not setting_id:match("_copy_from") then
         return
@@ -166,60 +220,8 @@ table.insert(options.options.widgets, create_option_set("rager", "medium_spring_
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
 table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_overcharge_medium", "ui_hud_overcharge_low"))
 table.insert(options.options.widgets, create_option_set("toxbomber", "chart_reuse", "citadel_bieltan_green"))
-table.insert(
-    options.options.widgets,
-    {
-        setting_id = "backstab_colour",
-        type = "group",
-        sub_widgets = {
-            {
-                setting_id = "backstab_active",
-                type = "checkbox",
-                default_value = true
-            },
-            {
-                setting_id = "backstab_radius",
-                type = "numeric",
-                default_value = 50,
-                range = {0, 200},
-                decimals_number = 0
-            },
-            {
-                setting_id = "backstab_distance",
-                type = "numeric",
-                default_value = 40,
-                range = {0, 40},
-                decimals_number = 0
-            },
-            {
-                setting_id = "backstab_front_opacity",
-                type = "numeric",
-                default_value = 255,
-                range = {0, 255},
-                decimals_number = 0
-            },
-            {
-                setting_id = "backstab_front_colour",
-                type = "dropdown",
-                default_value = "ui_terminal",
-                options = get_color_options()
-            },
-            {
-                setting_id = "backstab_back_opacity",
-                type = "numeric",
-                default_value = 255,
-                range = {0, 255},
-                decimals_number = 0
-            },
-            {
-                setting_id = "backstab_back_colour",
-                type = "dropdown",
-                default_value = "ui_terminal",
-                options = get_color_options()
-            }
-        }
-    }
-)
+table.insert(options.options.widgets, create_backstab_option_set("melee", "ui_terminal", "ui_terminal"))
+table.insert(options.options.widgets, create_backstab_option_set("ranged", "white", "white"))
 
 local add_warning = function(typeName, attackName)
   table.insert(

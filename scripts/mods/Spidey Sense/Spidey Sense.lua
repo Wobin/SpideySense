@@ -491,9 +491,14 @@ function mod:hook_monster(sound_name, unit_or_position, check_unit)
 		breed_name = breed and breed.name or ""
 	end
 
-	if mod:get("backstab_active") and sound_name:match("wwise/events/player/play_backstab_indicator") then
-		mod:create_indicator(unit_or_position, "backstab")		
-	end
+	if mod:get("melee_backstab_active")
+		and sound_name:match("wwise/events/player/play_backstab_indicator_melee")
+			or sound_name:match("wwise/events/player/play_backstab_indicator_melee_elite")
+	then mod:create_indicator(unit_or_position, "melee_backstab") end
+
+	if mod:get("ranged_backstab_active")
+		and sound_name:match("wwise/events/player/play_backstab_indicator_ranged")
+	then mod:create_indicator(unit_or_position, "ranged_backstab") end
 
 	if mod:get("burster_active")
 		and (sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber")
@@ -610,7 +615,9 @@ local hooked_sounds = {
 	"wwise/events/minions/play_fly_swarm",
 	"wwise/events/minions/play_minion_poxwalker_bomber",
 	"wwise/events/minions/play_enemy_combat_poxwalker_bomber",
-	"wwise/events/player/play_backstab_indicator",
+	"wwise/events/player/play_backstab_indicator_melee",
+	"wwise/events/player/play_backstab_indicator_melee_elite",
+	"wwise/events/player/play_backstab_indicator_ranged",
 	"wwise/events/weapon/play_special_sniper_flash",
 	"wwise/events/weapon/play_combat_weapon_las_sniper",
 	"wwise/events/minions/play_traitor_guard_grenadier",
