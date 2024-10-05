@@ -87,10 +87,13 @@ local localizations = {
         ["zh-cn"] = "狙击手",
         ru = "Снайпер",
     },
-    backstab_colour = {
-        en = "Colour for Backstab warning",
+    melee_backstab_colour = {
+        en = "Colour for Melee Backstab warning",
         ["zh-cn"] = "背刺警告颜色",
         ru = "Цвет предупреждения об ударах в спину",
+    },
+    ranged_backstab_colour = {
+        en = "Colour for Ranged Backstab warning",
     },
     barrel_colour = {
         en = "Colour for Barrel warning",
@@ -323,7 +326,7 @@ local function addFont(localisations, attack)
     ["zh-cn"] = "字体大小",
     ru = "Размер шрифта",
   }
-  localisations["font_colour_"..attack] = {
+  localisations["font_color_"..attack] = {
     en = "Font Color",
     ["zh-cn"] = "字体颜色",
     ru = "Цвет шрифта",
@@ -341,7 +344,7 @@ addFont(localizations, "charge")
 addFont(localizations, "shot")
 
 local function addLocalisation(localisations, typeName)
-    if typeName ~= "backstab" then
+    if typeName ~= "melee_backstab" and typeName ~= "ranged_backstab" then
         table.insert(mod.typeList, {text = typeName .. "_name", value = typeName})
     end
 
@@ -428,7 +431,8 @@ for i, color_name in ipairs(color_names) do
     }
 end
 
-addLocalisation(localizations, "backstab")
+addLocalisation(localizations, "melee_backstab")
+addLocalisation(localizations, "ranged_backstab")
 addLocalisation(localizations, "barrel")
 addLocalisation(localizations, "beast_of_nurgle")
 addLocalisation(localizations, "burster")
