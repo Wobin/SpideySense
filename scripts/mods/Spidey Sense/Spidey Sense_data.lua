@@ -268,6 +268,7 @@ add_warning("crusher", "cleave")
 add_warning("trapper", "net")
 add_warning("pogryn", "charge")
 add_warning("shotgun", "shot")
+add_warning("hound", "pounce")
 
 local _, pogryn = table.find_by_key(options.options.widgets, "setting_id", "pogryn_text_warnings")
 local _, subwidget = table.find_by_key(pogryn.sub_widgets, "setting_id", "pogryn_range_max")

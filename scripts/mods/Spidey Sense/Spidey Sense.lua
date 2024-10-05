@@ -19,6 +19,7 @@ mod.showCleave = false
 mod.showNet = false
 mod.showCharge = false
 mod.showShot = false
+mod.showPounce = false
 
 --[[
 local function extract_locals(level_base)
@@ -373,6 +374,7 @@ warnings["cleave"] = { "crusher", "Cleave", 2 }
 warnings["trap"] = { "trapper", "Net", 2 }
 warnings["charge"] = { "pogryn", "Charge", 3 }
 warnings["shot"] = {"shotgun", "Shot", 1}
+warnings["pounce"] = {"hound", "Pounce", 1}
 
 function mod:indicate_warning(unit_or_position, target_type)
   local position = get_position(unit_or_position)  
@@ -599,6 +601,11 @@ function mod:hook_monster(sound_name, unit_or_position, check_unit)
     and (sound_name:match("play_minion_shotgun_pump")) then
       mod:indicate_warning(unit_or_position, "shot")
   end
+
+  if mod:get("render_hound_warning")
+  	and (sound_name:match("play_enemy_chaos_hound_vce_leap"))
+	or (sound_name:match("play_chaos_hound_mutator_vce_leap"))
+  then mod:indicate_warning(unit_or_position, "pounce") end
 end
 
 local hooked_sounds = {
@@ -640,6 +647,8 @@ local hooked_sounds = {
   "play_weapon_netgunner_wind_up",    
   "wwise/events/minions/play_netgunner_proximity_warning",  
   "wwise/events/weapon/play_minion_shotgun_pump",
+  "wwise/events/minions/play_enemy_chaos_hound_vce_leap",
+  "wwise/events/minions/play_chaos_hound_mutator_vce_leap",
 }
 
 local hooked_external_sounds = {
@@ -688,7 +697,6 @@ mod:register_hud_element({
     "alive"
   },
 })
-
 mod:register_hud_element({
   class_name = "SpideySenseUIShotWarning",
   filename = "Spidey Sense/scripts/mods/Spidey Sense/ShotWarning",
@@ -697,4 +705,12 @@ mod:register_hud_element({
     "alive"
   },
 })
+mod:register_hud_element({
+	class_name = "SpideySenseUIPounceWarning",
+	filename = "Spidey Sense/scripts/mods/Spidey Sense/PounceWarning",
+	use_hud_scale = true,
+	visibility_groups = {
+	  "alive"
+	},
+  })
 end

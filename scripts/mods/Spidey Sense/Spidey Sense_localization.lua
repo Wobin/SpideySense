@@ -216,6 +216,9 @@ local localizations = {
       en = "Shotgunner Text Warnings",
       ["zh-cn"] = "霰弹枪手文字警告",
     },
+    hound_text_warnings = {
+        en = "Hound Text Warnings",
+    },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
         ["zh-cn"] = "粉碎者最大警告距离",
@@ -240,6 +243,9 @@ local localizations = {
         en = "Maximum distance for Shotgunner warning",
         ["zh-cn"] = "霰弹枪手最大警告距离",
     },
+    hound_range_max = {
+        en = "Maximum distance for Hound jump warning",
+    },
     copy_from = {
         en = "Copy From...",
         ["zh-cn"] = "复制自…",
@@ -263,6 +269,9 @@ local localizations = {
     shot_text = {
         en = "SHOT!!",
         ["zh-cn"] = "喷！！",
+    },
+    pounce_text = {
+        en = "DOG!!"
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -302,6 +311,12 @@ local localizations = {
       en = "Shows SHOT!! indicator when the Shotgunner pumps their gun",
       ["zh-cn"] = "当霰弹枪手上膛时，显示“喷！！”警告",
     },
+    render_hound_warning = {
+        en = "\"DOG!!\" indicator"
+    },
+    render_hound_warning_description = {
+        en = "Shows DOG!! indicator when Hound jumps to attack"
+    },
     
     arial = {en = "Arial"},
     itc_novarese_medium = {en = "Novarese Medium"},
@@ -339,6 +354,7 @@ addFont(localizations, "cleave")
 addFont(localizations, "net")
 addFont(localizations, "charge")
 addFont(localizations, "shot")
+addFont(localizations, "pounce")
 
 local function addLocalisation(localisations, typeName)
     if typeName ~= "backstab" then
