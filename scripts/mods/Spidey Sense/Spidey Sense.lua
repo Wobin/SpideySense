@@ -503,7 +503,8 @@ function mod:hook_monster(sound_name, unit_or_position, check_unit)
 	then mod:create_indicator(unit_or_position, "burster") end
   
 	if mod:get("hound_active")
-		and (sound_name:match("wwise/events/minions/play_enemy_chaos_hound"))
+		and (sound_name:match("wwise/events/minions/play_enemy_chaos_hound")
+		or sound_name:match("wwise/events/minions/play_chaos_hound_mutator"))
 	then mod:create_indicator(unit_or_position, "hound") end
 
 	if mod:get("mutant_active") 
@@ -603,8 +604,8 @@ function mod:hook_monster(sound_name, unit_or_position, check_unit)
   end
 
   if mod:get("render_hound_warning")
-  	and (sound_name:match("play_enemy_chaos_hound_vce_leap"))
-	or (sound_name:match("play_chaos_hound_mutator_vce_leap"))
+  	and (sound_name:match("play_enemy_chaos_hound_vce_leap")
+	or (sound_name:match("play_chaos_hound_mutator_vce_leap")))
   then mod:indicate_warning(unit_or_position, "pounce") end
 end
 
@@ -614,6 +615,7 @@ local hooked_sounds = {
 	"wwise/events/minions/play_netgunner_run_foley_special",
 	"wwise/events/minions/play_netgunner_reload",
 	"wwise/events/minions/play_enemy_chaos_hound",
+	"wwise/events/minions/play_chaos_hound_mutator",
 	"wwise/events/minions/play_fly_swarm",
 	"wwise/events/minions/play_minion_poxwalker_bomber",
 	"wwise/events/minions/play_enemy_combat_poxwalker_bomber",
