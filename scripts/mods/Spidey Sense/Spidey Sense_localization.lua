@@ -90,12 +90,12 @@ local localizations = {
     melee_backstab_colour = {
         en = "Colour for Melee Backstab warnings",
         ["zh-cn"] = "近战背刺警告颜色",
---        ru = "Цвет предупреждения об ударах в спину",
+        ru = "Цвет предупреждения об ударах ближнего боя в спину",
     },
     ranged_backstab_colour = {
         en = "Colour for Ranged Backstab warnings",
         ["zh-cn"] = "远程背刺警告颜色",
---        ru = "Цвет предупреждения об ударах в спину",
+        ru = "Цвет предупреждения об ударах дальнего боя в спину",
     },
     barrel_colour = {
         en = "Colour for Barrel warning",
@@ -220,12 +220,12 @@ local localizations = {
     shotgun_text_warnings = {
       en = "Shotgunner Text Warnings",
       ["zh-cn"] = "霰弹枪手文字警告",
-      -- ru = "",
+      ru = "Текст предупреждения для врагов с дробовиками",
     },
     hound_text_warnings ={
       en = "Hound Text Warnings",
       ["zh-cn"] = "猎犬文字警告",
-      -- ru = "",
+      ru = "Текст предупреждения для Гончих",
       },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
@@ -250,12 +250,12 @@ local localizations = {
     shotgun_range_max = {
         en = "Maximum distance for Shotgunner warning",
         ["zh-cn"] = "霰弹枪手最大警告距离",
-        -- ru = "",
+        ru = "Максимальная дистанция для предупреждения о врагах с дробовиками",
     },
     hound_range_max = {
         en = "Maximum distance for Hound warning",
         ["zh-cn"] = "猎犬最大警告距离",
-        -- ru = "",
+        ru = "Максимальная дистанция для предупреждения о Гончих",
     },
     copy_from = {
         en = "Copy From...",
@@ -280,12 +280,12 @@ local localizations = {
     shot_text = {
         en = "SHOT!!",
         ["zh-cn"] = "喷！！",
-        -- ru = "",
+        ru = "ВЫСТРЕЛ!!",
     },
     pounce_text = {
       en = "POUNCE!!",
       ["zh-cn"] = "扑！！",
-      -- ru = "",
+      ru = "ПРЫГАЕТ!!",
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -320,27 +320,27 @@ local localizations = {
     render_shotgun_warning = {
       en = "\"SHOT!!\" indicator",
       ["zh-cn"] = "“喷！！”警告语",
-      -- ru = "",
+      ru = "Индикатор «ВЫСТРЕЛ!!»",
     },
     render_shotgun_warning_description = {
       en = "Shows SHOT!! indicator when the Shotgunner pumps their gun",
       ["zh-cn"] = "当霰弹枪手上膛时，显示“喷！！”警告",
-      -- ru = "",
+      ru = "Показывает индикатор «ВЫСТРЕЛ!!» на экране, когда враг заряжает дробовик",
     },
     render_hound_warning = {
       en = "\"POUNCE!!\" indicator",
       ["zh-cn"] = "“扑！！”警告语",
-      -- ru = "",
+      ru = "Индикатор «ПРЫГАЕТ!!»",
     },
     render_hound_warning_description = {
       en = "Shows POUNCE!! indicator when the hound starts its leap",
       ["zh-cn"] = "当猎犬起跳时，显示“扑！！”警告",
-      -- ru = "",
+      ru = "Показывает индикатор «ПРЫГАЕТ!!» на экране, когда Гончая начинает прыжок",
     },
     render_pack_hound_warning = {
       en = "Include hounds during the Hunting Ground modifier",
       ["zh-cn"] = "包含狩猎场状况下的猎犬",
-      -- ru = "",
+      ru = "Включить гончих во время игры с модификатором «Охотничьи угодья»",
     },
     
     arial = {en = "Arial"},
@@ -394,7 +394,7 @@ local function addLocalisation(localisations, typeName)
     localisations[typeName .. "_only_behind"] = {
         en = "Show indicator only if behind you",
         ["zh-cn"] = "仅当目标在背后时显示指示器",
-        ru = "Показывать только индикатор ударов сзади",
+        ru = "Показывать индикатор только, если кто-то сзади",
     }
     localisations[typeName .. "_front_opacity"] = {
         en = "Foreground Opacity",
