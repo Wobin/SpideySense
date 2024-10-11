@@ -87,10 +87,15 @@ local localizations = {
         ["zh-cn"] = "狙击手",
         ru = "Снайпер",
     },
-    backstab_colour = {
-        en = "Colour for Backstab warning",
-        ["zh-cn"] = "背刺警告颜色",
-        ru = "Цвет предупреждения об ударах в спину",
+    melee_backstab_colour = {
+        en = "Colour for Melee Backstab warnings",
+--        ["zh-cn"] = "背刺警告颜色",
+--        ru = "Цвет предупреждения об ударах в спину",
+    },
+    ranged_backstab_colour = {
+        en = "Colour for Ranged Backstab warnings",
+--        ["zh-cn"] = "背刺警告颜色",
+--        ru = "Цвет предупреждения об ударах в спину",
     },
     barrel_colour = {
         en = "Colour for Barrel warning",
@@ -215,7 +220,13 @@ local localizations = {
     shotgun_text_warnings = {
       en = "Shotgunner Text Warnings",
       ["zh-cn"] = "霰弹枪手文字警告",
+      -- ru = "",
     },
+    hound_text_warnings ={
+      en = "Hound Text Warnings",
+      -- ["zh-cn"] = "",
+      -- ru = "",
+      },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
         ["zh-cn"] = "粉碎者最大警告距离",
@@ -239,6 +250,12 @@ local localizations = {
     shotgun_range_max = {
         en = "Maximum distance for Shotgunner warning",
         ["zh-cn"] = "霰弹枪手最大警告距离",
+        -- ru = "",
+    },
+    hound_range_max = {
+        en = "Maximum distance for Hound warning",
+        -- ["zh-cn"] = "",
+        -- ru = "",
     },
     copy_from = {
         en = "Copy From...",
@@ -263,6 +280,12 @@ local localizations = {
     shot_text = {
         en = "SHOT!!",
         ["zh-cn"] = "喷！！",
+        -- ru = "",
+    },
+    pounce_text = {
+      en = "POUNCE!!",
+      -- ["zh-cn"] = "",
+      -- ru = "",
     },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -297,10 +320,27 @@ local localizations = {
     render_shotgun_warning = {
       en = "\"SHOT!!\" indicator",
       ["zh-cn"] = "“喷！！”警告语",
+      -- ru = "",
     },
     render_shotgun_warning_description = {
       en = "Shows SHOT!! indicator when the Shotgunner pumps their gun",
       ["zh-cn"] = "当霰弹枪手上膛时，显示“喷！！”警告",
+      -- ru = "",
+    },
+    render_hound_warning = {
+      en = "\"POUNCE!!\" indicator",
+      -- ["zh-cn"] = "",
+      -- ru = "",
+    },
+    render_hound_warning_description = {
+      en = "Shows POUNCE!! indicator when the hound starts its leap",
+      -- ["zh-cn"] = "",
+      -- ru = "",
+    },
+    render_pack_hound_warning = {
+      en = "Include hounds during the Hunting Ground modifier",
+      -- ["zh-cn"] = "",
+      -- ru = "",
     },
     
     arial = {en = "Arial"},
@@ -339,9 +379,10 @@ addFont(localizations, "cleave")
 addFont(localizations, "net")
 addFont(localizations, "charge")
 addFont(localizations, "shot")
+addFont(localizations, "pounce")
 
 local function addLocalisation(localisations, typeName)
-    if typeName ~= "backstab" then
+    if typeName ~= "melee_backstab" and typeName ~= "ranged_backstab" then
         table.insert(mod.typeList, {text = typeName .. "_name", value = typeName})
     end
 
@@ -428,7 +469,8 @@ for i, color_name in ipairs(color_names) do
     }
 end
 
-addLocalisation(localizations, "backstab")
+addLocalisation(localizations, "melee_backstab")
+addLocalisation(localizations, "ranged_backstab")
 addLocalisation(localizations, "barrel")
 addLocalisation(localizations, "beast_of_nurgle")
 addLocalisation(localizations, "burster")

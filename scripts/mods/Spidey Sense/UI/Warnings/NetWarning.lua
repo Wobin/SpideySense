@@ -26,7 +26,7 @@ local Definitions = {
           font_size = mod:get("font_size_net"),
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = Color[mod:get("font_color_net")](255, true),
+          text_color = Color[mod:get("font_colour_net")](255, true),
           offset = { 0, 0, 1 }
         },
         visibility_function = function() return mod.showNet end

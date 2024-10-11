@@ -169,50 +169,104 @@ table.insert(options.options.widgets, create_option_set("toxbomber", "chart_reus
 table.insert(
     options.options.widgets,
     {
-        setting_id = "backstab_colour",
+        setting_id = "melee_backstab_colour",
         type = "group",
         sub_widgets = {
             {
-                setting_id = "backstab_active",
+                setting_id = "melee_backstab_active",
                 type = "checkbox",
                 default_value = true
             },
             {
-                setting_id = "backstab_radius",
+                setting_id = "melee_backstab_radius",
                 type = "numeric",
                 default_value = 50,
                 range = {0, 200},
                 decimals_number = 0
             },
             {
-                setting_id = "backstab_distance",
+                setting_id = "melee_backstab_distance",
                 type = "numeric",
                 default_value = 40,
                 range = {0, 40},
                 decimals_number = 0
             },
             {
-                setting_id = "backstab_front_opacity",
+                setting_id = "melee_backstab_front_opacity",
                 type = "numeric",
                 default_value = 255,
                 range = {0, 255},
                 decimals_number = 0
             },
             {
-                setting_id = "backstab_front_colour",
+                setting_id = "melee_backstab_front_colour",
                 type = "dropdown",
                 default_value = "ui_terminal",
                 options = get_color_options()
             },
             {
-                setting_id = "backstab_back_opacity",
+                setting_id = "melee_backstab_back_opacity",
                 type = "numeric",
                 default_value = 255,
                 range = {0, 255},
                 decimals_number = 0
             },
             {
-                setting_id = "backstab_back_colour",
+                setting_id = "melee_backstab_back_colour",
+                type = "dropdown",
+                default_value = "ui_terminal",
+                options = get_color_options()
+            }
+        }
+    }
+)
+table.insert(
+    options.options.widgets,
+    {
+        setting_id = "ranged_backstab_colour",
+        type = "group",
+        sub_widgets = {
+            {
+                setting_id = "ranged_backstab_active",
+                type = "checkbox",
+                default_value = true
+            },
+            {
+                setting_id = "ranged_backstab_radius",
+                type = "numeric",
+                default_value = 50,
+                range = {0, 200},
+                decimals_number = 0
+            },
+            {
+                setting_id = "ranged_backstab_distance",
+                type = "numeric",
+                default_value = 40,
+                range = {0, 40},
+                decimals_number = 0
+            },
+            {
+                setting_id = "ranged_backstab_front_opacity",
+                type = "numeric",
+                default_value = 255,
+                range = {0, 255},
+                decimals_number = 0
+            },
+            {
+                setting_id = "ranged_backstab_front_colour",
+                type = "dropdown",
+                default_value = "ui_terminal",
+                options = get_color_options()
+            },
+            {
+                setting_id = "ranged_backstab_back_opacity",
+                type = "numeric",
+                default_value = 255,
+                range = {0, 255},
+                decimals_number = 0
+            },
+            {
+                setting_id = "ranged_backstab_back_colour",
                 type = "dropdown",
                 default_value = "ui_terminal",
                 options = get_color_options()
@@ -268,9 +322,22 @@ add_warning("crusher", "cleave")
 add_warning("trapper", "net")
 add_warning("pogryn", "charge")
 add_warning("shotgun", "shot")
+add_warning("hound", "pounce")
+
+local insert_pack_warning = {
+                setting_id = "render_pack_hound_warning",
+                type = "checkbox",                
+                default_value = false
+  }
 
 local _, pogryn = table.find_by_key(options.options.widgets, "setting_id", "pogryn_text_warnings")
 local _, subwidget = table.find_by_key(pogryn.sub_widgets, "setting_id", "pogryn_range_max")
 subwidget.tooltip = "render_pogryn_warning_description"
+
+local _, hound = table.find_by_key(options.options.widgets, "setting_id", "hound_text_warnings")
+table.insert(hound.sub_widgets, 2, insert_pack_warning)
+local _, houndsubwidget = table.find_by_key(hound.sub_widgets, "setting_id", "hound_range_max")
+houndsubwidget.range = {5,50}
+houndsubwidget.default_value = 20
 
 return options
