@@ -89,12 +89,12 @@ local localizations = {
     },
     melee_backstab_colour = {
         en = "Colour for Melee Backstab warnings",
---        ["zh-cn"] = "背刺警告颜色",
+        ["zh-cn"] = "近战背刺警告颜色",
 --        ru = "Цвет предупреждения об ударах в спину",
     },
     ranged_backstab_colour = {
         en = "Colour for Ranged Backstab warnings",
---        ["zh-cn"] = "背刺警告颜色",
+        ["zh-cn"] = "远程背刺警告颜色",
 --        ru = "Цвет предупреждения об ударах в спину",
     },
     barrel_colour = {
@@ -224,7 +224,7 @@ local localizations = {
     },
     hound_text_warnings ={
       en = "Hound Text Warnings",
-      -- ["zh-cn"] = "",
+      ["zh-cn"] = "猎犬文字警告",
       -- ru = "",
       },
     crusher_range_max = {
@@ -254,7 +254,7 @@ local localizations = {
     },
     hound_range_max = {
         en = "Maximum distance for Hound warning",
-        -- ["zh-cn"] = "",
+        ["zh-cn"] = "猎犬最大警告距离",
         -- ru = "",
     },
     copy_from = {
@@ -284,7 +284,7 @@ local localizations = {
     },
     pounce_text = {
       en = "POUNCE!!",
-      -- ["zh-cn"] = "",
+      ["zh-cn"] = "扑！！",
       -- ru = "",
     },
     render_trapper_warning = {
@@ -329,17 +329,17 @@ local localizations = {
     },
     render_hound_warning = {
       en = "\"POUNCE!!\" indicator",
-      -- ["zh-cn"] = "",
+      ["zh-cn"] = "“扑！！”警告语",
       -- ru = "",
     },
     render_hound_warning_description = {
       en = "Shows POUNCE!! indicator when the hound starts its leap",
-      -- ["zh-cn"] = "",
+      ["zh-cn"] = "当猎犬起跳时，显示“扑！！”警告",
       -- ru = "",
     },
     render_pack_hound_warning = {
       en = "Include hounds during the Hunting Ground modifier",
-      -- ["zh-cn"] = "",
+      ["zh-cn"] = "包含狩猎场状况下的猎犬",
       -- ru = "",
     },
     
