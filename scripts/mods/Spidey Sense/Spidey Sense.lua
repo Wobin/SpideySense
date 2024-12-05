@@ -1,21 +1,22 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 11/10/2024
+Date: 03/12/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 5.0
+Version: 5.1.2
 --]]
 
 local mod = get_mod("Spidey Sense")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
 
-mod.version = "5.0"
+mod.version = "5.1.2"
 
 mod.showCleave = false
 mod.showNet = false
 mod.showCharge = false
 mod.showShot = false
 mod.showPounce = false
+mod.showSniper = false
 mod.main = {}
 mod._indicators = {}
 
@@ -36,21 +37,23 @@ function mod:getTrapper()
 end
 
 local throttle = {}
+local tc = Managers.time
 
 mod.hook_monster = function(sound_name, unit_or_position, check_unit)
   
 	--ignore monster spawn
 	if sound_name:match("_spawn") and not sound_name:match("chaos_spawn") then
+    --mod:echo(sound_name)
 		return
 	end
 
 	-- throttle half a second on each type
 	local lastCall = throttle[sound_name] or 0
-	local delta = Managers.time:time("main") - lastCall
+	local delta = tc:time("main") - lastCall
 	if delta < 0.5 then
 		return
 	end
-	throttle[sound_name] = Managers.time:time("main")
+	throttle[sound_name] = tc:time("main")
   if check_unit == nil then
     local userDataType = get_userdata_type(unit_or_position)
     -- if the unit_or_position is nil or a number,
@@ -207,6 +210,10 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
       or (mod:get("render_pack_hound_warning") and sound_name:match("play_chaos_hound_mutator_vce_leap"))) then
         indicate_warning(unit_or_position, "pounce") 
   end
+  if mod:get("render_sniper_warning")
+    and sound_name:match("play_special_sniper_flash") then
+      indicate_warning(unit_or_position, "sniper")
+  end
   
 end  
 
@@ -235,6 +242,18 @@ mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_wor
         hook_monster(file_path, wwise_source_id, Application.flow_callback_context_unit())
       end
     end
+end)
+
+local throttle = 0
+mod:hook_require("scripts/settings/fx/effect_templates/chaos_daemonhost_ambience", function(template)
+  mod:hook_safe(template, "update", function(template_data, template_context, dt, t)        
+    if t - throttle < 1 then return end    
+    throttle = t
+    if template_data.stage == 1 then
+      if not mod:get("daemonhost_active") then return end
+      create_indicator(template_data.unit, "daemonhost")
+    end
+  end)
 end)
  
   

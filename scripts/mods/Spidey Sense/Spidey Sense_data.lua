@@ -164,7 +164,7 @@ table.insert(options.options.widgets, create_option_set("mutant", "ui_green_ligh
 table.insert(options.options.widgets, create_option_set("plague_ogryn", "powder_blue", "citadel_bieltan_green"))
 table.insert(options.options.widgets, create_option_set("rager", "medium_spring_green", "midnight_blue"))
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
-table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_overcharge_medium", "ui_hud_overcharge_low"))
+table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_warp_charge_medium", "ui_hud_warp_charge_low"))
 table.insert(options.options.widgets, create_option_set("toxbomber", "chart_reuse", "citadel_bieltan_green"))
 table.insert(
     options.options.widgets,
@@ -323,6 +323,7 @@ add_warning("trapper", "net")
 add_warning("pogryn", "charge")
 add_warning("shotgun", "shot")
 add_warning("hound", "pounce")
+add_warning("sniper", "sniper")
 
 local insert_pack_warning = {
                 setting_id = "render_pack_hound_warning",
@@ -339,5 +340,9 @@ table.insert(hound.sub_widgets, 2, insert_pack_warning)
 local _, houndsubwidget = table.find_by_key(hound.sub_widgets, "setting_id", "hound_range_max")
 houndsubwidget.range = {5,50}
 houndsubwidget.default_value = 20
+
+local _, sniper = table.find_by_key(options.options.widgets, "setting_id", "sniper_text_warnings")
+local sniperkey, snipersubwidget = table.find_by_key(sniper.sub_widgets, "setting_id", "sniper_range_max")
+table.remove(sniper.sub_widgets, sniperkey)
 
 return options

@@ -13,6 +13,7 @@ warnings["trap"] = { "trapper", "Net", 2 }
 warnings["charge"] = { "pogryn", "Charge", 3 }
 warnings["shot"] = {"shotgun", "Shot", 1}
 warnings["pounce"] = {"hound", "Pounce", 1}
+warnings["sniper"] = {"sniper", "Sniper", 1}
 
 mod.ui.loadWarnings = function()
   mod:register_hud_element({
@@ -51,6 +52,14 @@ mod.ui.loadWarnings = function()
   mod:register_hud_element({
     class_name = "SpideySenseUIPounceWarning",
     filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/PounceWarning",
+    use_hud_scale = true,
+    visibility_groups = {
+      "alive"
+    },
+  })
+  mod:register_hud_element({
+    class_name = "SpideySenseUISniperWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/SniperWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -240,11 +249,13 @@ mod.ui.get_position = function(unit_or_position)
 end
 
 mod.ui.show_indicator = function(distance, attacker, indicate, delay)        
-    if distance > mod:get(attacker .."_range_max") then return end    
-    mod["show"..indicate] = true    
-    Promise.delay(delay):next(function() 
-        mod["show"..indicate] = false 
-    end)
+  local maxRange = mod:get(attacker .."_range_max") or 1000000 
+    if distance < maxRange then 
+      mod["show"..indicate] = true    
+      Promise.delay(delay):next(function() 
+          mod["show"..indicate] = false 
+      end)
+    end
 end
 
 

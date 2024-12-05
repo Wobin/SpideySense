@@ -226,7 +226,10 @@ local localizations = {
       en = "Hound Text Warnings",
       ["zh-cn"] = "猎犬文字警告",
       ru = "Текст предупреждения для Гончих",
-      },
+    },
+    sniper_text_warnings ={
+      en = "Sniper Shot Text Warnings"
+    },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
         ["zh-cn"] = "粉碎者最大警告距离",
@@ -287,6 +290,9 @@ local localizations = {
       ["zh-cn"] = "扑！！",
       ru = "ПРЫГАЕТ!!",
     },
+    sniper_text = {
+      en = "SNIPER SHOT!"      
+      },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
         ["zh-cn"] = "“网！！”警告语",
@@ -342,6 +348,9 @@ local localizations = {
       ["zh-cn"] = "包含狩猎场状况下的猎犬",
       ru = "Включить гончих во время игры с модификатором «Охотничьи угодья»",
     },
+    render_sniper_warning = {
+      en = "Shows SNIPER SHOT! indicator when a sniper fires an aimed shot",
+    },
     
     arial = {en = "Arial"},
     itc_novarese_medium = {en = "Novarese Medium"},
@@ -380,6 +389,7 @@ addFont(localizations, "net")
 addFont(localizations, "charge")
 addFont(localizations, "shot")
 addFont(localizations, "pounce")
+addFont(localizations, "sniper")
 
 local function addLocalisation(localisations, typeName)
     if typeName ~= "melee_backstab" and typeName ~= "ranged_backstab" then
