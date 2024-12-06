@@ -3,13 +3,13 @@ Title: Spidey Sense
 Author: Wobin
 Date: 03/12/2024
 Repository: https://github.com/Wobin/SpideySense
-Version: 5.1.2
+Version: 5.1.3
 --]]
 
 local mod = get_mod("Spidey Sense")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
 
-mod.version = "5.1.2"
+mod.version = "5.1.3"
 
 mod.showCleave = false
 mod.showNet = false

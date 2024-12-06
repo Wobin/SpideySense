@@ -4,7 +4,7 @@ local UIWidget = require("scripts/managers/ui/ui_widget")
 
 local mod = get_mod("Spidey Sense")
 local DLS = get_mod("DarktideLocalServer")
-
+local Color = Color
 mod.ui = {}
 
 local warnings = {}
@@ -263,6 +263,21 @@ mod:hook_safe("HudElementDamageIndicator", "init", function(self)
   mod.hudElement = self._indicator_widget 
 end)
 
+local colour_check = {}
+
+mod.colourCache = function(colourName, settingName)
+  if not colour_check[colourName] then
+    if rawget(Color, colourName) then      
+      colour_check[colourName] = colourName
+    else
+      colour_check[colourName] = "white"
+      mod:echo(mod:localize(settingName .. "_name") .. mod:localize("invalid_colour_setting"))
+    end
+  end
+  return Color[colour_check[colourName]]
+end
+
+local colourCache = mod.colourCache
 
 mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
 	local indicators = mod._indicators
@@ -311,17 +326,17 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
       arrow_style.angle = angle
       arrow2_style.angle = angle
       widget.alpha_multiplier = progress
-      
-			background_style.color = Color[mod:get(indicator.target_type .. "_back_colour")](
+
+			background_style.color = colourCache(mod:get(indicator.target_type .. "_back_colour"), indicator.target_type)(
 				mod:get(indicator.target_type .. "_back_opacity"),
 				true
 			)
-			front_style.color = Color[mod:get(indicator.target_type .. "_front_colour")](
+			front_style.color = colourCache(mod:get(indicator.target_type .. "_front_colour"), indicator.target_type)(
 				mod:get(indicator.target_type .. "_front_opacity"),
 				true
 			)
       if mod:get(indicator.target_type .. "_arrow_colour") then
-        arrow_style.color = Color[mod:get(indicator.target_type .. "_arrow_colour")](255,true)
+        arrow_style.color = colourCache(mod:get(indicator.target_type .. "_arrow_colour"), indicator.target_type)(255,true)
       end
       
       if indicator.is_nurgled and arrow_style.color then

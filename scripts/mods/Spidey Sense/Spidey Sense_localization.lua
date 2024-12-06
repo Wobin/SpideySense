@@ -12,6 +12,9 @@ local localizations = {
         ["zh-cn"] = "为某些特殊单位的音效提供彩色的方向圆弧指示器。",
         ru = "Spidey Sense - Добавляет цветной дуговой индикатор, показывающий направление звуковых сигналов для определённых врагов.",
     },
+    invalid_colour_setting = {
+      en = " has an invalid color. Please update the arc or text settings"
+    },
     none_name = {
         en = "None",
         ["zh-cn"] = "无",
@@ -186,6 +189,9 @@ local localizations = {
         en = "Beast of Nurgle",
         ["zh-cn"] = "纳垢兽",
         ru = "Зверь Нургла",
+    },
+    shotgunner_name = {
+      en = "Shotgunner"
     },
     core_options = {
         en = "Core Options",

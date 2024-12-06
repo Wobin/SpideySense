@@ -1,6 +1,7 @@
 local mod = get_mod("Spidey Sense")
 local UIWorkspaceSettings = require("scripts/settings/ui/ui_workspace_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
+local colourCache = mod.colourCache
 
 
 local Definitions = {
@@ -26,7 +27,7 @@ local Definitions = {
           font_size = mod:get("font_size_cleave"),
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = Color[mod:get("font_colour_cleave")](255, true),
+          text_color = colourCache(mod:get("font_colour_cleave"), "mauler")(255, true),
           offset = { 0, 0, 1 }
         },
         visibility_function = function() return mod.showCleave end
