@@ -5,7 +5,7 @@ local localizations = {
     mod_name = {
         en = "Spidey Sense",
         ["zh-cn"] = "蜘蛛感应",
-        ru = "Паучье Чутьё",
+        ru = "Паучье чутьё",
     },
     mod_description = {
         en = "Offers a coloured arc indicator for the direction of sound cues for certain special units",
@@ -13,7 +13,8 @@ local localizations = {
         ru = "Spidey Sense - Добавляет цветной дуговой индикатор, показывающий направление звуковых сигналов для определённых врагов.",
     },
     invalid_colour_setting = {
-      en = " has an invalid color. Please update the arc or text settings"
+        en = " has an invalid color. Please update the arc or text settings",
+        ru = " имеет недопустимый цвет. Пожалуйста, обновите настройки дуги или текста",
     },
     none_name = {
         en = "None",
@@ -191,7 +192,8 @@ local localizations = {
         ru = "Зверь Нургла",
     },
     shotgunner_name = {
-      en = "Shotgunner"
+        en = "Shotgunner",
+        ru = "Скаб с дробовиком",
     },
     core_options = {
         en = "Core Options",
@@ -234,7 +236,8 @@ local localizations = {
       ru = "Текст предупреждения для Гончих",
     },
     sniper_text_warnings ={
-      en = "Sniper Shot Text Warnings"
+      en = "Sniper Shot Text Warnings",
+      ru = "Текст предупреждения о снайперах",
     },
     crusher_range_max = {
         en = "Maximum distance for Crusher warning",
@@ -297,7 +300,8 @@ local localizations = {
       ru = "ПРЫГАЕТ!!",
     },
     sniper_text = {
-      en = "SNIPER SHOT!"      
+      en = "SNIPER SHOT!",
+      ru = "ВЫСТРЕЛ СНАЙПЕРА!",
       },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
@@ -352,10 +356,15 @@ local localizations = {
     render_pack_hound_warning = {
       en = "Include hounds during the Hunting Ground modifier",
       ["zh-cn"] = "包含狩猎场状况下的猎犬",
-      ru = "Включить гончих во время игры с модификатором «Охотничьи угодья»",
+      ru = "Включая гончих в «Охотничьих угодьях»",
     },
     render_sniper_warning = {
+      en = "\"SNIPER SHOT!\" indicator",
+      ru = "Индикатор «ВЫСТРЕЛ СНАЙПЕРА!»",
+    },
+    render_sniper_warning_description = {
       en = "Shows SNIPER SHOT! indicator when a sniper fires an aimed shot",
+      ru = "Показывает индикатор «ВЫСТРЕЛ СНАЙПЕРА!» на экране, когда снайпер готов выстрелить",
     },
     
     arial = {en = "Arial"},
