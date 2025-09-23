@@ -190,6 +190,12 @@ local localizations = {
         ["zh-cn"] = "纳垢兽",
         ru = "Зверь Нургла",
     },
+    plasma_gunner_colour = {
+        en = "Colour for Plasma Gunner"
+    },
+    plasma_gunner_name = {
+        en = "Plasma Gunner"
+    },
     shotgunner_name = {
       en = "Shotgunner"
     },
@@ -499,6 +505,7 @@ addLocalisation(localizations, "hound")
 addLocalisation(localizations, "mauler")
 addLocalisation(localizations, "mutant")
 addLocalisation(localizations, "plague_ogryn")
+addLocalisation(localizations, "plasma_gunner")
 addLocalisation(localizations, "rager")
 addLocalisation(localizations, "sniper")
 addLocalisation(localizations, "trapper")
