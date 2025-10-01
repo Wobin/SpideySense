@@ -442,6 +442,7 @@ local localizations = {
     render_sniper_warning = {
       en = "\"SNIPER SHOT!\" indicator",
       ru = "Индикатор «ВЫСТРЕЛ СНАЙПЕРА!»",
+      ["zh-tw"] = "「狙擊!!」警告語",
     },
     render_sniper_warning_description = {
       en = "Shows SNIPER SHOT! indicator when a sniper fires an aimed shot",
