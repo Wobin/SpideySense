@@ -1,15 +1,15 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 03/12/2024
+Date: 23/09/2025
 Repository: https://github.com/Wobin/SpideySense
-Version: 5.1.3
+Version: 5.2.0
 --]]
 
 local mod = get_mod("Spidey Sense")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
 
-mod.version = "5.1.3"
+mod.version = "5.2.0"
 
 mod.showCleave = false
 mod.showNet = false
@@ -83,10 +83,10 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
   end
   
 	local breed_name = ""
-	if sound_name:match("footsteps") then
+	if sound_name:match("footstep") or sound_name:match("heavy_run") then
 		local unit_data_extension = ScriptUnit.extension(unit_or_position, "unit_data_system")
 		local breed = unit_data_extension and unit_data_extension:breed()
-		breed_name = breed and breed.name or ""
+		breed_name = breed and breed.name or ""    
 	end
 
 	if mod:get("burster_active")
@@ -175,6 +175,12 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
   if mod:get("beast_of_nurgle_active")
     and sound_name:match("beast_of_nurgle") 
     then create_indicator(unit_or_position, "beast_of_nurgle") end
+
+  if mod:get("plasma_gunner_active")
+    and (( breed_name:match("renegade_plasma_gunner")
+          and (sound_name:match("play_footstep_boots_medium_enemy") or sound_name:match("traitor_guard_heavy_run")))
+    or sound_name:match("plasmapistol"))
+    then create_indicator(unit_or_position, "plasma_gunner") end
   
   if mod:get("melee_backstab_active")
 		and sound_name:match("wwise/events/player/play_backstab_indicator_melee")
@@ -211,7 +217,7 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
         indicate_warning(unit_or_position, "pounce") 
   end
   if mod:get("render_sniper_warning")
-    and sound_name:match("play_special_sniper_flash") then
+    and sound_name:match("play_special_sniper_flasheer") or sound_name:match("play_weapon_longlas_minion") then
       indicate_warning(unit_or_position, "sniper")
   end
   
@@ -220,47 +226,44 @@ end
 
 mod.on_all_mods_loaded = function()
 
-mod:info(mod.version)
-mod.ui.loadWarnings()
+  if not Managers.backend:authenticated() then
+   Promise.delay(5):next(mod.on_all_mods_loaded)
+   return
+  end
 
-local hooked_external_sounds = mod.sound.hooked_external_sounds
-local hooked_sounds = mod.sound.hooked_sounds
-local hook_monster = mod.hook_monster
+  mod:info(mod.version)
+  mod.ui.loadWarnings()
 
-mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)        
-	for _, sound_name in ipairs(hooked_sounds) do    
-		if wwise_event_name:match(sound_name) then            
-			hook_monster(wwise_event_name, unit_or_position_or_id, Application.flow_callback_context_unit())
-      return
-		end
-	end
-end)
+  local hooked_external_sounds = mod.sound.hooked_external_sounds
+  local hooked_sounds = mod.sound.hooked_sounds
+  local hook_monster = mod.hook_monster
 
-mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_world, sound_event, sound_source, file_path, file_format, wwise_source_id)
-    for _, speaker in ipairs(hooked_external_sounds) do
-      if sound_source:match(speaker) then        
-        hook_monster(file_path, wwise_source_id, Application.flow_callback_context_unit())
+  mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)        
+    for _, sound_name in ipairs(hooked_sounds) do    
+      if wwise_event_name:match(sound_name) then            
+        hook_monster(wwise_event_name, unit_or_position_or_id, Application.flow_callback_context_unit())
+        return
       end
     end
-end)
-
-local throttle = 0
-mod:hook_require("scripts/settings/fx/effect_templates/chaos_daemonhost_ambience", function(template)
-  mod:hook_safe(template, "update", function(template_data, template_context, dt, t)        
-    if t - throttle < 1 then return end    
-    throttle = t
-    if template_data.stage == 1 then
-      if not mod:get("daemonhost_active") then return end
-      create_indicator(template_data.unit, "daemonhost")
-    end
   end)
-end)
- 
-  
-  if not Managers.backend:authenticated() then
-    Managers.backend:authenticate():catch(function(errors)
-      mod:dump(errors)
-      mod:info("Error authenticating")
-      end)
-  end  
+
+  mod:hook_safe(WwiseWorld, "trigger_resource_external_event", function(_wwise_world, sound_event, sound_source, file_path, file_format, wwise_source_id)
+      for _, speaker in ipairs(hooked_external_sounds) do
+        if sound_source:match(speaker) then        
+          hook_monster(file_path, wwise_source_id, Application.flow_callback_context_unit())
+        end
+      end
+  end)
+
+  local throttle = 0
+  mod:hook_require("scripts/settings/fx/effect_templates/chaos_daemonhost_ambience", function(template)
+    mod:hook_safe(template, "update", function(template_data, template_context, dt, t)        
+      if t - throttle < 1 then return end    
+      throttle = t
+      if template_data.stage == 1 then
+        if not mod:get("daemonhost_active") then return end
+        create_indicator(template_data.unit, "daemonhost")
+      end
+    end)
+  end)
 end

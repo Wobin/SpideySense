@@ -230,8 +230,8 @@ local localizations = {
         ["zh-tw"] = "納垢巨獸",
     },
     plasma_gunner_colour = {
-        en = "Colour for Plasma Gunner",
-        ["zh-tw"] = "電漿槍手警告顏色",
+       en = "Colour for Plasma Gunner",
+       ["zh-tw"] = "電漿槍手警告顏色",
     },
     plasma_gunner_name = {
         en = "Plasma Gunner",

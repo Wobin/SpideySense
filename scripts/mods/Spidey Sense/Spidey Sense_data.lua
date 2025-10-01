@@ -162,6 +162,7 @@ table.insert(options.options.widgets, create_option_set("hound", "chart_reuse", 
 table.insert(options.options.widgets, create_option_set("mauler", "turquoise", "ui_blue_light"))
 table.insert(options.options.widgets, create_option_set("mutant", "ui_green_light", "spring_green"))
 table.insert(options.options.widgets, create_option_set("plague_ogryn", "powder_blue", "citadel_bieltan_green"))
+table.insert(options.options.widgets, create_option_set("plasma_gunner", "royal_blue", "tomato"))
 table.insert(options.options.widgets, create_option_set("rager", "medium_spring_green", "midnight_blue"))
 table.insert(options.options.widgets, create_option_set("sniper", "powder_blue", "ui_ability_purple"))
 table.insert(options.options.widgets, create_option_set("trapper", "ui_hud_warp_charge_medium", "ui_hud_warp_charge_low"))

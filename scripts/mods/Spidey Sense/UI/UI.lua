@@ -1,11 +1,15 @@
 local HudElementDamageIndicatorSettings =	require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_indicator_settings")
 local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
-
+--local mt = get_mod("modding_tools")
 local mod = get_mod("Spidey Sense")
 local DLS = get_mod("DarktideLocalServer")
 local Color = Color
 mod.ui = {}
+
+mod.loadingarrow = false
+mod.arrow1_texture = false
+mod.arrow2_texture = false
 
 local warnings = {}
 warnings["cleave"] = { "crusher", "Cleave", 2 }
@@ -117,7 +121,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 			},
 			color = Color["black"](255,true),
       material_values = {
-            texture_map = nil
+            texture_map = mod.arrow1_texture or nil
           },
 			offset = {
 					0,
@@ -125,8 +129,9 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 					6
 				},
 		},
-    visibility_function = function (content) 
+    visibility_function = function (content, style) 
         if not content.target_type then return false end
+        if not style.material_values.texture_map then return false end
         local alert = content.target_type and mod:get(content.target_type .."_arrow_distance") or nil
                 return (content.distance and alert) and
                 (alert > 0 and
@@ -150,7 +155,7 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 			},
 			color = UIHudSettings.ui_hud_green_super_light,
        material_values = {
-            texture_map = nil
+            texture_map = mod.arrow1_texture or nil
           },  
 			offset = {
 					0,
@@ -158,8 +163,9 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 					5
 				},
 		},
-    visibility_function = function (content) 
+    visibility_function = function (content, style) 
         if not content.target_type then return false end
+        if not style.material_values.texture_map then return false end
         return mod:get(content.target_type .."_nurgle_blessed") and content.is_nurgled
     end,
 	}
@@ -175,22 +181,37 @@ end)
 local arrowpng =  "https://wobin.github.io/SpideySense/images/arrow.png"
 local arrow2png = "https://wobin.github.io/SpideySense/images/arrow2.png"
 
-local load_arrow = function(indicator)
-  if DLS then
-    local texture_dir = DLS.absolute_path("images")
-    local arrowpromise =  DLS.get_image(texture_dir .."/arrow.png"):next(function(data) indicator.style.arrow.material_values.texture_map = data.texture end)
-    local arrow2promise = DLS.get_image(texture_dir .."/arrow2.png"):next(function(data) indicator.style.arrow2.material_values.texture_map = data.texture end)
+local texture_dir
+local load_arrow = function(indicator)  
+  if mod.arrow1_texture then indicator.style.arrow.material_values.texture_map = mod.arrow1_texture end
+  if mod.arrow2_texture then indicator.style.arrow2.material_values.texture_map = mod.arrow2_texture end
+
+  if mod.arrow1_texture and mod.arrow2_texture then return Promise:new() end
+  
+  if DLS then    
+    texture_dir = texture_dir or DLS.absolute_path("images")
+    local arrowpromise =  DLS.get_image(texture_dir .."/arrow.png"):next(function(data) 
+        mod.arrow1_texture = data.texture
+        indicator.style.arrow.material_values.texture_map = data.texture 
+      end) 
+    
+    local arrow2promise = DLS.get_image(texture_dir .."/arrow2.png"):next(function(data) 
+        mod.arrow2_texture = data.texture
+        indicator.style.arrow2.material_values.texture_map = data.texture 
+      end)
     return Promise.all(arrowpromise, arrow2promise)
-  else  
+  else      
    return Managers.backend:authenticate():next(function()
       Managers.url_loader:load_texture(arrowpng):next(function(data)                  
+        mod.arrow1_texture = data.texture
         indicator.style.arrow.material_values.texture_map = data.texture
       end)
       Managers.url_loader:load_texture(arrow2png):next(function(data)          
+        mod.arrow2_texture = data.texture
         indicator.style.arrow2.material_values.texture_map = data.texture              
       end)
     end)
-  end
+  end  
 end
 
 local function get_player_direction_angle()
@@ -260,7 +281,7 @@ end
 
 
 mod:hook_safe("HudElementDamageIndicator", "init", function(self)
-  mod.hudElement = self._indicator_widget 
+  mod.hudElement = self._indicator_widget   
 end)
 
 local colour_check = {}
@@ -391,7 +412,10 @@ local show_indicator = mod.ui.show_indicator
 local spawn_indicator = mod.ui.spawn_indicator
 
 mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration)	
-	local position = get_position(unit_or_position)
+	
+  if not mod.hudElement then return end
+  
+  local position = get_position(unit_or_position)
   
   if mod:get(target_type .."_nurgle_blessed") then
     local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")    
@@ -413,15 +437,21 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
 	local directionRotated = Quaternion.rotate(Quaternion.inverse(listener_rotation), direction)
 	local directionRotatedNormalized = Vector3.normalize(directionRotated)
 	local angle = math.atan2(directionRotatedNormalized.x, directionRotatedNormalized.y)
+  local arrow1_map = mod.hudElement.style.arrow.material_values.texture_map
+  local arrow2_map = mod.hudElement.style.arrow2.material_values.texture_map
 
 	local distance = Vector3.distance(position, listener_position)
 	if distance < (mod:get(target_type .. "_distance") or 40) then
 		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
       local active_distance = mod:get(target_type .. "_active_range") and ((distance / mod:get(target_type .. "_distance")) * 325) - 125
           or mod:get(target_type .."_radius")            
-      if mod.hudElement and (not mod.hudElement.style.arrow.material_values.texture_map or not mod.hudElement.style.arrow2.material_values.texture_map) then
-        load_arrow(mod.hudElement):next(
-          function() spawn_indicator(angle, target_type, extra_duration, active_distance, distance, nurgled[unit_or_position]) end)
+      if mod.hudElement and 
+        ( nurgled[unit_or_position] and not arrow1_map) or 
+        ( mod:get(target_type .."_arrow_distance") and not arrow2_map) and 
+        not mod.loadingarrow 
+      then     
+        mod.loadingarrow = true        
+        load_arrow(mod.hudElement):next(function() mod.loadingarrow = false end)
       else
         spawn_indicator(angle, target_type, extra_duration, active_distance, distance, nurgled[unit_or_position])
       end			

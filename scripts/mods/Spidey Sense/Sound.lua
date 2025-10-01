@@ -11,8 +11,7 @@ mod.sound.hooked_sounds = {
 	"wwise/events/minions/play_enemy_combat_poxwalker_bomber",	
   "wwise/events/player/play_backstab_indicator_melee",
 	"wwise/events/player/play_backstab_indicator_melee_elite",
-	"wwise/events/player/play_backstab_indicator_ranged",
-	"wwise/events/weapon/play_special_sniper_flash",
+	"wwise/events/player/play_backstab_indicator_ranged",	
 	"wwise/events/weapon/play_combat_weapon_las_sniper",
 	"wwise/events/minions/play_traitor_guard_grenadier",
 	"wwise/events/weapon/play_explosion_fuse",
@@ -43,8 +42,14 @@ mod.sound.hooked_sounds = {
   "wwise/events/weapon/play_minion_shotgun_pump",
   "wwise/events/minions/play_enemy_chaos_hound_vce_leap",
   "wwise/events/minions/play_chaos_hound_mutator_vce_leap",
-  "wwise/events/weapon/play_special_sniper_flash",
-  "spawn"
+  "wwise/events/weapon/play_special_sniper_flash",  
+  "wwise/events/weapon/play_weapon_longlas_minion",
+  "spawn",
+  "wwise/events/weapon/stop_minion_plasmapistol_charge",
+  "wwise/events/weapon/play_minion_plasmapistol_charge",
+  "wwise/events/weapon/play_minion_plasmapistol",
+  "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run_type_2",
+  "wwise/events/minions//play_footstep_boots_medium_enemy"
  }
 
 mod.sound.hooked_external_sounds = {
