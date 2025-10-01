@@ -230,10 +230,12 @@ local localizations = {
         ["zh-tw"] = "納垢巨獸",
     },
     plasma_gunner_colour = {
-        en = "Colour for Plasma Gunner"
+       en = "Colour for Plasma Gunner",
+       ["zh-tw"] = "電漿槍手警告顏色",
     },
     plasma_gunner_name = {
-        en = "Plasma Gunner"
+        en = "Plasma Gunner",
+        ["zh-tw"] = "電漿槍手",
     },
     shotgunner_name = {
         en = "Shotgunner",
@@ -440,6 +442,7 @@ local localizations = {
     render_sniper_warning = {
       en = "\"SNIPER SHOT!\" indicator",
       ru = "Индикатор «ВЫСТРЕЛ СНАЙПЕРА!»",
+      ["zh-tw"] = "「狙擊!!」警告語",
     },
     render_sniper_warning_description = {
       en = "Shows SNIPER SHOT! indicator when a sniper fires an aimed shot",
