@@ -1,15 +1,15 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 01/10/2025
+Date: 06/11/2025
 Repository: https://github.com/Wobin/SpideySense
-Version: 5.3.0
+Version: 5.3.1
 --]]
 
 local mod = get_mod("Spidey Sense")
 local FontManager = require("scripts/managers/ui/ui_font_manager")
 
-mod.version = "5.3.0"
+mod.version = "5.3.1"
 
 mod.showCleave = false
 mod.showNet = false
