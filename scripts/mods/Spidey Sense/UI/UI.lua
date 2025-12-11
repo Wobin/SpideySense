@@ -218,6 +218,9 @@ local function get_player_direction_angle()
 	local player = Managers.player:local_player(1)
 
 	local world_viewport_name = player.viewport_name
+    if not world_viewport_name then
+        return
+    end
 
 	local camera_manager = Managers.state.camera
 	local camera = camera_manager:camera(world_viewport_name)
