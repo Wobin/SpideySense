@@ -217,7 +217,7 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
         indicate_warning(unit_or_position, "pounce") 
   end
   if mod:get("render_sniper_warning")
-    and sound_name:match("play_special_sniper_flasheer") or sound_name:match("play_weapon_longlas_minion") then
+    and sound_name:match("play_special_sniper_flash") or sound_name:match("play_weapon_longlas_minion") then
       indicate_warning(unit_or_position, "sniper")
   end
   
