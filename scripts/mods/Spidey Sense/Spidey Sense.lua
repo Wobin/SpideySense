@@ -1,15 +1,14 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 06/11/2025
+Date: 14/02/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 5.3.1
+Version: 6.0
 --]]
 
 local mod = get_mod("Spidey Sense")
-local FontManager = require("scripts/managers/ui/ui_font_manager")
 
-mod.version = "5.3.1"
+mod.version = "6.0"
 
 mod.showCleave = false
 mod.showNet = false
@@ -17,7 +16,6 @@ mod.showCharge = false
 mod.showShot = false
 mod.showPounce = false
 mod.showSniper = false
-mod.main = {}
 mod._indicators = {}
 
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Helper")
@@ -25,10 +23,52 @@ mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Debug")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/UI")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Sound")
 
+local SpideySenseImgui = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Spidey_Sense_imgui")
+mod.imgui_window = SpideySenseImgui:new()
+
 local create_indicator = mod.ui.create_indicator 
 local findlocalvalue = mod.helper.findlocalvalue
 local get_userdata_type = mod.helper.get_userdata_type
 local indicate_warning = mod.ui.indicate_warning 
+
+local active_enemies = {}
+local function update_active_enemies()
+  active_enemies.burster = mod:get("burster_active")
+  active_enemies.barrel = mod:get("barrel_active")
+  active_enemies.beast_of_nurgle = mod:get("beast_of_nurgle_active")
+  active_enemies.crusher = mod:get("crusher_active")
+  active_enemies.chaos_spawn = mod:get("chaos_spawn_active")
+  active_enemies.daemonhost = mod:get("daemonhost_active")
+  active_enemies.flamer = mod:get("flamer_active")
+  active_enemies.grenadier = mod:get("grenadier_active")
+  active_enemies.hound = mod:get("hound_active")
+  active_enemies.mauler = mod:get("mauler_active")
+  active_enemies.mutant = mod:get("mutant_active")
+  active_enemies.plague_ogryn = mod:get("plague_ogryn_active")
+  active_enemies.plasma_gunner = mod:get("plasma_gunner_active")
+  active_enemies.rager = mod:get("rager_active")
+  active_enemies.sniper = mod:get("sniper_active")
+  active_enemies.trapper = mod:get("trapper_active")
+  active_enemies.toxbomber = mod:get("toxbomber_active")
+  active_enemies.melee_backstab = mod:get("melee_backstab_active")
+  active_enemies.ranged_backstab = mod:get("ranged_backstab_active")
+end
+
+-- Update cache when settings change
+mod.on_setting_changed = function(setting_id)
+  if setting_id:match("_active") then
+    update_active_enemies()
+  end
+  if setting_id == "open_imgui_settings" then
+    mod:set(setting_id, false, false)
+    if mod.toggle_imgui_settings then
+      mod.toggle_imgui_settings()
+    end
+  end
+end
+
+-- Initial cache
+update_active_enemies() 
 
 
 function mod:getTrapper()  
@@ -89,39 +129,39 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
 		breed_name = breed and breed.name or ""    
 	end
 
-	if mod:get("burster_active")
+	if active_enemies.burster
 		and (sound_name:match("wwise/events/minions/play_minion_poxwalker_bomber")
 			or sound_name:match("wwise/events/minions/play_enemy_combat_poxwalker_bomber"))
 	then create_indicator(unit_or_position, "burster") end
   
-	if mod:get("hound_active")
+	if active_enemies.hound
 		and (sound_name:match("wwise/events/minions/play_enemy_chaos_hound"))
 	then create_indicator(unit_or_position, "hound") end
 
-	if mod:get("mutant_active") 
+	if active_enemies.mutant 
     and sound_name:match("wwise/events/minions/play_enemy_mutant_charger") 
   then create_indicator(unit_or_position, "mutant")	end
   
-	if mod:get("trapper_active")
+	if active_enemies.trapper
 		and (sound_name:match("wwise/events/minions/play_netgunner_run_foley_special")
 			or sound_name:match("wwise/events/minions/play_netgunner_reload"))
 	then create_indicator(unit_or_position, "trapper") end
   
-	if mod:get("sniper_active")
+	if active_enemies.sniper
 		and (sound_name:match("wwise/events/weapon/play_combat_weapon_las_sniper")
 			or sound_name:match("wwise/events/weapon/play_special_sniper_flash")
 			or (breed_name:match("sniper") and sound_name:match("wwise/events/minions/play_netgunner")))
 	then create_indicator(unit_or_position, "sniper") end
     
-	if mod:get("grenadier_active")
+	if active_enemies.grenadier
 		and (breed_name:match("grenadier") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier"))
 	then create_indicator(unit_or_position, "grenadier") end
   
-	if mod:get("barrel_active") and sound_name:match("wwise/events/weapon/play_explosion_fuse") then
+	if active_enemies.barrel and sound_name:match("wwise/events/weapon/play_explosion_fuse") then
 		create_indicator(unit_or_position, "barrel", 3)
 	end
   
-	if mod:get("flamer_active")
+	if active_enemies.flamer
 		and (sound_name:match("wwise/events/minions/play_enemy_cultist_flamer_foley_tank")
 			or sound_name:match("wwise/events/weapon/play_aoe_liquid_fire_loop")
 			or sound_name:match("wwise/events/minions/play_cultist_flamer_foley_gas_loop")
@@ -130,27 +170,27 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
 			or (breed_name:match("flamer") and sound_name:match("wwise/events/minions/play_traitor_guard_grenadier")))
 	then create_indicator(unit_or_position, "flamer")	end
   
-  if mod:get("crusher_active")
+  if active_enemies.crusher
     and breed_name:match("chaos_ogryn_executor")
     and (sound_name:match("play_minion_footsteps_chaos_ogryn") 
       or sound_name:match("play_enemy_chaos_ogryn_armoured_executor") 
       or sound_name:match("play_shared_foley_chaos_ogryn_elites"))
   then create_indicator(unit_or_position, "crusher") end
   
-  if mod:get("mauler_active")
+  if active_enemies.mauler
       and ((breed_name:match("renegade_executor") 
       and (sound_name:match("wwise/events/minions/play_shared_foley_traitor_guard_heavy_run") 
       or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy")))
       or sound_name:match("wwise/events/minions/play_shared_elite_executor_cleave_warning"))
   then create_indicator(unit_or_position, "mauler") end
   
-  if mod:get("daemonhost_active")
+  if active_enemies.daemonhost
     and (sound_name:match("wwise/events/minions/play_enemy_daemonhost") 
     or sound_name:match("wwise/events/vo/play_sfx_es_daemonhost_vo")
     or sound_name:match("wwise/externals/loc_enemy_daemonhost"))
   then create_indicator(unit_or_position, "daemonhost") end
   
-  if mod:get("rager_active")
+  if active_enemies.rager
     and (breed_name:match("berzerker") 
     and (sound_name:match("wwise/events/minions/play_shared_foley_elite_run") 
     or sound_name:match("wwise/events/minions/play_minion_footsteps_boots_heavy") 
@@ -160,34 +200,34 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
     or sound_name:match("wwise/events/minions/play_shared_foley_chaos_cultist_light_run")))
   then create_indicator(unit_or_position, "rager") end
   
-  if mod:get("toxbomber_active")
+  if active_enemies.toxbomber
     and (sound_name:match("wwise/events/minions/play_cultist_grenadier"))
     then create_indicator(unit_or_position, "toxbomber") end
   
-  if mod:get("plague_ogryn_active")
+  if active_enemies.plague_ogryn
     and sound_name:match("plague_ogryn") 
     then create_indicator(unit_or_position, "plague_ogryn") end    
   
-  if mod:get("chaos_spawn_active")
+  if active_enemies.chaos_spawn
     and sound_name:match("chaos_spawn") 
     then create_indicator(unit_or_position, "chaos_spawn") end
   
-  if mod:get("beast_of_nurgle_active")
+  if active_enemies.beast_of_nurgle
     and sound_name:match("beast_of_nurgle") 
     then create_indicator(unit_or_position, "beast_of_nurgle") end
 
-  if mod:get("plasma_gunner_active")
+  if active_enemies.plasma_gunner
     and (( breed_name:match("renegade_plasma_gunner")
           and (sound_name:match("play_footstep_boots_medium_enemy") or sound_name:match("traitor_guard_heavy_run")))
     or sound_name:match("plasmapistol"))
     then create_indicator(unit_or_position, "plasma_gunner") end
   
-  if mod:get("melee_backstab_active")
+  if active_enemies.melee_backstab
 		and sound_name:match("wwise/events/player/play_backstab_indicator_melee")
 			or sound_name:match("wwise/events/player/play_backstab_indicator_melee_elite")
 	then create_indicator(unit_or_position, "melee_backstab") end
 
-	if mod:get("ranged_backstab_active")
+	if active_enemies.ranged_backstab
 		and sound_name:match("wwise/events/player/play_backstab_indicator_ranged")
     then create_indicator(unit_or_position, "ranged_backstab") end
   
@@ -217,12 +257,24 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
         indicate_warning(unit_or_position, "pounce") 
   end
   if mod:get("render_sniper_warning")
-    and sound_name:match("play_special_sniper_flash") or sound_name:match("play_weapon_longlas_minion") then
+    and (sound_name:match("play_special_sniper_flash") or sound_name:match("play_weapon_longlas_minion")) then
       indicate_warning(unit_or_position, "sniper")
   end
   
 end  
 
+
+mod.toggle_imgui_settings = function()  
+  if mod.imgui_window then
+    mod.imgui_window:toggle()
+  end
+end
+
+mod.update = function(dt)
+  if mod.imgui_window then
+    mod.imgui_window:update()
+  end
+end
 
 mod.on_all_mods_loaded = function()
 

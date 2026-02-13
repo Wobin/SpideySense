@@ -5,6 +5,14 @@ local UIWidget = require("scripts/managers/ui/ui_widget")
 local mod = get_mod("Spidey Sense")
 local DLS = get_mod("DarktideLocalServer")
 local Color = Color
+local Vector3 = Vector3
+local Quaternion = Quaternion
+local Unit = Unit
+local ScriptUnit = ScriptUnit
+local Camera = Camera
+local Matrix4x4 = Matrix4x4
+local Managers = Managers
+local Promise = Promise
 mod.ui = {}
 
 mod.loadingarrow = false
@@ -289,19 +297,47 @@ end)
 
 local colour_check = {}
 
-mod.colourCache = function(colourName, settingName)
-  if not colour_check[colourName] then
-    if rawget(Color, colourName) then      
-      colour_check[colourName] = colourName
+-- Helper to convert color value to RGB array format
+local function get_color_rgb(colourValue, settingName)
+  -- Handle new RGB array format {alpha, red, green, blue}
+  if type(colourValue) == "table" then
+    return colourValue
+  end
+  
+  -- Handle old color name format (string)
+  if not colour_check[colourValue] then
+    if rawget(Color, colourValue) then      
+      colour_check[colourValue] = colourValue
     else
-      colour_check[colourName] = "white"
+      colour_check[colourValue] = "white"
       mod:echo(mod:localize(settingName .. "_name") .. mod:localize("invalid_colour_setting"))
     end
   end
-  return Color[colour_check[colourName]]
+  return Color[colour_check[colourValue]](255, true)
 end
 
-local colourCache = mod.colourCache
+mod.colourCache = function(colourValue, settingName)
+  -- Kept for backwards compatibility
+  if type(colourValue) == "table" then
+    return function(alpha, as_rgb)
+      if as_rgb then
+        return colourValue
+      else
+        return {colourValue[1], colourValue[2], colourValue[3], colourValue[4]}
+      end
+    end
+  end
+  
+  if not colour_check[colourValue] then
+    if rawget(Color, colourValue) then      
+      colour_check[colourValue] = colourValue
+    else
+      colour_check[colourValue] = "white"
+      mod:echo(mod:localize(settingName .. "_name") .. mod:localize("invalid_colour_setting"))
+    end
+  end
+  return Color[colour_check[colourValue]]
+end
 
 mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
 	local indicators = mod._indicators
@@ -327,6 +363,10 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	local pulse_speed_multiplier = HudElementDamageIndicatorSettings.pulse_speed_multiplier
 	local size = HudElementDamageIndicatorSettings.size
 	local player_angle = self:_get_player_direction_angle()
+	
+	-- Cache color constants
+	local color_yellow = Color["yellow"](255, true)
+	local color_lime = Color["lime"](255, true)
   
   
   
@@ -351,24 +391,15 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
       arrow2_style.angle = angle
       widget.alpha_multiplier = progress
 
-			background_style.color = colourCache(mod:get(indicator.target_type .. "_back_colour"), indicator.target_type)(
-				mod:get(indicator.target_type .. "_back_opacity"),
-				true
-			)
-			front_style.color = colourCache(mod:get(indicator.target_type .. "_front_colour"), indicator.target_type)(
-				mod:get(indicator.target_type .. "_front_opacity"),
-				true
-			)
-      if mod:get(indicator.target_type .. "_arrow_colour") then
-        arrow_style.color = colourCache(mod:get(indicator.target_type .. "_arrow_colour"), indicator.target_type)(255,true)
+			-- Use cached colors from indicator
+			background_style.color = indicator.back_color
+			front_style.color = indicator.front_color
+      if indicator.arrow_color then
+        arrow_style.color = indicator.arrow_color
       end
       
-      if indicator.is_nurgled and arrow_style.color then
-        if arrow_style.color[3] > arrow_style.color[2] and arrow_style.color[3] > arrow_style.color[4] then
-          arrow2_style.color = Color["yellow"](255, true)
-        else
-          arrow2_style.color = Color["lime"](255, true)
-        end
+      if indicator.is_nurgled and indicator.arrow_color then
+        arrow2_style.color = indicator.nurgle_color or color_lime
       end
       
       
@@ -397,6 +428,34 @@ mod.ui.spawn_indicator = function(angle, target_type, extra_duration, distance, 
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
 	local player_angle = get_player_direction_angle()
+	
+	-- Cache all colors and settings for this indicator to avoid lookups every frame
+	local back_colour = mod:get(target_type .. "_back_colour")
+	local back_opacity = mod:get(target_type .. "_back_opacity")
+	local front_colour = mod:get(target_type .. "_front_colour")
+	local front_opacity = mod:get(target_type .. "_front_opacity")
+	local arrow_colour = mod:get(target_type .. "_arrow_colour")
+	
+	-- Convert colors to RGB arrays once
+	local back_color = get_color_rgb(back_colour, target_type)
+	back_color[1] = back_opacity
+	local front_color = get_color_rgb(front_colour, target_type)
+	front_color[1] = front_opacity
+	
+	local arrow_color = nil
+	local nurgle_color = nil
+	if arrow_colour then
+		arrow_color = get_color_rgb(arrow_colour, target_type)
+		-- Calculate nurgle indicator color based on arrow color
+		if is_nurgled and arrow_color then
+			if arrow_color[3] > arrow_color[2] and arrow_color[3] > arrow_color[4] then
+				nurgle_color = Color["yellow"](255, true)
+			else
+				nurgle_color = Color["lime"](255, true)
+			end
+		end
+	end
+	
 	mod._indicators[#mod._indicators + 1] = {
 		angle = player_angle + angle,
 		time = t + duration,
@@ -404,11 +463,16 @@ mod.ui.spawn_indicator = function(angle, target_type, extra_duration, distance, 
 		target_type = target_type,
     distance = distance,
     actual_distance = actual_distance,
-    is_nurgled = mod:get(target_type .."_nurgle_blessed") and is_nurgled
+    is_nurgled = mod:get(target_type .."_nurgle_blessed") and is_nurgled,
+    -- Cached colors
+    back_color = back_color,
+    front_color = front_color,
+    arrow_color = arrow_color,
+    nurgle_color = nurgle_color
 	}
 end
 
-local nurgled = {}
+local nurgled = setmetatable({}, { __mode = "kv" })
 local get_position = mod.ui.get_position
 local listener_position_rotation = mod.ui.listener_position_rotation
 local show_indicator = mod.ui.show_indicator
@@ -420,7 +484,16 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
   
   local position = get_position(unit_or_position)
   
-  if mod:get(target_type .."_nurgle_blessed") then
+  -- Cache settings to avoid multiple mod:get() calls
+  local max_distance = mod:get(target_type .. "_distance") or 40
+  local only_behind = mod:get(target_type .. "_only_behind")
+  local active_range = mod:get(target_type .. "_active_range")
+  local radius = mod:get(target_type .. "_radius")
+  local arrow_distance = mod:get(target_type .. "_arrow_distance")
+  local nurgle_blessed = mod:get(target_type .. "_nurgle_blessed")
+  
+  -- Only check nurgle buffs if the setting is enabled
+  if nurgle_blessed then
     local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")    
     local buffs = buff_ext and buff_ext:buffs()    
     nurgled[unit_or_position] = false
@@ -428,6 +501,7 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
       for _, buff in ipairs(buffs) do        
         if buff:template_name() == "mutator_minion_nurgle_blessing_tougher" then
           nurgled[unit_or_position] = true
+          break
         end
       end    
     end
@@ -444,13 +518,12 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
   local arrow2_map = mod.hudElement.style.arrow2.material_values.texture_map
 
 	local distance = Vector3.distance(position, listener_position)
-	if distance < (mod:get(target_type .. "_distance") or 40) then
-		if not mod:get(target_type .. "_only_behind") or (angle > 1.5 or angle < -1.5) then
-      local active_distance = mod:get(target_type .. "_active_range") and ((distance / mod:get(target_type .. "_distance")) * 325) - 125
-          or mod:get(target_type .."_radius")            
+	if distance < max_distance then
+		if not only_behind or (angle > 1.5 or angle < -1.5) then
+      local active_distance = active_range and ((distance / max_distance) * 325) - 125 or radius
       if mod.hudElement and 
         ( nurgled[unit_or_position] and not arrow1_map) or 
-        ( mod:get(target_type .."_arrow_distance") and not arrow2_map) and 
+        ( arrow_distance and not arrow2_map) and 
         not mod.loadingarrow 
       then     
         mod.loadingarrow = true        
@@ -464,7 +537,7 @@ end
 
 mod.ui.indicate_warning = function(unit_or_position, target_type)
   local position = get_position(unit_or_position)  
-	local listener_position, listener_rotation = listener_position_rotation()
- 	local distance = Vector3.distance(position, listener_position)  
-  show_indicator(distance, unpack(warnings[target_type]))
+  local listener_position = listener_position_rotation()
+  local distance = Vector3.distance(position, listener_position)  
+  show_indicator(distance, table.unpack(warnings[target_type]))
 end

@@ -8,9 +8,9 @@ return {
 			mod_localization = "Spidey Sense/scripts/mods/Spidey Sense/Spidey Sense_localization",
 		})
 	end,
-  load_after = {
-    "DarktideLocalServer"
-  },
-  version = "5.3.1",
+	load_after = {
+   		 "DarktideLocalServer"
+  	},
+	version = "6.0",
 	packages = {},
 }

@@ -14,6 +14,12 @@ local localizations = {
         ["zh-tw"] = "為某些特殊單位的音效提供彩色的方向弧形指示器。",
         ru = "Spidey Sense - Добавляет цветной дуговой индикатор, показывающий направление звуковых сигналов для определённых врагов.",
     },
+    open_imgui_settings = {
+        en = "Open Settings",
+        ["zh-cn"] = "打开设置",
+        ["zh-tw"] = "開啟設定",
+        ru = "Открыть настройки",
+    },
     invalid_colour_setting = {
         en = " has an invalid color. Please update the arc or text settings",
         ru = " имеет недопустимый цвет. Пожалуйста, обновите настройки дуги или текста",
@@ -24,6 +30,54 @@ local localizations = {
         ["zh-cn"] = "无",
         ["zh-tw"] = "無",
         ru = "Нет",
+    },
+    copy_settings_from = {
+        en = "Copy Settings From",
+        ["zh-cn"] = "从以下复制设置",
+        ["zh-tw"] = "從以下複製設定",
+        ru = "Скопировать настройки из",
+    },
+    copy_none = {
+        en = "none",
+        ["zh-cn"] = "无",
+        ["zh-tw"] = "無",
+        ru = "нет",
+    },
+    enemy_type_settings = {
+        en = "=== ENEMY TYPE SETTINGS ===",
+        ["zh-cn"] = "=== 敌人类型设置 ===",
+        ["zh-tw"] = "=== 敵人類型設定 ===",
+        ru = "=== НАСТРОЙКИ ТИПОВ ВРАГОВ ===",
+    },
+    enemy_type = {
+        en = "Enemy Type",
+        ["zh-cn"] = "敌人类型",
+        ["zh-tw"] = "敵人類型",
+        ru = "Тип врага",
+    },
+    text_warning_settings = {
+        en = "=== TEXT WARNING SETTINGS ===",
+        ["zh-cn"] = "=== 文字警告设置 ===",
+        ["zh-tw"] = "=== 文字警告設定 ===",
+        ru = "=== НАСТРОЙКИ ТЕКСТОВЫХ ПРЕДУПРЕЖДЕНИЙ ===",
+    },
+    text_warning_type = {
+        en = "Text Warning Type",
+        ["zh-cn"] = "文字警告类型",
+        ["zh-tw"] = "文字警告類型",
+        ru = "Тип текстового предупреждения",
+    },
+    select_enemy_type = {
+        en = "Select Enemy Type...",
+        ["zh-cn"] = "选择敌人类型...",
+        ["zh-tw"] = "選擇敵人類型...",
+        ru = "Выберите тип врага...",
+    },
+    select_text_warning = {
+        en = "Select Text Warning...",
+        ["zh-cn"] = "选择文字警告...",
+        ["zh-tw"] = "選擇文字警告...",
+        ru = "Выберите текстовое предупреждение...",
     },
     mutant_colour = {
         en = "Colour for Mutant warning",
@@ -108,6 +162,12 @@ local localizations = {
         ["zh-cn"] = "狙击手",
         ru = "Снайпер",
         ["zh-tw"] = "狙擊手",
+    },
+    melee_backstab_name = {
+        en = "Melee Backstab"
+    },
+    ranged_backstab_name = {
+      en = "Ranged Backstab"  
     },
     melee_backstab_colour = {
         en = "Colour for Melee Backstab warnings",
@@ -239,9 +299,9 @@ local localizations = {
     },
     shotgunner_name = {
         en = "Shotgunner",
+        ["zh-cn"] = "霰弹枪手",
+        ["zh-tw"] = "霰彈槍手",
         ru = "Скаб с дробовиком",
-      en = "Shotgunner",
-      ["zh-tw"] = "霰彈槍手",
     },
     core_options = {
         en = "Core Options",
@@ -551,6 +611,9 @@ local function addLocalisation(localisations, typeName)
         ru = "Дистанция оповещения о приближении (м)",
         ["zh-tw"] = "接近警告距離（米）",
     }
+    localisations[typeName .. "_arrow_description"] = {
+        en = "Shows an indicator when the target is within a certain closer range",
+    }
     localisations[typeName .. "_arrow_colour"] = {
         en = "Proximity Alert Colour",
         ["zh-cn"] = "接近警告颜色",
@@ -611,5 +674,43 @@ addLocalisation(localizations, "rager")
 addLocalisation(localizations, "sniper")
 addLocalisation(localizations, "trapper")
 addLocalisation(localizations, "toxbomber")
+
+-- Text warning display names
+localizations.text_warning_crusher_cleave = {
+    en = "Crusher (Cleave)",
+    ["zh-cn"] = "粉碎者（横扫）",
+    ["zh-tw"] = "粉碎者（橫掃）",
+    ru = "Крушитель (Рассечение)",
+}
+localizations.text_warning_trapper_net = {
+    en = "Trapper (Net)",
+    ["zh-cn"] = "陷阱手（网）",
+    ["zh-tw"] = "陷阱手（網）",
+    ru = "Ловчий (Сеть)",
+}
+localizations.text_warning_pogryn_charge = {
+    en = "Plague Ogryn (Charge)",
+    ["zh-cn"] = "瘟疫欧根（冲锋）",
+    ["zh-tw"] = "瘟疫歐根（衝鋒）",
+    ru = "Чумной огрин (Рывок)",
+}
+localizations.text_warning_shotgun_shot = {
+    en = "Shotgunner (Shot)",
+    ["zh-cn"] = "霰弹枪手（射击）",
+    ["zh-tw"] = "霰彈槍手（射擊）",
+    ru = "Дробовик (Выстрел)",
+}
+localizations.text_warning_hound_pounce = {
+    en = "Hound (Pounce)",
+    ["zh-cn"] = "猎犬（扑击）",
+    ["zh-tw"] = "獵犬（撲擊）",
+    ru = "Гончая (Прыжок)",
+}
+localizations.text_warning_sniper_sniper = {
+    en = "Sniper",
+    ["zh-cn"] = "狙击手",
+    ["zh-tw"] = "狙擊手",
+    ru = "Снайпер",
+}
 
 return localizations
