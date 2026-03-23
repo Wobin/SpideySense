@@ -294,12 +294,7 @@ end
 -- Render settings for selected enemy type
 local function render_enemy_settings(type_name, is_backstab)
     Imgui_spacing()
-    
-    -- Display enemy name header
-    local enemy_name = mod:localize(type_name .. "_name") or type_name
-    Imgui_text(enemy_name)
-    Imgui_spacing()
-    
+        
     Imgui_separator()
     Imgui_spacing()
     

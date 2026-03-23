@@ -23,7 +23,7 @@ mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Debug")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/UI")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Sound")
 
-local SpideySenseImgui = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Spidey_Sense_imgui")
+local SpideySenseImgui = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/Setup")
 mod.imgui_window = SpideySenseImgui:new()
 
 local create_indicator = mod.ui.create_indicator 
@@ -252,7 +252,7 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
   end
   
   if mod:get("render_hound_warning")
-      and (sound_name:match("play_enemy_chaos_hound_vce_leap")
+      and ((sound_name:match("play_enemy_chaos_hound_vce_leap") or sound_name:match("wwise/events/minions/play_chaos_hound_armoured_vce_leap"))
       or (mod:get("render_pack_hound_warning") and sound_name:match("play_chaos_hound_mutator_vce_leap"))) then
         indicate_warning(unit_or_position, "pounce") 
   end
