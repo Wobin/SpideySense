@@ -3,12 +3,12 @@ Title: Spidey Sense
 Author: Wobin
 Date: 23/03/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 6.2
+Version: 6.2a
 --]]
 
 local mod = get_mod("Spidey Sense")
 
-mod.version = "6.2"
+mod.version = "6.2a"
 
 mod.showCleave = false
 mod.showNet = false
@@ -58,6 +58,26 @@ end
 mod.on_setting_changed = function(setting_id)
   if mod.ui and mod.ui.invalidate_setting_caches then
     mod.ui.invalidate_setting_caches(setting_id)
+  end
+  if setting_id:match("_copy_from") then
+    local typeName = string.sub(setting_id, 1, string.find(setting_id, "_copy_from") - 1)
+    local new_value = mod:get(setting_id)
+    if new_value and new_value ~= "none" then
+      mod:set(typeName .. "_active",         mod:get(new_value .. "_active"),         false)
+      mod:set(typeName .. "_radius",         mod:get(new_value .. "_radius"),         false)
+      mod:set(typeName .. "_active_range",   mod:get(new_value .. "_active_range"),   false)
+      mod:set(typeName .. "_nurgle_blessed", mod:get(new_value .. "_nurgle_blessed"), false)
+      mod:set(typeName .. "_distance",       mod:get(new_value .. "_distance"),       false)
+      mod:set(typeName .. "_arrow_distance", mod:get(new_value .. "_arrow_distance"), false)
+      mod:set(typeName .. "_arrow_colour",   mod:get(new_value .. "_arrow_colour"),   false)
+      mod:set(typeName .. "_only_behind",    mod:get(new_value .. "_only_behind"),    false)
+      mod:set(typeName .. "_front_opacity",  mod:get(new_value .. "_front_opacity"),  false)
+      mod:set(typeName .. "_front_colour",   mod:get(new_value .. "_front_colour"),   false)
+      mod:set(typeName .. "_back_opacity",   mod:get(new_value .. "_back_opacity"),   false)
+      mod:set(typeName .. "_back_colour",    mod:get(new_value .. "_back_colour"),    false)
+    end
+    mod:set(setting_id, "none", false)
+    return
   end
   if setting_id:match("_active") then
     update_active_enemies()

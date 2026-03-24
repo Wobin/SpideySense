@@ -22,6 +22,7 @@ local localizations = {
     },
     invalid_colour_setting = {
         en = " has an invalid color. Please update the arc or text settings",
+        ["zh-cn"] = "颜色设置无效，请更新圆弧或文字设置",
         ru = " имеет недопустимый цвет. Пожалуйста, обновите настройки дуги или текста",
         ["zh-tw"] = " 的顏色設定無效。請更新弧形或文字設定。",
     },
@@ -164,10 +165,12 @@ local localizations = {
         ["zh-tw"] = "狙擊手",
     },
     melee_backstab_name = {
-        en = "Melee Backstab"
+        en = "Melee Backstab",
+        ["zh-cn"] = "近战背刺",
     },
     ranged_backstab_name = {
-      en = "Ranged Backstab"  
+      en = "Ranged Backstab",
+      ["zh-cn"] = "远程背刺",
     },
     melee_backstab_colour = {
         en = "Colour for Melee Backstab warnings",
@@ -291,10 +294,12 @@ local localizations = {
     },
     plasma_gunner_colour = {
        en = "Colour for Plasma Gunner",
+       ["zh-cn"] = "血痂等离子炮手警告颜色",
        ["zh-tw"] = "電漿槍手警告顏色",
     },
     plasma_gunner_name = {
         en = "Plasma Gunner",
+        ["zh-cn"] = "血痂等离子炮手",
         ["zh-tw"] = "電漿槍手",
     },
     shotgunner_name = {
@@ -353,6 +358,7 @@ local localizations = {
     },
     sniper_text_warnings ={
       en = "Sniper Shot Text Warnings",
+      ["zh-cn"] = "狙击手射击文字警告",
       ru = "Текст предупреждения о снайперах",
       ["zh-tw"] = "狙擊手射擊文字警告",
     },
@@ -430,9 +436,10 @@ local localizations = {
     },
     sniper_text = {
       en = "SNIPER SHOT!",
+      ["zh-cn"] = "狙击！！",
       ru = "ВЫСТРЕЛ СНАЙПЕРА!",
       ["zh-tw"] = "狙擊!!",
-      },
+    },
     render_trapper_warning = {
         en = "\"NET!!\" indicator",
         ["zh-cn"] = "“网！！”警告语",
@@ -482,32 +489,34 @@ local localizations = {
       ["zh-tw"] = "當霰彈槍手上膛時，顯示「噴!!」警告",
     },
     render_hound_warning = {
-      en = "\"POUNCE!!\" indicator",
-      ["zh-cn"] = "“扑！！”警告语",
-      ru = "Индикатор «ПРЫГАЕТ!!»",
-      ["zh-tw"] = "「撲!!」警告語",
+        en = "\"POUNCE!!\" indicator",
+        ["zh-cn"] = "“扑！！”警告语",
+        ru = "Индикатор «ПРЫГАЕТ!!»",
+        ["zh-tw"] = "「撲!!」警告語",
     },
     render_hound_warning_description = {
-      en = "Shows POUNCE!! indicator when the hound starts its leap",
-      ["zh-cn"] = "当猎犬起跳时，显示“扑！！”警告",
-      ru = "Показывает индикатор «ПРЫГАЕТ!!» на экране, когда Гончая начинает прыжок",
-      ["zh-tw"] = "當瘟疫獵犬起跳時，顯示「撲!!」警告",
+        en = "Shows POUNCE!! indicator when the hound starts its leap",
+        ["zh-cn"] = "当猎犬起跳时，显示“扑！！”警告",
+        ru = "Показывает индикатор «ПРЫГАЕТ!!» на экране, когда Гончая начинает прыжок",
+        ["zh-tw"] = "當瘟疫獵犬起跳時，顯示「撲!!」警告",
     },
     render_pack_hound_warning = {
-      en = "Include hounds during the Hunting Ground modifier",
-      ["zh-cn"] = "包含狩猎场状况下的猎犬",
-      ru = "Включая гончих в «Охотничьих угодьях»",
-      ["zh-tw"] = "在狩獵場修正中包含獵犬",
+        en = "Include hounds during the Hunting Ground modifier",
+        ["zh-cn"] = "包含狩猎场状况下的猎犬",
+        ru = "Включая гончих в «Охотничьих угодьях»",
+        ["zh-tw"] = "在狩獵場修正中包含獵犬",
     },
     render_sniper_warning = {
-      en = "\"SNIPER SHOT!\" indicator",
-      ru = "Индикатор «ВЫСТРЕЛ СНАЙПЕРА!»",
-      ["zh-tw"] = "「狙擊!!」警告語",
+        en = "\"SNIPER SHOT!\" indicator",
+        ["zh-cn"] = "“狙击！！”警告语",
+        ru = "Индикатор «ВЫСТРЕЛ СНАЙПЕРА!»",
+        ["zh-tw"] = "「狙擊!!」警告語",
     },
     render_sniper_warning_description = {
-      en = "Shows SNIPER SHOT! indicator when a sniper fires an aimed shot",
-      ru = "Показывает индикатор «ВЫСТРЕЛ СНАЙПЕРА!» на экране, когда снайпер готов выстрелить",
-      ["zh-tw"] = "當狙擊手進行瞄準射擊時顯示「狙擊!！」警告",
+        en = "Shows SNIPER SHOT! indicator when a sniper fires an aimed shot",
+        ["zh-cn"] = "当狙击手进行瞄准射击时显示“狙击！！”警告",
+        ru = "Показывает индикатор «ВЫСТРЕЛ СНАЙПЕРА!» на экране, когда снайпер готов выстрелить",
+        ["zh-tw"] = "當狙擊手進行瞄準射擊時顯示「狙擊!！」警告",
     },
     
     arial = {en = "Arial"},
@@ -613,6 +622,7 @@ local function addLocalisation(localisations, typeName)
     }
     localisations[typeName .. "_arrow_description"] = {
         en = "Shows an indicator when the target is within a certain closer range",
+        ["zh-cn"] = "当目标进入近距离范围内时显示指示器",
     }
     localisations[typeName .. "_arrow_colour"] = {
         en = "Proximity Alert Colour",
@@ -684,13 +694,13 @@ localizations.text_warning_crusher_cleave = {
 }
 localizations.text_warning_trapper_net = {
     en = "Trapper (Net)",
-    ["zh-cn"] = "陷阱手（网）",
+    ["zh-cn"] = "血痂陷阱手（网）",
     ["zh-tw"] = "陷阱手（網）",
     ru = "Ловчий (Сеть)",
 }
 localizations.text_warning_pogryn_charge = {
     en = "Plague Ogryn (Charge)",
-    ["zh-cn"] = "瘟疫欧根（冲锋）",
+    ["zh-cn"] = "瘟疫欧格林（冲锋）",
     ["zh-tw"] = "瘟疫歐根（衝鋒）",
     ru = "Чумной огрин (Рывок)",
 }

@@ -317,7 +317,7 @@ update_slider_int(type_name .. "_radius", is_backstab and 0 or -125, 200, nil, D
     update_slider_int(type_name .. "_distance", 0, 40, nil, DEFAULT_ENEMY_DISTANCE)
     
     if not is_backstab then
-        update_slider_int(type_name .. "_arrow_distance", 0, 40, type_name .. "_arrow_description")
+        update_slider_int(type_name .. "_arrow_distance", 0, 40, type_name .. "_arrow_description", 0)
         -- Only show proximity alert color when proximity range is set
         if mod:get(type_name .. "_arrow_distance") > 0 then
             Imgui_spacing()
@@ -359,9 +359,12 @@ local function render_text_warning_settings(type_name, attack_name)
     
     if mod:get("render_" .. type_name .. "_warning") then
         Imgui_spacing()
-        local range_max = (type_name == "hound") and 50 or 20
-        local range_tooltip = (type_name == "pogryn") and "pogryn_range_max_description" or nil
-        update_slider_int(type_name .. "_range_max", 5, range_max, range_tooltip, DEFAULT_WARNING_RANGE)
+        if type_name ~= "sniper" then
+            local range_max = (type_name == "hound") and 50 or 20
+            local range_default = (type_name == "hound") and 20 or DEFAULT_WARNING_RANGE
+            local range_tooltip = (type_name == "pogryn") and "pogryn_range_max_description" or nil
+            update_slider_int(type_name .. "_range_max", 5, range_max, range_tooltip, range_default)
+        end
         
         if type_name == "hound" then
             Imgui_spacing()
