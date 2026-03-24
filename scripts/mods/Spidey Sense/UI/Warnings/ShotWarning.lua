@@ -23,14 +23,14 @@ local Definitions = {
         value_id = "text",
         style_id = "text",
         style = {
-          font_type = mod:get("font_name_shot"),
-          font_size = mod:get("font_size_shot"),
+          font_type = mod:get("font_name_shot") or mod.ui.default_warning_font,
+          font_size = mod:get("font_size_shot") or 28,
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = colourCache(mod:get("font_colour_shot"), mod:localize("shotgunner"))(255, true),
+          text_color = colourCache(mod:get("font_colour_shot"), "font_colour_shot")(255, true),
           offset = { 0, 0, 1 }
         },
-        visibility_function = function() return mod.showShot end
+        visibility_function = function() return mod.ui.is_warning_visible("Shot") end
       }
     }, "alert")
   }

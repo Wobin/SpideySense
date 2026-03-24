@@ -14,6 +14,13 @@ local Matrix4x4 = Matrix4x4
 local Managers = Managers
 local Promise = Promise
 mod.ui = {}
+mod.ui.default_warning_font = "proxima_nova_light"
+mod.ui._healed_settings = mod.ui._healed_settings or {}
+mod.ui._target_settings_cache = mod.ui._target_settings_cache or {}
+mod.ui._warning_settings_cache = mod.ui._warning_settings_cache or {}
+mod.ui._default_color_name_cache = mod.ui._default_color_name_cache or {}
+mod.ui._default_color_rgb_cache = mod.ui._default_color_rgb_cache or {}
+mod.ui.warning_expiry = mod.ui.warning_expiry or {}
 
 mod.loadingarrow = false
 mod.arrow1_texture = false
@@ -26,6 +33,80 @@ warnings["charge"] = { "pogryn", "Charge", 3 }
 warnings["shot"] = {"shotgun", "Shot", 1}
 warnings["pounce"] = {"hound", "Pounce", 1}
 warnings["sniper"] = {"sniper", "Sniper", 1}
+
+local healed_settings = mod.ui._healed_settings
+local target_settings_cache = mod.ui._target_settings_cache
+local warning_settings_cache = mod.ui._warning_settings_cache
+local default_color_name_cache = mod.ui._default_color_name_cache
+local default_color_rgb_cache = mod.ui._default_color_rgb_cache
+local warning_expiry = mod.ui.warning_expiry
+local get_target_settings
+
+-- Warning flag mapping for backwards compatibility
+local warning_flag_by_indicate = {
+  Cleave = "showCleave",
+  Net = "showNet",
+  Charge = "showCharge",
+  Shot = "showShot",
+  Pounce = "showPounce",
+  Sniper = "showSniper",
+}
+
+local function get_main_time()
+  local time_manager = Managers and Managers.time
+  return time_manager and time_manager:time("main") or 0
+end
+
+local function heal_setting_once(setting_id, value)
+  if type(setting_id) ~= "string" or healed_settings[setting_id] then
+    return
+  end
+
+  mod:set(setting_id, value, false)
+  healed_settings[setting_id] = true
+end
+
+local function get_numeric_setting(setting_id, fallback_value)
+  local value = mod:get(setting_id)
+  if type(value) == "number" then
+    return value
+  end
+
+  heal_setting_once(setting_id, fallback_value)
+  return fallback_value
+end
+
+local function clear_cache(cache)
+  for key in pairs(cache) do
+    cache[key] = nil
+  end
+end
+
+local function set_warning_flag(indicate, active)
+  local flag = warning_flag_by_indicate[indicate]
+  if flag then
+    mod[flag] = active == true
+  end
+end
+
+mod.ui.is_warning_visible = function(indicate)
+  return (warning_expiry[indicate] or 0) > get_main_time()
+end
+
+mod.ui.invalidate_setting_caches = function(setting_id)
+  if type(setting_id) == "string" then
+    healed_settings[setting_id] = nil
+    default_color_name_cache[setting_id] = nil
+    default_color_rgb_cache[setting_id] = nil
+  else
+    clear_cache(healed_settings)
+    clear_cache(default_color_name_cache)
+    clear_cache(default_color_rgb_cache)
+  end
+
+  clear_cache(target_settings_cache)
+  clear_cache(warning_settings_cache)
+end
 
 mod.ui.loadWarnings = function()
   mod:register_hud_element({
@@ -140,7 +221,8 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
     visibility_function = function (content, style) 
         if not content.target_type then return false end
         if not style.material_values.texture_map then return false end
-        local alert = content.target_type and mod:get(content.target_type .."_arrow_distance") or nil
+        local target_settings = content.target_type and get_target_settings and get_target_settings(content.target_type) or nil
+        local alert = target_settings and target_settings.arrow_distance or nil
                 return (content.distance and alert) and
                 (alert > 0 and
                 content.distance < alert or false) 
@@ -174,7 +256,8 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
     visibility_function = function (content, style) 
         if not content.target_type then return false end
         if not style.material_values.texture_map then return false end
-        return mod:get(content.target_type .."_nurgle_blessed") and content.is_nurgled
+    local target_settings = content.target_type and get_target_settings and get_target_settings(content.target_type) or nil
+    return target_settings and target_settings.nurgle_blessed and content.is_nurgled
     end,
 	}
 }
@@ -281,13 +364,18 @@ mod.ui.get_position = function(unit_or_position)
 end
 
 mod.ui.show_indicator = function(distance, attacker, indicate, delay)        
-  local maxRange = mod:get(attacker .."_range_max") or 1000000 
-    if distance < maxRange then 
-      mod["show"..indicate] = true    
-      Promise.delay(delay):next(function() 
-          mod["show"..indicate] = false 
-      end)
-    end
+  local settings = warning_settings_cache[attacker]
+  if not settings then
+    settings = {
+      range_max = get_numeric_setting(attacker .. "_range_max", 10),
+    }
+    warning_settings_cache[attacker] = settings
+  end
+
+  if distance < settings.range_max then
+    warning_expiry[indicate] = math.max(warning_expiry[indicate] or 0, get_main_time() + (delay or 0))
+    set_warning_flag(indicate, true)
+  end
 end
 
 
@@ -297,11 +385,120 @@ end)
 
 local colour_check = {}
 
+local function get_default_color_name(setting_id)
+  if type(setting_id) ~= "string" then
+    return "white"
+  end
+
+  local cached_name = default_color_name_cache[setting_id]
+  if cached_name then
+    return cached_name
+  end
+
+  if setting_id:match("^font_colour_") then
+    default_color_name_cache[setting_id] = "ui_terminal"
+    return "ui_terminal"
+  end
+
+  local enemy_type, color_slot = string.match(setting_id, "^(.-)_(front|back|arrow)_colour$")
+  local defaults = mod.ui and mod.ui.default_colors
+  local enemy_defaults = defaults and enemy_type and defaults[enemy_type]
+
+  if enemy_defaults and enemy_defaults[color_slot] then
+    default_color_name_cache[setting_id] = enemy_defaults[color_slot]
+    return enemy_defaults[color_slot]
+  end
+
+  default_color_name_cache[setting_id] = "white"
+  return "white"
+end
+
+local function get_default_color_rgb(setting_id)
+  local cached_rgb = default_color_rgb_cache[setting_id]
+  if cached_rgb then
+    return cached_rgb, get_default_color_name(setting_id)
+  end
+
+  local fallback_name = get_default_color_name(setting_id)
+  local fallback_color = Color[fallback_name] and Color[fallback_name](255, true) or Color.white(255, true)
+
+  default_color_rgb_cache[setting_id] = fallback_color
+
+  return fallback_color, fallback_name
+end
+
+local function persist_fallback_color(setting_id, color_rgb)
+  if type(setting_id) == "string" and setting_id:match("_colour$") and type(color_rgb) == "table" then
+    heal_setting_once(setting_id, color_rgb)
+  end
+end
+
+local function echo_color_fallback(setting_id, colour_value, fallback_name)
+  local setting_label = setting_id
+  if type(setting_id) == "string" then
+    setting_label = mod:localize(setting_id .. "_name") or setting_id
+  end
+
+  local reason
+  if colour_value == nil then
+    reason = " was missing"
+  elseif colour_value == "" then
+    reason = " was empty"
+  elseif type(colour_value) ~= "string" then
+    reason = " had unsupported type " .. type(colour_value)
+  else
+    reason = " used unknown color '" .. tostring(colour_value) .. "'"
+  end
+
+  mod:echo(setting_label .. reason .. "; falling back to default color '" .. tostring(fallback_name) .. "'.")
+end
+
+get_target_settings = function(target_type)
+  local settings = target_settings_cache[target_type]
+  if settings then
+    return settings
+  end
+
+  settings = {
+    max_distance = get_numeric_setting(target_type .. "_distance", 40),
+    only_behind = mod:get(target_type .. "_only_behind"),
+    active_range = mod:get(target_type .. "_active_range"),
+    radius = get_numeric_setting(target_type .. "_radius", 50),
+    arrow_distance = get_numeric_setting(target_type .. "_arrow_distance", 0),
+    nurgle_blessed = mod:get(target_type .. "_nurgle_blessed"),
+    back_colour = mod:get(target_type .. "_back_colour"),
+    back_opacity = get_numeric_setting(target_type .. "_back_opacity", 255),
+    front_colour = mod:get(target_type .. "_front_colour"),
+    front_opacity = get_numeric_setting(target_type .. "_front_opacity", 255),
+    arrow_colour = mod:get(target_type .. "_arrow_colour"),
+  }
+
+  target_settings_cache[target_type] = settings
+
+  return settings
+end
+
+mod.ui.get_target_settings = get_target_settings
+
+local function is_silent_missing_color(colour_value)
+  return colour_value == nil or colour_value == ""
+end
+
 -- Helper to convert color value to RGB array format
 local function get_color_rgb(colourValue, settingName)
   -- Handle new RGB array format {alpha, red, green, blue}
   if type(colourValue) == "table" then
     return colourValue
+  end
+
+  if type(colourValue) ~= "string" or colourValue == "" then
+    local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
+    persist_fallback_color(settingName, fallback_rgb)
+    if not is_silent_missing_color(colourValue) then
+      echo_color_fallback(settingName, colourValue, fallback_name)
+    end
+
+    return fallback_rgb
   end
   
   -- Handle old color name format (string)
@@ -309,11 +506,28 @@ local function get_color_rgb(colourValue, settingName)
     if rawget(Color, colourValue) then      
       colour_check[colourValue] = colourValue
     else
-      colour_check[colourValue] = "white"
-      mod:echo(mod:localize(settingName .. "_name") .. mod:localize("invalid_colour_setting"))
+      local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
+      colour_check[colourValue] = fallback_name
+      persist_fallback_color(settingName, fallback_rgb)
+      echo_color_fallback(settingName, colourValue, fallback_name)
     end
   end
   return Color[colour_check[colourValue]](255, true)
+end
+
+local function sanitize_color_with_alpha(color_value, alpha_value)
+  local color = type(color_value) == "table" and color_value or Color.white(255, true)
+  local alpha = type(alpha_value) == "number" and alpha_value or 255
+  local red = type(color[2]) == "number" and color[2] or 255
+  local green = type(color[3]) == "number" and color[3] or 255
+  local blue = type(color[4]) == "number" and color[4] or 255
+
+  return {
+    alpha,
+    red,
+    green,
+    blue,
+  }
 end
 
 mod.colourCache = function(colourValue, settingName)
@@ -327,13 +541,30 @@ mod.colourCache = function(colourValue, settingName)
       end
     end
   end
+
+  if type(colourValue) ~= "string" or colourValue == "" then
+    local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
+    persist_fallback_color(settingName, fallback_rgb)
+    if settingName and not is_silent_missing_color(colourValue) then
+      echo_color_fallback(settingName, colourValue, fallback_name)
+    end
+    return function(alpha, as_rgb)
+      if as_rgb then
+        return fallback_rgb
+      else
+        return { fallback_rgb[1], fallback_rgb[2], fallback_rgb[3], fallback_rgb[4] }
+      end
+    end
+  end
   
   if not colour_check[colourValue] then
     if rawget(Color, colourValue) then      
       colour_check[colourValue] = colourValue
     else
-      colour_check[colourValue] = "white"
-      mod:echo(mod:localize(settingName .. "_name") .. mod:localize("invalid_colour_setting"))
+      local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
+      colour_check[colourValue] = fallback_name
+      persist_fallback_color(settingName, fallback_rgb)
+      echo_color_fallback(settingName, colourValue, fallback_name)
     end
   end
   return Color[colour_check[colourValue]]
@@ -428,24 +659,23 @@ mod.ui.spawn_indicator = function(angle, target_type, extra_duration, distance, 
 	local t = Managers.ui:get_time()
 	local duration = HudElementDamageIndicatorSettings.life_time + (extra_duration or 0)
 	local player_angle = get_player_direction_angle()
+  local settings = get_target_settings(target_type)
 	
 	-- Cache all colors and settings for this indicator to avoid lookups every frame
-	local back_colour = mod:get(target_type .. "_back_colour")
-	local back_opacity = mod:get(target_type .. "_back_opacity")
-	local front_colour = mod:get(target_type .. "_front_colour")
-	local front_opacity = mod:get(target_type .. "_front_opacity")
-	local arrow_colour = mod:get(target_type .. "_arrow_colour")
+  local back_colour = settings.back_colour
+  local back_opacity = settings.back_opacity
+  local front_colour = settings.front_colour
+  local front_opacity = settings.front_opacity
+  local arrow_colour = settings.arrow_colour
 	
 	-- Convert colors to RGB arrays once
-	local back_color = get_color_rgb(back_colour, target_type)
-	back_color[1] = back_opacity
-	local front_color = get_color_rgb(front_colour, target_type)
-	front_color[1] = front_opacity
+  local back_color = sanitize_color_with_alpha(get_color_rgb(back_colour, target_type .. "_back_colour"), back_opacity)
+  local front_color = sanitize_color_with_alpha(get_color_rgb(front_colour, target_type .. "_front_colour"), front_opacity)
 	
 	local arrow_color = nil
 	local nurgle_color = nil
 	if arrow_colour then
-		arrow_color = get_color_rgb(arrow_colour, target_type)
+    arrow_color = get_color_rgb(arrow_colour, target_type .. "_arrow_colour")
 		-- Calculate nurgle indicator color based on arrow color
 		if is_nurgled and arrow_color then
 			if arrow_color[3] > arrow_color[2] and arrow_color[3] > arrow_color[4] then
@@ -463,7 +693,7 @@ mod.ui.spawn_indicator = function(angle, target_type, extra_duration, distance, 
 		target_type = target_type,
     distance = distance,
     actual_distance = actual_distance,
-    is_nurgled = mod:get(target_type .."_nurgle_blessed") and is_nurgled,
+    is_nurgled = settings.nurgle_blessed and is_nurgled,
     -- Cached colors
     back_color = back_color,
     front_color = front_color,
@@ -483,17 +713,10 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
   if not mod.hudElement then return end
   
   local position = get_position(unit_or_position)
-  
-  -- Cache settings to avoid multiple mod:get() calls
-  local max_distance = mod:get(target_type .. "_distance") or 40
-  local only_behind = mod:get(target_type .. "_only_behind")
-  local active_range = mod:get(target_type .. "_active_range")
-  local radius = mod:get(target_type .. "_radius")
-  local arrow_distance = mod:get(target_type .. "_arrow_distance")
-  local nurgle_blessed = mod:get(target_type .. "_nurgle_blessed")
+	local settings = get_target_settings(target_type)
   
   -- Only check nurgle buffs if the setting is enabled
-  if nurgle_blessed then
+  if settings.nurgle_blessed then
     local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")    
     local buffs = buff_ext and buff_ext:buffs()    
     nurgled[unit_or_position] = false
@@ -518,12 +741,12 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
   local arrow2_map = mod.hudElement.style.arrow2.material_values.texture_map
 
 	local distance = Vector3.distance(position, listener_position)
-	if distance < max_distance then
-		if not only_behind or (angle > 1.5 or angle < -1.5) then
-      local active_distance = active_range and ((distance / max_distance) * 325) - 125 or radius
+	if distance < settings.max_distance then
+		if not settings.only_behind or (angle > 1.5 or angle < -1.5) then
+      local active_distance = settings.active_range and math.max(0, (distance / settings.max_distance) * 325 - 125) or settings.radius
       if mod.hudElement and 
         ( nurgled[unit_or_position] and not arrow1_map) or 
-        ( arrow_distance and not arrow2_map) and 
+        ( settings.arrow_distance and not arrow2_map) and 
         not mod.loadingarrow 
       then     
         mod.loadingarrow = true        
@@ -538,6 +761,7 @@ end
 mod.ui.indicate_warning = function(unit_or_position, target_type)
   local position = get_position(unit_or_position)  
   local listener_position = listener_position_rotation()
-  local distance = Vector3.distance(position, listener_position)  
-  show_indicator(distance, table.unpack(warnings[target_type]))
+  local distance = Vector3.distance(position, listener_position)
+  local w = warnings[target_type]
+  show_indicator(distance, w[1], w[2], w[3])
 end

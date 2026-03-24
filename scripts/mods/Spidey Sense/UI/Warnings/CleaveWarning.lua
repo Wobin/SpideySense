@@ -23,14 +23,14 @@ local Definitions = {
         value_id = "text",
         style_id = "text",
         style = {
-          font_type = mod:get("font_name_cleave"),
-          font_size = mod:get("font_size_cleave"),
+          font_type = mod:get("font_name_cleave") or mod.ui.default_warning_font,
+          font_size = mod:get("font_size_cleave") or 28,
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = colourCache(mod:get("font_colour_cleave"), "mauler")(255, true),
+          text_color = colourCache(mod:get("font_colour_cleave"), "font_colour_cleave")(255, true),
           offset = { 0, 0, 1 }
         },
-        visibility_function = function() return mod.showCleave end
+        visibility_function = function() return mod.ui.is_warning_visible("Cleave") end
       }
     }, "alert")
   }

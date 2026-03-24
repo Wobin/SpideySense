@@ -22,14 +22,14 @@ local Definitions = {
         value_id = "text",
         style_id = "text",
         style = {
-          font_type = mod:get("font_name_charge"),
-          font_size = mod:get("font_size_charge"),
+          font_type = mod:get("font_name_charge") or mod.ui.default_warning_font,
+          font_size = mod:get("font_size_charge") or 28,
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = colourCache(mod:get("font_colour_charge"), "plague_ogryn" )(255, true),
+          text_color = colourCache(mod:get("font_colour_charge"), "font_colour_charge" )(255, true),
           offset = { 0, 0, 1 }
         },
-        visibility_function = function() return mod.showCharge end
+        visibility_function = function() return mod.ui.is_warning_visible("Charge") end
       }
     }, "alert")
   }

@@ -23,14 +23,14 @@ local Definitions = {
         value_id = "text",
         style_id = "text",
         style = {
-          font_type = mod:get("font_name_pounce"),
-          font_size = mod:get("font_size_pounce"),
+          font_type = mod:get("font_name_pounce") or mod.ui.default_warning_font,
+          font_size = mod:get("font_size_pounce") or 28,
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = colourCache(mod:get("font_colour_pounce"), "hound")(255, true),
+          text_color = colourCache(mod:get("font_colour_pounce"), "font_colour_pounce")(255, true),
           offset = { 0, 0, 1 }
         },
-        visibility_function = function() return mod.showPounce end
+        visibility_function = function() return mod.ui.is_warning_visible("Pounce") end
       }
     }, "alert")
   }

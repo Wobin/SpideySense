@@ -1,14 +1,14 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 14/02/2026
+Date: 23/03/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 6.0
+Version: 6.2
 --]]
 
 local mod = get_mod("Spidey Sense")
 
-mod.version = "6.0"
+mod.version = "6.2"
 
 mod.showCleave = false
 mod.showNet = false
@@ -56,6 +56,9 @@ end
 
 -- Update cache when settings change
 mod.on_setting_changed = function(setting_id)
+  if mod.ui and mod.ui.invalidate_setting_caches then
+    mod.ui.invalidate_setting_caches(setting_id)
+  end
   if setting_id:match("_active") then
     update_active_enemies()
   end

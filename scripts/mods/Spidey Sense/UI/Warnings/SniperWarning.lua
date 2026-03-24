@@ -23,14 +23,14 @@ local Definitions = {
         value_id = "text",
         style_id = "text",
         style = {
-          font_type = mod:get("font_name_sniper"),
-          font_size = mod:get("font_size_sniper"),
+          font_type = mod:get("font_name_sniper") or mod.ui.default_warning_font,
+          font_size = mod:get("font_size_sniper") or 28,
           text_vertical_alignment = "center",
           text_horizontal_alignment = "center",
-          text_color = colourCache(mod:get("font_colour_sniper"), "sniper")(255, true),
+          text_color = colourCache(mod:get("font_colour_sniper"), "font_colour_sniper")(255, true),
           offset = { 0, 0, 1 }
         },
-        visibility_function = function() return mod.showSniper end
+        visibility_function = function() return mod.ui.is_warning_visible("Sniper") end
       }
     }, "alert")
   }

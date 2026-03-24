@@ -4,46 +4,61 @@ local ui_scale = 1.5
 local WIDTH = 500
 local HEIGHT = 600
 local OFFSET = 100
+local DEFAULT_COLOR_NAME = "white"
+local DEFAULT_WARNING_FONT_COLOR = "ui_terminal"
+local DEFAULT_WARNING_FONT_SIZE = 28
+local DEFAULT_WARNING_RANGE = 10
+local DEFAULT_ENEMY_RADIUS = 50
+local DEFAULT_ENEMY_DISTANCE = 40
+local DEFAULT_OPACITY = 255
+
 local first_run = true
 local window_width = math.min(WIDTH * ui_scale, RESOLUTION_LOOKUP.width - OFFSET)
 local window_height = math.min(HEIGHT * ui_scale, RESOLUTION_LOOKUP.height - OFFSET)
 
 local Managers = Managers
+local Imgui_text
+local Imgui_is_item_hovered
+local Imgui_begin_tool_tip
+local Imgui_end_tool_tip
 
--- Helper function to convert color name to RGB array
+local function localize_or_key(value)
+    return mod:localize(value) or value
+end
+
+local function show_tooltip(tooltip_id)
+    if tooltip_id and Imgui_is_item_hovered() then
+        Imgui_begin_tool_tip()
+        Imgui_text(mod:localize(tooltip_id))
+        Imgui_end_tool_tip()
+    end
+end
+
 local function color_name_to_rgb(color_name)
     if type(color_name) == "table" then
-        -- Already in RGB format {alpha, red, green, blue}
         return color_name
     end
-    
+
     if type(color_name) == "string" and Color[color_name] then
-        -- Convert color name to ARGB array
-        local argb = Color[color_name](255, true)
-        return argb
+        return Color[color_name](255, true)
     end
-    
-    -- Default to white if color not found
+
     return {255, 255, 255, 255}
 end
 
--- Helper function to get color setting with migration from color names
 local function get_color_setting(setting_id, default_color_name)
     local value = mod:get(setting_id)
-    
+
     if not value then
-        -- No value set, use default
-        return color_name_to_rgb(default_color_name or "white")
+        return color_name_to_rgb(default_color_name or DEFAULT_COLOR_NAME)
     end
-    
+
     if type(value) == "string" then
-        -- Old format (color name), convert to RGB and save
         local rgb = color_name_to_rgb(value)
         mod:set(setting_id, rgb, false)
         return rgb
     end
-    
-    -- Already in RGB format
+
     return value
 end
 
@@ -108,7 +123,7 @@ end
 local available_fonts = get_available_fonts_impl()
 
 -- Default colors for enemy types (for migration)
-local default_colors = {
+mod.ui.default_colors = {
     burster = {front = "burly_wood", back = "citadel_averland_sunset", arrow = "burly_wood"},
     barrel = {front = "cheeseburger", back = "citadel_balthasar_gold", arrow = "cheeseburger"},
     beast_of_nurgle = {front = "citadel_dorn_yellow", back = "citadel_balthasar_gold", arrow = "citadel_dorn_yellow"},
@@ -129,15 +144,16 @@ local default_colors = {
     melee_backstab = {front = "ui_terminal", back = "ui_terminal"},
     ranged_backstab = {front = "ui_terminal", back = "ui_terminal"},
 }
+local default_colors = mod.ui.default_colors
 
--- Local Imgui refs for performance\
+-- Local Imgui refs for performance
 local Imgui = Imgui
 local Imgui_checkbox = Imgui.checkbox
 local Imgui_slider_int = Imgui.slider_int
 local Imgui_begin_combo = Imgui.begin_combo
 local Imgui_selectable = Imgui.selectable
 local Imgui_end_combo = Imgui.end_combo
-local Imgui_text = Imgui.text
+Imgui_text = Imgui.text
 local Imgui_separator = Imgui.separator
 local Imgui_set_next_window_size = Imgui.set_next_window_size
 local Imgui_set_next_window_pos = Imgui.set_next_window_pos
@@ -148,9 +164,9 @@ local Imgui_open_imgui = Imgui.open_imgui
 local Imgui_close_imgui = Imgui.close_imgui
 local Imgui_spacing = Imgui.spacing
 local Imgui_color_edit_3 = Imgui.color_edit_3
-local Imgui_is_item_hovered = Imgui.is_item_hovered
-local Imgui_begin_tool_tip = Imgui.begin_tool_tip
-local Imgui_end_tool_tip = Imgui.end_tool_tip
+Imgui_is_item_hovered = Imgui.is_item_hovered
+Imgui_begin_tool_tip = Imgui.begin_tool_tip
+Imgui_end_tool_tip = Imgui.end_tool_tip
 
 local SpideySenseImgui = class("SpideySenseImgui")
 
@@ -201,43 +217,41 @@ end
 -- Helper function to update a checkbox setting
 local function update_checkbox(setting_id, tooltip_id)
     local current_value = mod:get(setting_id)
-    local label = mod:localize(setting_id) or setting_id
-    local new_value = Imgui_checkbox(label, current_value)
-    if tooltip_id and Imgui_is_item_hovered() then
-        Imgui_begin_tool_tip()
-        Imgui_text(mod:localize(tooltip_id))
-        Imgui_end_tool_tip()
-    end
+    local new_value = Imgui_checkbox(localize_or_key(setting_id), current_value)
+    show_tooltip(tooltip_id)
+
     if new_value ~= current_value then
         mod:set(setting_id, new_value)
     end
+
     return new_value
 end
 
 -- Helper function to update a numeric setting
-local function update_slider_int(setting_id, min_value, max_value, tooltip_id)
+local function update_slider_int(setting_id, min_value, max_value, tooltip_id, default_value)
     local current_value = mod:get(setting_id)
-    local label = mod:localize(setting_id) or setting_id
-    local new_value = Imgui_slider_int(label, current_value, min_value, max_value)
-    if tooltip_id and Imgui_is_item_hovered() then
-        Imgui_begin_tool_tip()
-        Imgui_text(mod:localize(tooltip_id))
-        Imgui_end_tool_tip()
+    if current_value == nil and default_value ~= nil then
+        current_value = default_value
+        mod:set(setting_id, current_value, false)
     end
+
+    local new_value = Imgui_slider_int(localize_or_key(setting_id), current_value, min_value, max_value)
+    show_tooltip(tooltip_id)
+
     if new_value ~= current_value then
         mod:set(setting_id, new_value)
     end
+
     return new_value
 end
 
 -- Helper function to render color picker
 local function render_color_picker(setting_id, default_color_name)
     local color_argb = get_color_setting(setting_id, default_color_name)
-    local label = mod:localize(setting_id) or setting_id
-    
-    Imgui_text(label)
+
+    Imgui_text(localize_or_key(setting_id))
     local r, g, b = Imgui_color_edit_3("##" .. setting_id, color_argb[2] / 255, color_argb[3] / 255, color_argb[4] / 255)
-    
+
     if r ~= color_argb[2] / 255 or g ~= color_argb[3] / 255 or b ~= color_argb[4] / 255 then
         local new_color = {255, math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)}
         mod:set(setting_id, new_color)
@@ -259,30 +273,21 @@ local function render_copy_from_dropdown(type_name)
             if enemy_type ~= type_name then
                 local display_name = mod:localize(enemy_type .. "_name") or enemy_type
                 if Imgui_selectable(display_name, current_value == enemy_type) then
-                    -- Copy all settings from the selected enemy type
                     local copy_from = enemy_type
+
                     mod:set(type_name .. "_active", mod:get(copy_from .. "_active"), false)
                     mod:set(type_name .. "_radius", mod:get(copy_from .. "_radius"), false)
                     mod:set(type_name .. "_active_range", mod:get(copy_from .. "_active_range"), false)
                     mod:set(type_name .. "_nurgle_blessed", mod:get(copy_from .. "_nurgle_blessed"), false)
                     mod:set(type_name .. "_distance", mod:get(copy_from .. "_distance"), false)
                     mod:set(type_name .. "_arrow_distance", mod:get(copy_from .. "_arrow_distance"), false)
-                    
-                    -- Copy color settings with migration
-                    local arrow_color = get_color_setting(copy_from .. "_arrow_colour")
-                    mod:set(type_name .. "_arrow_colour", arrow_color, false)
-                    
                     mod:set(type_name .. "_only_behind", mod:get(copy_from .. "_only_behind"), false)
                     mod:set(type_name .. "_front_opacity", mod:get(copy_from .. "_front_opacity"), false)
-                    
-                    local front_color = get_color_setting(copy_from .. "_front_colour")
-                    mod:set(type_name .. "_front_colour", front_color, false)
-                    
                     mod:set(type_name .. "_back_opacity", mod:get(copy_from .. "_back_opacity"), false)
-                    
-                    local back_color = get_color_setting(copy_from .. "_back_colour")
-                    mod:set(type_name .. "_back_colour", back_color, false)
-                    
+
+                    mod:set(type_name .. "_arrow_colour", get_color_setting(copy_from .. "_arrow_colour"), false)
+                    mod:set(type_name .. "_front_colour", get_color_setting(copy_from .. "_front_colour"), false)
+                    mod:set(type_name .. "_back_colour", get_color_setting(copy_from .. "_back_colour"), false)
                     mod:set(setting_id, "none", false)
                 end
             end
@@ -307,9 +312,9 @@ local function render_enemy_settings(type_name, is_backstab)
         update_checkbox(type_name .. "_nurgle_blessed")
     end
     
-    update_slider_int(type_name .. "_radius", is_backstab and 0 or -125, 200)
-    
-    update_slider_int(type_name .. "_distance", 0, 40)
+update_slider_int(type_name .. "_radius", is_backstab and 0 or -125, 200, nil, DEFAULT_ENEMY_RADIUS)
+
+    update_slider_int(type_name .. "_distance", 0, 40, nil, DEFAULT_ENEMY_DISTANCE)
     
     if not is_backstab then
         update_slider_int(type_name .. "_arrow_distance", 0, 40, type_name .. "_arrow_description")
@@ -324,16 +329,16 @@ local function render_enemy_settings(type_name, is_backstab)
     end
     
     Imgui_spacing()
-    local front_default = default_colors[type_name] and default_colors[type_name].front or "white"
+    local front_default = default_colors[type_name] and default_colors[type_name].front or DEFAULT_COLOR_NAME
     render_color_picker(type_name .. "_front_colour", front_default)
     Imgui_spacing()
-    update_slider_int(type_name .. "_front_opacity", 0, 255)
-    
+    update_slider_int(type_name .. "_front_opacity", 0, 255, nil, DEFAULT_OPACITY)
+
     Imgui_spacing()
-    local back_default = default_colors[type_name] and default_colors[type_name].back or "white"
+    local back_default = default_colors[type_name] and default_colors[type_name].back or DEFAULT_COLOR_NAME
     render_color_picker(type_name .. "_back_colour", back_default)
     Imgui_spacing()
-    update_slider_int(type_name .. "_back_opacity", 0, 255)
+    update_slider_int(type_name .. "_back_opacity", 0, 255, nil, DEFAULT_OPACITY)
     
     if not is_backstab then
         Imgui_spacing()
@@ -355,9 +360,8 @@ local function render_text_warning_settings(type_name, attack_name)
     if mod:get("render_" .. type_name .. "_warning") then
         Imgui_spacing()
         local range_max = (type_name == "hound") and 50 or 20
-        local default_max = (type_name == "hound") and 20 or 10
         local range_tooltip = (type_name == "pogryn") and "pogryn_range_max_description" or nil
-        update_slider_int(type_name .. "_range_max", 5, range_max, range_tooltip)
+        update_slider_int(type_name .. "_range_max", 5, range_max, range_tooltip, DEFAULT_WARNING_RANGE)
         
         if type_name == "hound" then
             Imgui_spacing()
@@ -365,12 +369,12 @@ local function render_text_warning_settings(type_name, attack_name)
         end
         
         Imgui_spacing()
-        update_slider_int("font_size_" .. attack_name, 28, 125)
+        update_slider_int("font_size_" .. attack_name, 28, 125, nil, DEFAULT_WARNING_FONT_SIZE)
         
         Imgui_spacing()
         -- Font dropdown
         local font_setting_id = "font_name_" .. attack_name
-        local current_font = mod:get(font_setting_id) or "proxima_nova_light"
+        local current_font = mod:get(font_setting_id) or mod.ui.default_warning_font
         local font_label = mod:localize(font_setting_id) or "Font Name"
         local current_font_display = mod:localize(current_font) or current_font
         
@@ -385,7 +389,7 @@ local function render_text_warning_settings(type_name, attack_name)
         end
         
         Imgui_spacing()
-        render_color_picker("font_colour_" .. attack_name, "ui_terminal")
+        render_color_picker("font_colour_" .. attack_name, DEFAULT_WARNING_FONT_COLOR)
     end
 end
 
