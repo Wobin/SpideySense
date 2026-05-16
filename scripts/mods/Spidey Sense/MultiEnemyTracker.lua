@@ -132,22 +132,20 @@ end
 Check if a unit is valid (still alive, not destroyed)
 --]]
 function tracker:is_unit_valid(unit)
-	if not unit then
+	if not unit or type(unit) ~= "userdata" then
 		return false
 	end
 
-	-- Check if unit is a valid userdata type
-	if type(unit) ~= "userdata" then
+	-- ScriptUnit.extension throws on destroyed units, so gate on Unit.alive first.
+	if not Unit.alive(unit) then
 		return false
 	end
 
-	-- Check if unit exists in world
 	local unit_data_ext = ScriptUnit.extension(unit, "unit_data_system")
 	if not unit_data_ext then
 		return false
 	end
 
-	-- Check if unit is alive (has health)
 	local health_ext = ScriptUnit.extension(unit, "health_system")
 	if health_ext and health_ext:current_health() <= 0 then
 		return false

@@ -6,26 +6,29 @@ local mod = get_mod("Spidey Sense")
 
 local widget_definitions = {}
 
+-- Canonical roman-numeral visibility lookup. Single source of truth — UI.lua
+-- reads this via the returned widget_definitions table to drive the draw loop.
+widget_definitions.VISIBILITY_BY_STYLE_ID = {
+	roman_numeral    = {[1] = true, [9] = true},
+	roman_numeral_2  = {[2] = true},
+	roman_numeral_3  = {[3] = true},
+	roman_numeral_4  = {[4] = true},
+	roman_numeral_5  = {[5] = true, [6] = true, [7] = true, [8] = true},
+	roman_numeral_10 = {[10] = true, [11] = true, [12] = true, [13] = true, [14] = true, [15] = true},
+	roman_numeral_1b = {[6] = true, [11] = true},
+	roman_numeral_2b = {[7] = true, [12] = true},
+	roman_numeral_3b = {[8] = true, [13] = true},
+	roman_numeral_4b = {[14] = true},
+	roman_numeral_5b = {[15] = true},
+	roman_numeral_10b = {[9] = true},
+}
+
 function widget_definitions.create_indicator_definition(get_target_settings)
 	local center_distance = HudElementDamageIndicatorSettings.center_distance
 	local size = HudElementDamageIndicatorSettings.size
-	
-	-- Roman numeral visibility lookup (O(1) hash table lookup)
-	local visibility_by_style_id = {
-		roman_numeral = {[1] = true, [9] = true},
-		roman_numeral_2 = {[2] = true},
-		roman_numeral_3 = {[3] = true},
-		roman_numeral_4 = {[4] = true},
-		roman_numeral_5 = {[5] = true, [6] = true, [7] = true, [8] = true},
-		roman_numeral_10 = {[10] = true, [11] = true, [12] = true, [13] = true, [14] = true, [15] = true},
-		roman_numeral_1b = {[6] = true, [11] = true},
-		roman_numeral_2b = {[7] = true, [12] = true},
-		roman_numeral_3b = {[8] = true, [13] = true},
-		roman_numeral_4b = {[14] = true},
-		roman_numeral_5b = {[15] = true},
-		roman_numeral_10b = {[9] = true},
-	}
-	
+
+	local visibility_by_style_id = widget_definitions.VISIBILITY_BY_STYLE_ID
+
 	local function is_count_visible(style_id, count)
 		local visible = visibility_by_style_id[style_id]
 		return visible and visible[count] or false

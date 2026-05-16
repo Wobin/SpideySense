@@ -17,6 +17,27 @@ local Managers = Managers
 local Promise = Promise
 mod.ui = {}
 mod.ui.default_warning_font = "proxima_nova_light"
+mod.ui.default_colors = {
+    burster = {front = "burly_wood", back = "citadel_averland_sunset", arrow = "burly_wood"},
+    barrel = {front = "cheeseburger", back = "citadel_balthasar_gold", arrow = "cheeseburger"},
+    beast_of_nurgle = {front = "citadel_dorn_yellow", back = "citadel_balthasar_gold", arrow = "citadel_dorn_yellow"},
+    crusher = {front = "sienna", back = "ui_red_medium", arrow = "sienna"},
+    chaos_spawn = {front = "cheeseburger", back = "ui_red_medium", arrow = "cheeseburger"},
+    daemonhost = {front = "teal", back = "blue_violet", arrow = "teal"},
+    flamer = {front = "online_green", back = "medium_violet_red", arrow = "online_green"},
+    grenadier = {front = "sandy_brown", back = "ui_interaction_pickup", arrow = "sandy_brown"},
+    hound = {front = "chart_reuse", back = "cadet_blue", arrow = "chart_reuse"},
+    mauler = {front = "turquoise", back = "ui_blue_light", arrow = "turquoise"},
+    mutant = {front = "ui_green_light", back = "spring_green", arrow = "ui_green_light"},
+    plague_ogryn = {front = "powder_blue", back = "citadel_bieltan_green", arrow = "powder_blue"},
+    plasma_gunner = {front = "royal_blue", back = "tomato", arrow = "royal_blue"},
+    rager = {front = "medium_spring_green", back = "midnight_blue", arrow = "medium_spring_green"},
+    sniper = {front = "powder_blue", back = "ui_ability_purple", arrow = "powder_blue"},
+    trapper = {front = "ui_hud_warp_charge_medium", back = "ui_hud_warp_charge_low", arrow = "ui_hud_warp_charge_medium"},
+    toxbomber = {front = "chart_reuse", back = "citadel_bieltan_green", arrow = "chart_reuse"},
+    melee_backstab = {front = "ui_terminal", back = "ui_terminal"},
+    ranged_backstab = {front = "ui_terminal", back = "ui_terminal"},
+}
 mod.ui._healed_settings = mod.ui._healed_settings or {}
 mod.ui._target_settings_cache = mod.ui._target_settings_cache or {}
 mod.ui._warning_settings_cache = mod.ui._warning_settings_cache or {}
@@ -51,6 +72,20 @@ local COMPOSITE_EXTRA_PADDING = {
   [8]  = 12,  -- V + III
   [12] = 6,   -- X + II
   [13] = 12,  -- X + III
+  [14] = 12,  -- X + IV
+}
+
+-- Per-style positional calibration (widget pixels) for textures whose visible
+-- glyph doesn't sit at its canvas centre. Applied on top of slot positioning,
+-- with matching pivot compensation so rotation still pivots on screen-centre.
+-- Format: { dx, dy } in widget-local pixels — +dx is right, +dy is "down"
+-- (toward screen-centre when the indicator is at angle 0).
+local NUMERAL_STYLE_NUDGE = {
+  -- X texture (scanner_map_greek_22) is a repurposed scanner asset, not a
+  -- preset_2X glyph — its X is painted up-and-left of canvas centre relative
+  -- to the other numerals, so shift it down-and-right to align with them.
+  roman_numeral_10  = { 10, 2},
+  roman_numeral_10b = { 10, 2 },
 }
 
 local NUMERAL_STYLE_IDS = {
@@ -59,6 +94,26 @@ local NUMERAL_STYLE_IDS = {
   "roman_numeral_1b", "roman_numeral_2b", "roman_numeral_3b",
   "roman_numeral_4b", "roman_numeral_5b", "roman_numeral_10b",
 }
+
+-- Inverse of widget_definitions.VISIBILITY_BY_STYLE_ID: for a given roman-numeral
+-- count, the list of styles that should render. At most 2 entries per count (one
+-- per slot). Built once at file load; iterated in the indicator draw hot path.
+local STYLES_BY_COUNT = {}
+do
+  local visibility_by_style_id = widget_definitions.VISIBILITY_BY_STYLE_ID
+  for style_id, counts in pairs(visibility_by_style_id) do
+    local is_b = string.sub(style_id, -1) == "b"
+    for count in pairs(counts) do
+      STYLES_BY_COUNT[count] = STYLES_BY_COUNT[count] or {}
+      table.insert(STYLES_BY_COUNT[count], { style_id = style_id, is_b = is_b })
+    end
+  end
+end
+
+-- Color constants used by the indicator draw loop. Hoisted out of the hot path
+-- so we don't allocate two color tables per frame.
+local COLOR_YELLOW = Color["yellow"](255, true)
+local COLOR_LIME   = Color["lime"](255, true)
 
 -- Given a rotated_texture pass on the damage-indicator widget, return where it
 -- currently rotates around in widget-local pixels (screen pixels relative to the
@@ -103,13 +158,18 @@ end
 -- centre regardless of the arc's bounce. Cheap; safe to call once per visible
 -- numeral per indicator draw. Optional sx re-slots the glyph along local-X
 -- (with matching pivot.x compensation) so the screen-centre rotation pivot is
--- preserved as the slot moves between frames.
-mod.ui.tick_centred_pass = function(style, distance, angle, sx)
+-- preserved as the slot moves between frames. Optional nudge = { dx, dy } adds
+-- a per-style calibration shift (with matching pivot compensation on both axes)
+-- for textures whose visible glyph doesn't sit at the canvas centre.
+mod.ui.tick_centred_pass = function(style, distance, angle, sx, nudge)
   style.angle = angle
-  style.offset[2] = distance - style._radius_outside_arc - style.size[2] * 0.5
+  local nx = nudge and nudge[1] or 0
+  local ny = nudge and nudge[2] or 0
+  style.offset[2] = distance - style._radius_outside_arc - style.size[2] * 0.5 + ny
+  style.pivot[2]  = style._radius_outside_arc + style.size[2] * 0.5 - ny
   if sx then
-    style.offset[1] = sx
-    style.pivot[1]  = style.size[1] * 0.5 - sx
+    style.offset[1] = sx + nx
+    style.pivot[1]  = style.size[1] * 0.5 - sx - nx
   end
 end
 
@@ -144,6 +204,7 @@ local warning_settings_cache = mod.ui._warning_settings_cache
 local default_color_name_cache = mod.ui._default_color_name_cache
 local default_color_rgb_cache = mod.ui._default_color_rgb_cache
 local warning_expiry = mod.ui.warning_expiry
+local colour_check = {}
 local get_target_settings
 
 -- Warning flag mapping for backwards compatibility
@@ -202,10 +263,14 @@ mod.ui.invalidate_setting_caches = function(setting_id)
     healed_settings[setting_id] = nil
     default_color_name_cache[setting_id] = nil
     default_color_rgb_cache[setting_id] = nil
+    if setting_id:match("_colour$") then
+      clear_cache(colour_check)
+    end
   else
     clear_cache(healed_settings)
     clear_cache(default_color_name_cache)
     clear_cache(default_color_rgb_cache)
+    clear_cache(colour_check)
   end
 
   clear_cache(target_settings_cache)
@@ -413,8 +478,6 @@ mod:hook_safe("HudElementDamageIndicator", "init", function(self)
   mod.ui.configure_numeral_passes(self._indicator_widget)
 end)
 
-local colour_check = {}
-
 local function get_default_color_name(setting_id)
   if type(setting_id) ~= "string" then
     return "white"
@@ -597,44 +660,9 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	local pulse_speed_multiplier = HudElementDamageIndicatorSettings.pulse_speed_multiplier
 	local size = HudElementDamageIndicatorSettings.size
 	local player_angle = self:_get_player_direction_angle()
-	
-	-- Cache color constants
-	local color_yellow = Color["yellow"](255, true)
-	local color_lime = Color["lime"](255, true)
-  
 
-  local preset_map = {
-      [1] = "content/ui/materials/icons/presets/preset_21",  -- I
-      [2] = "content/ui/materials/icons/presets/preset_22",  -- II
-      [3] = "content/ui/materials/icons/presets/preset_23",  -- III
-      [4] = "content/ui/materials/icons/presets/preset_24",  -- IV
-      [5] = "content/ui/materials/icons/presets/preset_25",  -- V
-      [6] = "content/ui/materials/backgrounds/scanner/scanner_map_greek_22" -- X
-    }
-    
-  -- Roman numeral visibility lookup (O(1) hash table lookup)
-  local visibility_by_style_id = {
-    roman_numeral = {[1] = true, [9] = true},
-    roman_numeral_2 = {[2] = true},
-    roman_numeral_3 = {[3] = true},
-    roman_numeral_4 = {[4] = true},
-    roman_numeral_5 = {[5] = true, [6] = true, [7] = true, [8] = true},
-    roman_numeral_10 = {[10] = true, [11] = true, [12] = true, [13] = true, [14] = true, [15] = true},
-    roman_numeral_1b = {[6] = true, [11] = true},
-    roman_numeral_2b = {[7] = true, [12] = true},
-    roman_numeral_3b = {[8] = true, [13] = true},
-    roman_numeral_4b = {[14] = true},
-    roman_numeral_5b = {[15] = true},
-    roman_numeral_10b = {[9] = true},
-  }
-    
 	for i = num_indicators, 1, -1 do
 		local indicator = indicators[i]
-
-		if not indicator then
-			return
-		end
-
 		local time = indicator.time
 
 		if t <= time then
@@ -648,6 +676,9 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
       arrow_style.angle = angle
       arrow2_style.angle = angle
 
+      background_style.color = indicator.back_color
+      front_style.color = indicator.front_color
+
       local roman_numeral_count = indicator.roman_numeral_count or 0
 
       if indicator.arrow_color then
@@ -655,7 +686,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
       end
 
       if indicator.is_nurgled and indicator.arrow_color then
-        arrow2_style.color = indicator.nurgle_color or color_lime
+        arrow2_style.color = indicator.nurgle_color or COLOR_LIME
       end
 
 			local distance = center_distance
@@ -677,16 +708,20 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
       local half_spacing = (NUMERAL_PAIR_SPACING + extra) * 0.5
       local is_composite = COMPOSITE_COUNTS[roman_numeral_count]
 
-      for style_name, visibility_counts in pairs(visibility_by_style_id) do
-        if visibility_counts[roman_numeral_count] then
-          local is_b = string.sub(style_name, -1) == "b"
+      local styles_for_count = STYLES_BY_COUNT[roman_numeral_count]
+      if styles_for_count then
+        local numeral_color = indicator.back_color
+        for j = 1, #styles_for_count do
+          local entry = styles_for_count[j]
+          local style = widget.style[entry.style_id]
           local sx
           if is_composite then
-            sx = is_b and half_spacing or -half_spacing
+            sx = entry.is_b and half_spacing or -half_spacing
           else
             sx = 0
           end
-          mod.ui.tick_centred_pass(widget.style[style_name], distance, angle, sx)
+          style.color = numeral_color
+          mod.ui.tick_centred_pass(style, distance, angle, sx, NUMERAL_STYLE_NUDGE[entry.style_id])
         end
       end
 
@@ -725,9 +760,9 @@ mod.ui.spawn_indicator = function(angle, target_type, extra_duration, distance, 
 		-- Calculate nurgle indicator color based on arrow color
 		if is_nurgled and arrow_color then
 			if arrow_color[3] > arrow_color[2] and arrow_color[3] > arrow_color[4] then
-				nurgle_color = Color["yellow"](255, true)
+				nurgle_color = COLOR_YELLOW
 			else
-				nurgle_color = Color["lime"](255, true)
+				nurgle_color = COLOR_LIME
 			end
 		end
 	end
@@ -791,16 +826,20 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
 	if distance < settings.max_distance then
 		if not settings.only_behind or (angle > 1.5 or angle < -1.5) then
       local active_distance = settings.active_range and math.max(0, (distance / settings.max_distance) * 325 - 125) or settings.radius
-      if mod.hudElement and 
-        ( nurgled[unit_or_position] and not arrow1_map) or 
-        ( settings.arrow_distance and not arrow2_map) and 
-        not mod.loadingarrow 
-      then     
-        mod.loadingarrow = true        
+      -- arrow_distance arrow renders via style.arrow → fed by arrow1_texture;
+      -- nurgle indicator renders via style.arrow2 → fed by arrow2_texture.
+      local needs_distance_arrow = settings.arrow_distance and not arrow1_map
+      local needs_nurgle_arrow   = nurgled[unit_or_position] and not arrow2_map
+
+      if mod.hudElement
+        and (needs_distance_arrow or needs_nurgle_arrow)
+        and not mod.loadingarrow
+      then
+        mod.loadingarrow = true
         load_arrow(mod.hudElement):next(function() mod.loadingarrow = false end)
       else
         spawn_indicator(angle, target_type, extra_duration, active_distance, distance, nurgled[unit_or_position], roman_numeral_count)
-      end			
+      end
 		end
 	end
 end

@@ -50,7 +50,7 @@ mod.sound.hooked_sounds = {
   "wwise/events/weapon/play_minion_plasmapistol_charge",
   "wwise/events/weapon/play_minion_plasmapistol",
   "wwise/events/minions/play_shared_foley_traitor_guard_heavy_run_type_2",
-  "wwise/events/minions//play_footstep_boots_medium_enemy"
+  "wwise/events/minions/play_footstep_boots_medium_enemy"
  }
 
 mod.sound.hooked_external_sounds = {
