@@ -20,6 +20,7 @@ mod._indicators = {}
 
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Helper")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Debug")
+mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/MultiEnemyTracker")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/UI")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Sound")
 
@@ -30,6 +31,29 @@ local create_indicator = mod.ui.create_indicator
 local findlocalvalue = mod.helper.findlocalvalue
 local get_userdata_type = mod.helper.get_userdata_type
 local indicate_warning = mod.ui.indicate_warning 
+
+-- Wrap create_indicator to register units with the multi-enemy tracker
+local original_create_indicator = create_indicator
+local function create_indicator_tracked(unit_or_position, target_type, extra_duration)
+	local tracking_enabled = mod:get("multi_enemy_tracking_enabled")
+	local roman_numerals_enabled = mod:get("multi_enemy_roman_numerals_enabled")
+	
+	-- Register unit with multi-enemy tracker if it's a unit and tracking is enabled
+	if tracking_enabled and type(unit_or_position) == "userdata" then
+		mod.multi_enemy_tracker:register_unit(unit_or_position, target_type)
+		-- Only pass instance number if roman numerals are enabled and there are 2+ of this breed
+		if roman_numerals_enabled then
+			local breed_count = mod.multi_enemy_tracker:get_count(target_type)
+			-- Only display numbers when there are 2 or more of this breed
+			if breed_count >= 2 then
+				local instance_number = mod.multi_enemy_tracker:get_instance_number(unit_or_position, target_type)
+				return original_create_indicator(unit_or_position, target_type, extra_duration, instance_number)
+			end
+		end
+	end
+	return original_create_indicator(unit_or_position, target_type, extra_duration)
+end
+create_indicator = create_indicator_tracked
 
 local active_enemies = {}
 local function update_active_enemies()
@@ -294,6 +318,9 @@ mod.toggle_imgui_settings = function()
 end
 
 mod.update = function(dt)
+  -- Update multi-enemy tracker
+  mod.multi_enemy_tracker:update()
+  
   if mod.imgui_window then
     mod.imgui_window:update()
   end
@@ -305,6 +332,16 @@ mod.on_all_mods_loaded = function()
    Promise.delay(5):next(mod.on_all_mods_loaded)
    return
   end
+
+  -- Preload inventory background package for roman numeral textures
+  local function load_package(package_name)
+    if not Managers.package:has_loaded(package_name) then
+      mod:echo("loading package")
+      Managers.package:load(package_name, "Spidey Sense")
+    end
+  end
+
+  load_package("packages/ui/views/inventory_background_view/inventory_background_view")
 
   mod:info(mod.version)
   mod.ui.loadWarnings()

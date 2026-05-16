@@ -723,4 +723,40 @@ localizations.text_warning_sniper_sniper = {
     ru = "Снайпер",
 }
 
+-- Multi-enemy tracking localization
+localizations.multi_enemy_tracking = {
+    en = "Multiple Enemy Detection",
+    ["zh-cn"] = "多敌人检测",
+    ["zh-tw"] = "多敵人檢測",
+    ru = "Обнаружение множественных врагов",
+}
+
+localizations.multi_enemy_tracking_enabled = {
+    en = "Enable Multiple Enemy Tracking",
+    ["zh-cn"] = "启用多敌人跟踪",
+    ["zh-tw"] = "啟用多敵人追蹤",
+    ru = "Включить отслеживание нескольких врагов",
+}
+
+localizations.multi_enemy_tracking_enabled_tooltip = {
+    en = "Track and number multiple instances of the same enemy breed within detection range",
+    ["zh-cn"] = "跟踪并为同一敌人品种的多个实例编号（在检测范围内）",
+    ["zh-tw"] = "追蹤並編號同一敵人品種的多個實例（在偵測範圍內）",
+    ru = "Отслеживать и нумеровать несколько экземпляров одного типа врага в пределах диапазона обнаружения",
+}
+
+localizations.multi_enemy_roman_numerals_enabled = {
+    en = "Display Roman Numerals",
+    ["zh-cn"] = "显示罗马数字",
+    ["zh-tw"] = "顯示羅馬數字",
+    ru = "Отображать римские цифры",
+}
+
+localizations.multi_enemy_roman_numerals_enabled_tooltip = {
+    en = "Show roman numeral indicators (I-VIII) on arc indicators for multiple enemies of the same type",
+    ["zh-cn"] = "为同类型的多个敌人显示罗马数字指示符（I-VIII）",
+    ["zh-tw"] = "為同類型的多個敵人顯示羅馬數字指示符（I-VIII）",
+    ru = "Показывать индикаторы с римскими цифрами (I-VIII) на дугах для нескольких врагов одного типа",
+}
+
 return localizations

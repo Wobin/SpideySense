@@ -325,6 +325,27 @@ local _, sniper = table.find_by_key(options.options.widgets, "setting_id", "snip
 local sniperkey, snipersubwidget = table.find_by_key(sniper.sub_widgets, "setting_id", "sniper_range_max")
 table.remove(sniper.sub_widgets, sniperkey)
 
+-- Multi-enemy tracking settings
+table.insert(options.options.widgets, {
+	setting_id = "multi_enemy_tracking",
+	type = "group",
+	title = "multi_enemy_tracking",
+	sub_widgets = {
+		{
+			setting_id = "multi_enemy_tracking_enabled",
+			type = "checkbox",
+			default_value = true,
+			tooltip = "multi_enemy_tracking_enabled_tooltip"
+		},
+		{
+			setting_id = "multi_enemy_roman_numerals_enabled",
+			type = "checkbox",
+			default_value = true,
+			tooltip = "multi_enemy_roman_numerals_enabled_tooltip"
+		}
+	}
+})
+
 -- Build full map of colour setting_id -> default colour name
 local colour_setting_defaults = {}
 
