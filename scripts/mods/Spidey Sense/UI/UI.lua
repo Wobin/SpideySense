@@ -643,8 +643,8 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 	if num_indicators < 1 then
 		return
 	end
-  
-	local widget = self._indicator_widget  
+
+	local widget = self._indicator_widget
 	local widget_offset = widget.offset
 	local background_style = widget.style.background
 	local background_pivot = background_style.pivot
@@ -675,6 +675,7 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
 			front_style.angle = angle
       arrow_style.angle = angle
       arrow2_style.angle = angle
+      widget.alpha_multiplier = progress
 
       background_style.color = indicator.back_color
       front_style.color = indicator.front_color
@@ -790,8 +791,8 @@ local listener_position_rotation = mod.ui.listener_position_rotation
 local show_indicator = mod.ui.show_indicator
 local spawn_indicator = mod.ui.spawn_indicator
 
-mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration, roman_numeral_count)	
-	
+mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration, roman_numeral_count)
+
   if not mod.hudElement then return end
   
   local position = get_position(unit_or_position)
