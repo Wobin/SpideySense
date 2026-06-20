@@ -1,14 +1,14 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 23/03/2026
+Date: 20/06/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 7.0
+Version: 7.2
 --]]
 
 local mod = get_mod("Spidey Sense")
 
-mod.version = "7.0"
+mod.version = "7.2"
 
 mod.showCleave = false
 mod.showNet = false
@@ -69,7 +69,6 @@ local function update_active_enemies()
   active_enemies.ranged_backstab = mod:get("ranged_backstab_active")
 end
 
--- Update cache when settings change
 mod.on_setting_changed = function(setting_id)
   if mod.ui and mod.ui.invalidate_setting_caches then
     mod.ui.invalidate_setting_caches(setting_id)
@@ -100,7 +99,6 @@ mod.on_setting_changed = function(setting_id)
   end
 end
 
--- Initial cache
 update_active_enemies() 
 
 
@@ -113,13 +111,10 @@ local throttle = {}
 
 mod.hook_monster = function(sound_name, unit_or_position, check_unit)
 
-	--ignore monster spawn
 	if sound_name:match("_spawn") and not sound_name:match("chaos_spawn") then
-    --mod:echo(sound_name)
 		return
 	end
 
-	-- throttle half a second on each type
 	local now = Managers.time:time("main")
 	local lastCall = throttle[sound_name] or 0
 	if now - lastCall < 0.5 then
@@ -128,8 +123,6 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
 	throttle[sound_name] = now
   if check_unit == nil then
     local userDataType = get_userdata_type(unit_or_position)
-    -- if the unit_or_position is nil or a number,
-    -- try to pull the unit or position from higher in the callstack
     if userDataType ~= "Unit" and userDataType ~= "Vector3" then
       unit_or_position = findlocalvalue({
         { "attacking_unit", "Unit" },
@@ -143,14 +136,11 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
     unit_or_position = check_unit  
   end
   
-  -- Naturally netters aren't as straight forward as we hoped, we need to pull the unit from the event extension
-  if sound_name:match("wwise/events/minions/play_weapon_netgunner_wind_up") then 
+  if sound_name:match("wwise/events/minions/play_weapon_netgunner_wind_up") then
     unit_or_position = mod:getTrapper()    
   end
   
   if unit_or_position == nil then
-    --mod:echo("Cannot match unit on ".. sound_name)
-    --mod:dump(extract_locals(1))
     return
   end
   
@@ -254,7 +244,6 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
     or sound_name:match("plasmapistol"))
     then create_indicator(unit_or_position, "plasma_gunner") end
   
-  -- `play_backstab_indicator_melee` is a prefix of `..._melee_elite`, so one match catches both.
   if active_enemies.melee_backstab
 		and sound_name:match("wwise/events/player/play_backstab_indicator_melee")
 	then create_indicator(unit_or_position, "melee_backstab") end
@@ -307,7 +296,6 @@ mod.on_all_mods_loaded = function()
    return
   end
 
-  -- Preload inventory background package for roman numeral textures
   local function load_package(package_name)
     if not Managers.package:has_loaded(package_name) then
       Managers.package:load(package_name, "Spidey Sense")

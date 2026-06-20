@@ -6,8 +6,6 @@ local mod = get_mod("Spidey Sense")
 
 local widget_definitions = {}
 
--- Canonical roman-numeral visibility lookup. Single source of truth — UI.lua
--- reads this via the returned widget_definitions table to drive the draw loop.
 widget_definitions.VISIBILITY_BY_STYLE_ID = {
 	roman_numeral    = {[1] = true, [9] = true},
 	roman_numeral_2  = {[2] = true},
@@ -131,10 +129,6 @@ function widget_definitions.create_indicator_definition(get_target_settings)
 				return target_settings and target_settings.nurgle_blessed and content.is_nurgled
 			end,
 		},
-		-- Roman numeral passes. Geometry (pivot, alignment, offset[1..2]) is
-		-- configured at runtime by mod.ui.center_pass_outside_arc in UI.lua so
-		-- they share the arc's screen-centre rotation point. offset[3] (z) and
-		-- offset[1] (slot X) are preserved by the helper.
 		{
 			value = "content/ui/materials/icons/presets/preset_21",
 			style_id = "roman_numeral",
@@ -219,8 +213,6 @@ function widget_definitions.create_indicator_definition(get_target_settings)
 				return is_count_visible("roman_numeral_10", content.roman_numeral_count)
 			end
 		},
-		-- Slot 2 roman numerals. offset[1] = 20 picks the right slot at angle 0;
-		-- the helper compensates pivot.x so rotation centre stays on screen centre.
 		{
 			value = "content/ui/materials/icons/presets/preset_21",
 			style_id = "roman_numeral_1b",
