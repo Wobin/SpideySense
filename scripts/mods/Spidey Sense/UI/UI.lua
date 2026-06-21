@@ -682,6 +682,9 @@ mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _d
         end
       end
 
+      widget.content.distance = indicator.actual_distance or nil
+      widget.content.target_type = indicator.target_type
+      widget.content.is_nurgled = indicator.is_nurgled
       widget.content.roman_numeral_count = roman_numeral_count
 
 

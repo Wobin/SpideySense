@@ -1,14 +1,14 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 20/06/2026
+Date: 21/06/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 7.2
+Version: 7.3
 --]]
 
 local mod = get_mod("Spidey Sense")
 
-mod.version = "7.2"
+mod.version = "7.3"
 
 mod.showCleave = false
 mod.showNet = false

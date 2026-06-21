@@ -11,6 +11,6 @@ return {
 	load_after = {
    		 "DarktideLocalServer"
   	},
-	version = "7.2",
+	version = "7.3",
 	packages = {},
 }
