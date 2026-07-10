@@ -36,15 +36,12 @@ mod.sound.hooked_sounds = {
   "wwise/events/minions/play_footstep_boots_heavy_plague_ogryn",
   "wwise/events/minions/play_chaos_spawn",  
   "wwise/events/minions/play_beast_of_nurgle",
-  "wwise/events/minions/play_shared_elite_executor_cleave_warning",  
-  "play_weapon_netgunner_wind_up",    
-  "wwise/events/minions/play_netgunner_proximity_warning",  
-  "wwise/events/weapon/play_minion_shotgun_pump",
+  "wwise/events/minions/play_shared_elite_executor_cleave_warning",
+  "wwise/events/minions/play_netgunner_proximity_warning",
   "wwise/events/minions/play_enemy_chaos_hound_vce_leap",
   "wwise/events/minions/play_chaos_hound_mutator_vce_leap",
   "wwise/events/minions/play_chaos_hound_armoured_vce_leap",
-  "wwise/events/weapon/play_special_sniper_flash",  
-  "wwise/events/weapon/play_weapon_longlas_minion",
+  "wwise/events/weapon/play_special_sniper_flash",
   "spawn",
   "wwise/events/weapon/stop_minion_plasmapistol_charge",
   "wwise/events/weapon/play_minion_plasmapistol_charge",
@@ -54,5 +51,11 @@ mod.sound.hooked_sounds = {
  }
 
 mod.sound.hooked_external_sounds = {
-  "es_daemonhost_vo", 
+  "es_daemonhost_vo",
 }
+
+mod.sound.hooked_inventory_sounds = {
+  "wwise/events/weapon/play_weapon_longlas_minion",
+  "play_weapon_netgunner_wind_up",
+  "wwise/events/weapon/play_minion_shotgun_pump",
+ }

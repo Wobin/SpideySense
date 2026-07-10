@@ -4,7 +4,7 @@ local UIWidget = require("scripts/managers/ui/ui_widget")
 
 local mod = get_mod("Spidey Sense")
 local widget_definitions = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/widget_definitions")
-local DLS = get_mod("DarktideLocalServer")
+local SimpleAssets = get_mod("SimpleAssets")
 local Color = Color
 local Vector3 = Vector3
 local Quaternion = Quaternion
@@ -149,6 +149,8 @@ warnings["charge"] = { "pogryn", "Charge", 3 }
 warnings["shot"] = {"shotgun", "Shot", 1}
 warnings["pounce"] = {"hound", "Pounce", 1}
 warnings["sniper"] = {"sniper", "Sniper", 1}
+
+local UNLIMITED_RANGE_WARNINGS = { sniper = true }
 
 local healed_settings = mod.ui._healed_settings
 local target_settings_cache = mod.ui._target_settings_cache
@@ -327,40 +329,29 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 end)
 
 
-local arrowpng =  "https://wobin.github.io/SpideySense/images/arrow.png"
-local arrow2png = "https://wobin.github.io/SpideySense/images/arrow2.png"
-
-local texture_dir
-local load_arrow = function(indicator)  
+local load_arrow = function(indicator)
   if mod.arrow1_texture then indicator.style.arrow.material_values.texture_map = mod.arrow1_texture end
   if mod.arrow2_texture then indicator.style.arrow2.material_values.texture_map = mod.arrow2_texture end
 
   if mod.arrow1_texture and mod.arrow2_texture then return Promise:new() end
-  
-  if DLS then    
-    texture_dir = texture_dir or DLS.absolute_path("images")
-    local arrowpromise =  DLS.get_image(texture_dir .."/arrow.png"):next(function(data) 
-        mod.arrow1_texture = data.texture
-        indicator.style.arrow.material_values.texture_map = data.texture 
-      end) 
-    
-    local arrow2promise = DLS.get_image(texture_dir .."/arrow2.png"):next(function(data) 
-        mod.arrow2_texture = data.texture
-        indicator.style.arrow2.material_values.texture_map = data.texture 
-      end)
-    return Promise.all(arrowpromise, arrow2promise)
-  else      
-   return Managers.backend:authenticate():next(function()
-      Managers.url_loader:load_texture(arrowpng):next(function(data)                  
+
+  if not SimpleAssets then return Promise:new() end
+
+  local arrowpromise = SimpleAssets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
+      if data and data.texture then
         mod.arrow1_texture = data.texture
         indicator.style.arrow.material_values.texture_map = data.texture
-      end)
-      Managers.url_loader:load_texture(arrow2png):next(function(data)          
+      end
+    end):catch(function() end)
+
+  local arrow2promise = SimpleAssets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
+      if data and data.texture then
         mod.arrow2_texture = data.texture
-        indicator.style.arrow2.material_values.texture_map = data.texture              
-      end)
-    end)
-  end  
+        indicator.style.arrow2.material_values.texture_map = data.texture
+      end
+    end):catch(function() end)
+
+  return Promise.all(arrowpromise, arrow2promise)
 end
 
 local function get_player_direction_angle()
@@ -424,8 +415,15 @@ end
 mod.ui.show_indicator = function(distance, attacker, indicate, delay)        
   local settings = warning_settings_cache[attacker]
   if not settings then
+    local range_max
+    if UNLIMITED_RANGE_WARNINGS[attacker] then
+      range_max = math.huge
+    else
+      local raw = mod:get(attacker .. "_range_max")
+      range_max = type(raw) == "number" and raw or math.huge
+    end
     settings = {
-      range_max = get_numeric_setting(attacker .. "_range_max", 10),
+      range_max = range_max,
     }
     warning_settings_cache[attacker] = settings
   end

@@ -1,14 +1,14 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 21/06/2026
+Date: 10/07/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 7.3
+Version: 7.5
 --]]
 
 local mod = get_mod("Spidey Sense")
 
-mod.version = "7.3"
+mod.version = "7.5"
 
 mod.showCleave = false
 mod.showNet = false
@@ -19,13 +19,14 @@ mod.showSniper = false
 mod._indicators = {}
 
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Helper")
+mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/SourceRegistry")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Debug")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/MultiEnemyTracker")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/UI")
 mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/Sound")
 
-local findlocalvalue = mod.helper.findlocalvalue
 local get_userdata_type = mod.helper.get_userdata_type
+local source_registry = mod.source_registry
 
 
 local original_create_indicator = mod.ui.create_indicator
@@ -99,13 +100,7 @@ mod.on_setting_changed = function(setting_id)
   end
 end
 
-update_active_enemies() 
-
-
-function mod:getTrapper()  
-  local name,value = debug.getlocal(8, 1)  
-  return value._unit
-end
+update_active_enemies()
 
 local throttle = {}
 
@@ -124,22 +119,19 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
   if check_unit == nil then
     local userDataType = get_userdata_type(unit_or_position)
     if userDataType ~= "Unit" and userDataType ~= "Vector3" then
-      unit_or_position = findlocalvalue({
-        { "attacking_unit", "Unit" },
-        { "position", "Vector3" },      
-        { "parent_unit", "Unit" },
-        { "unit", "Unit" },
-        { "dialogue_actor_unit", "Unit"},      
-      })
+      local resolved = type(unit_or_position) == "number" and source_registry.get(unit_or_position) or nil
+      if resolved then
+        unit_or_position = resolved
+        source_registry.hits = source_registry.hits + 1
+      else
+        unit_or_position = nil
+        source_registry.misses = source_registry.misses + 1
+      end
     end
   else
-    unit_or_position = check_unit  
+    unit_or_position = check_unit
   end
-  
-  if sound_name:match("wwise/events/minions/play_weapon_netgunner_wind_up") then
-    unit_or_position = mod:getTrapper()    
-  end
-  
+
   if unit_or_position == nil then
     return
   end
@@ -287,6 +279,7 @@ end
 
 mod.update = function(dt)
   mod.multi_enemy_tracker:update()
+  source_registry.update()
 end
 
 mod.on_all_mods_loaded = function()
@@ -311,7 +304,9 @@ mod.on_all_mods_loaded = function()
   local hooked_sounds = mod.sound.hooked_sounds
   local hook_monster = mod.hook_monster
 
-  mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)        
+  source_registry.install()
+
+  mod:hook_safe(WwiseWorld, "trigger_resource_event", function(_wwise_world, wwise_event_name, unit_or_position_or_id)
     for _, sound_name in ipairs(hooked_sounds) do    
       if wwise_event_name:match(sound_name) then            
         hook_monster(wwise_event_name, unit_or_position_or_id, Application.flow_callback_context_unit())
@@ -330,12 +325,33 @@ mod.on_all_mods_loaded = function()
 
   local throttle = 0
   mod:hook_require("scripts/settings/fx/effect_templates/chaos_daemonhost_ambience", function(template)
-    mod:hook_safe(template, "update", function(template_data, template_context, dt, t)        
-      if t - throttle < 1 then return end    
+    mod:hook_safe(template, "update", function(template_data, template_context, dt, t)
+      if t - throttle < 1 then return end
       throttle = t
       if template_data.stage == 1 then
         if not mod:get("daemonhost_active") then return end
         create_indicator(template_data.unit, "daemonhost")
+      end
+    end)
+  end)
+
+  mod:hook_require("scripts/settings/fx/effect_templates/renegade_sniper_laser", function(template)
+    mod:hook_safe(template, "start", function(template_data, template_context)
+      if not mod:get("render_sniper_warning") then return end
+      indicate_warning(template_data.unit, "sniper")
+    end)
+  end)
+
+  local hooked_inventory_sounds = mod.sound.hooked_inventory_sounds
+  mod:hook_require("scripts/extension_systems/fx/minion_fx_extension", function(MinionFxExtension)
+    mod:hook_safe(MinionFxExtension, "_trigger_inventory_wwise_event", function(self, event_name)
+      local unit = self._unit
+      if not unit then return end
+      for _, sound_name in ipairs(hooked_inventory_sounds) do
+        if event_name:match(sound_name) then
+          hook_monster(event_name, unit, unit)
+          return
+        end
       end
     end)
   end)

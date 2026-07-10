@@ -9,8 +9,8 @@ return {
 		})
 	end,
 	load_after = {
-   		 "DarktideLocalServer"
+   		 "SimpleAssets"
   	},
-	version = "7.3",
+	version = "7.5",
 	packages = {},
 }
