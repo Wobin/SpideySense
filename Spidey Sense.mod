@@ -11,6 +11,6 @@ return {
 	load_after = {
    		 "SimpleAssets"
   	},
-	version = "7.5",
+	version = "7.6",
 	packages = {},
 }

@@ -329,29 +329,53 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 end)
 
 
+local arrowpng  = "https://wobin.github.io/SpideySense/images/arrow.png"
+local arrow2png = "https://wobin.github.io/SpideySense/images/arrow2.png"
+
 local load_arrow = function(indicator)
   if mod.arrow1_texture then indicator.style.arrow.material_values.texture_map = mod.arrow1_texture end
   if mod.arrow2_texture then indicator.style.arrow2.material_values.texture_map = mod.arrow2_texture end
 
   if mod.arrow1_texture and mod.arrow2_texture then return Promise:new() end
 
-  if not SimpleAssets then return Promise:new() end
+  if SimpleAssets then
+    local arrowpromise = SimpleAssets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
+        if data and data.texture then
+          mod.arrow1_texture = data.texture
+          indicator.style.arrow.material_values.texture_map = data.texture
+        end
+      end):catch(function() end)
 
-  local arrowpromise = SimpleAssets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
-      if data and data.texture then
-        mod.arrow1_texture = data.texture
-        indicator.style.arrow.material_values.texture_map = data.texture
-      end
-    end):catch(function() end)
+    local arrow2promise = SimpleAssets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
+        if data and data.texture then
+          mod.arrow2_texture = data.texture
+          indicator.style.arrow2.material_values.texture_map = data.texture
+        end
+      end):catch(function() end)
 
-  local arrow2promise = SimpleAssets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
-      if data and data.texture then
-        mod.arrow2_texture = data.texture
-        indicator.style.arrow2.material_values.texture_map = data.texture
-      end
-    end):catch(function() end)
+    return Promise.all(arrowpromise, arrow2promise)
+  end
 
-  return Promise.all(arrowpromise, arrow2promise)
+  -- Fallback when SimpleAssets is absent: load the arrows from the hosted PNGs via the engine url loader (needs online + backend auth).
+  if not (Managers.url_loader and Managers.backend) then return Promise:new() end
+
+  return Managers.backend:authenticate():next(function()
+    local arrowpromise = Managers.url_loader:load_texture(arrowpng, nil, "spidey_arrow"):next(function(data)
+        if data and data.texture then
+          mod.arrow1_texture = data.texture
+          indicator.style.arrow.material_values.texture_map = data.texture
+        end
+      end):catch(function() end)
+
+    local arrow2promise = Managers.url_loader:load_texture(arrow2png, nil, "spidey_arrow2"):next(function(data)
+        if data and data.texture then
+          mod.arrow2_texture = data.texture
+          indicator.style.arrow2.material_values.texture_map = data.texture
+        end
+      end):catch(function() end)
+
+    return Promise.all(arrowpromise, arrow2promise)
+  end):catch(function() end)
 end
 
 local function get_player_direction_angle()

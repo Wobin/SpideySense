@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to upload (e.g. 7.5)
+        description: Version to upload (e.g. 7.6)
         required: true
 
 jobs:
