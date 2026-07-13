@@ -18,7 +18,13 @@ jobs:
       - name: Set version
         run: echo "VERSION=${{ github.event.release.tag_name || inputs.version }}" >> "$GITHUB_ENV"
 
-      - name: Package (no git artefacts)
+      - name: Install LuaJIT
+        run: sudo apt-get update && sudo apt-get install -y luajit
+
+      - name: Run tests
+        run: luajit spec/run_all.lua
+
+      - name: Package (no git artefacts, no tests)
         run: |
           git archive --format=zip --prefix="Spidey Sense/" \
             -o "Spidey-Sense-${VERSION}.zip" HEAD
@@ -28,6 +34,10 @@ jobs:
           unzip -l "Spidey-Sense-${VERSION}.zip"
           if unzip -l "Spidey-Sense-${VERSION}.zip" | grep -E '\.git|\.github'; then
             echo "Git artefacts found in zip" && exit 1
+          fi
+          # spec/ is export-ignore'd in .gitattributes; fail loudly if that ever regresses
+          if unzip -l "Spidey-Sense-${VERSION}.zip" | grep -E 'Spidey Sense/spec/'; then
+            echo "Test suite leaked into the release zip" && exit 1
           fi
           unzip -l "Spidey-Sense-${VERSION}.zip" | grep -q 'Spidey Sense/Spidey Sense.mod' \
             || { echo "Missing Spidey Sense.mod" && exit 1; }

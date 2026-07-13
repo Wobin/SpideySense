@@ -55,7 +55,6 @@ mod.sound.hooked_external_sounds = {
 }
 
 mod.sound.hooked_inventory_sounds = {
-  "wwise/events/weapon/play_weapon_longlas_minion",
   "play_weapon_netgunner_wind_up",
   "wwise/events/weapon/play_minion_shotgun_pump",
  }

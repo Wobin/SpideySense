@@ -11,8 +11,6 @@ tracker.unit_numbers = {}
 
 tracker.numbers_in_use = {}
 
-local unit_spawn_times = setmetatable({}, { __mode = "kv" })
-
 function tracker:register_unit(unit, breed_name)
 	if not unit or not breed_name then
 		return
@@ -48,14 +46,11 @@ function tracker:register_unit(unit, breed_name)
 
 	unit_numbers[unit] = instance_number
 	numbers_in_use[instance_number] = true
-	unit_spawn_times[unit] = Managers.time:time("main")
 
 	table.insert(instances, unit)
 end
 
 function tracker:update()
-	local main_time = Managers.time and Managers.time:time("main") or 0
-
 	for breed_name, instances in pairs(self.active_instances) do
 		local unit_numbers = self.unit_numbers[breed_name]
 		local numbers_in_use = self.numbers_in_use[breed_name]
@@ -119,30 +114,6 @@ function tracker:get_instance_number(unit, breed_name)
 	end
 
 	return self.unit_numbers[breed_name][unit]
-end
-
-function tracker:get_breed_info(unit, breed_name)
-	local instance_num = self:get_instance_number(unit, breed_name)
-	local total_count = self:get_count(breed_name)
-
-	if instance_num then
-		return {
-			instance_number = instance_num,
-			total_in_breed = total_count
-		}
-	end
-
-	return nil
-end
-
-function tracker:clear()
-	self.active_instances = {}
-	self.breed_counts = {}
-	self.unit_numbers = {}
-	self.numbers_in_use = {}
-	for unit in pairs(unit_spawn_times) do
-		unit_spawn_times[unit] = nil
-	end
 end
 
 return tracker

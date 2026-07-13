@@ -4,3 +4,4 @@
 .vscode/        export-ignore
 README.md       export-ignore
 LICENSE         export-ignore
+spec/           export-ignore

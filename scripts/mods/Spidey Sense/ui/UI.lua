@@ -3,7 +3,7 @@ local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 local UIWidget = require("scripts/managers/ui/ui_widget")
 
 local mod = get_mod("Spidey Sense")
-local widget_definitions = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/UI/widget_definitions")
+local widget_definitions = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/ui/widget_definitions")
 local SimpleAssets = get_mod("SimpleAssets")
 local Color = Color
 local Vector3 = Vector3
@@ -16,28 +16,7 @@ local Managers = Managers
 local Promise = Promise
 mod.ui = {}
 mod.ui.default_warning_font = "proxima_nova_light"
-mod.ui.default_colors = {
-    burster = {front = "burly_wood", back = "citadel_averland_sunset", arrow = "burly_wood"},
-    barrel = {front = "cheeseburger", back = "citadel_balthasar_gold", arrow = "cheeseburger"},
-    beast_of_nurgle = {front = "citadel_dorn_yellow", back = "citadel_balthasar_gold", arrow = "citadel_dorn_yellow"},
-    crusher = {front = "sienna", back = "ui_red_medium", arrow = "sienna"},
-    chaos_spawn = {front = "cheeseburger", back = "ui_red_medium", arrow = "cheeseburger"},
-    daemonhost = {front = "teal", back = "blue_violet", arrow = "teal"},
-    flamer = {front = "online_green", back = "medium_violet_red", arrow = "online_green"},
-    grenadier = {front = "sandy_brown", back = "ui_interaction_pickup", arrow = "sandy_brown"},
-    hound = {front = "chart_reuse", back = "cadet_blue", arrow = "chart_reuse"},
-    mauler = {front = "turquoise", back = "ui_blue_light", arrow = "turquoise"},
-    mutant = {front = "ui_green_light", back = "spring_green", arrow = "ui_green_light"},
-    plague_ogryn = {front = "powder_blue", back = "citadel_bieltan_green", arrow = "powder_blue"},
-    plasma_gunner = {front = "royal_blue", back = "tomato", arrow = "royal_blue"},
-    rager = {front = "medium_spring_green", back = "midnight_blue", arrow = "medium_spring_green"},
-    sniper = {front = "powder_blue", back = "ui_ability_purple", arrow = "powder_blue"},
-    trapper = {front = "ui_hud_warp_charge_medium", back = "ui_hud_warp_charge_low", arrow = "ui_hud_warp_charge_medium"},
-    toxbomber = {front = "chart_reuse", back = "citadel_bieltan_green", arrow = "chart_reuse"},
-    melee_backstab = {front = "ui_terminal", back = "ui_terminal"},
-    ranged_backstab = {front = "ui_terminal", back = "ui_terminal"},
-}
-mod.ui._healed_settings = mod.ui._healed_settings or {}
+mod.ui.default_colors = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/core/Colours")
 mod.ui._target_settings_cache = mod.ui._target_settings_cache or {}
 mod.ui._warning_settings_cache = mod.ui._warning_settings_cache or {}
 mod.ui._default_color_name_cache = mod.ui._default_color_name_cache or {}
@@ -152,14 +131,12 @@ warnings["sniper"] = {"sniper", "Sniper", 1}
 
 local UNLIMITED_RANGE_WARNINGS = { sniper = true }
 
-local healed_settings = mod.ui._healed_settings
 local target_settings_cache = mod.ui._target_settings_cache
 local warning_settings_cache = mod.ui._warning_settings_cache
 local default_color_name_cache = mod.ui._default_color_name_cache
 local default_color_rgb_cache = mod.ui._default_color_rgb_cache
 local warning_expiry = mod.ui.warning_expiry
 local colour_check = {}
-local get_target_settings
 
 local arc_side_cached
 local function get_arc_side()
@@ -173,27 +150,9 @@ local function get_arc_side()
   return arc_side_cached
 end
 
-local warning_flag_by_indicate = {
-  Cleave = "showCleave",
-  Net = "showNet",
-  Charge = "showCharge",
-  Shot = "showShot",
-  Pounce = "showPounce",
-  Sniper = "showSniper",
-}
-
 local function get_main_time()
   local time_manager = Managers and Managers.time
   return time_manager and time_manager:time("main") or 0
-end
-
-local function heal_setting_once(setting_id, value)
-  if type(setting_id) ~= "string" or healed_settings[setting_id] then
-    return
-  end
-
-  mod:set(setting_id, value, false)
-  healed_settings[setting_id] = true
 end
 
 local function get_numeric_setting(setting_id, fallback_value)
@@ -202,7 +161,6 @@ local function get_numeric_setting(setting_id, fallback_value)
     return value
   end
 
-  heal_setting_once(setting_id, fallback_value)
   return fallback_value
 end
 
@@ -212,27 +170,18 @@ local function clear_cache(cache)
   end
 end
 
-local function set_warning_flag(indicate, active)
-  local flag = warning_flag_by_indicate[indicate]
-  if flag then
-    mod[flag] = active == true
-  end
-end
-
 mod.ui.is_warning_visible = function(indicate)
   return (warning_expiry[indicate] or 0) > get_main_time()
 end
 
 mod.ui.invalidate_setting_caches = function(setting_id)
   if type(setting_id) == "string" then
-    healed_settings[setting_id] = nil
     default_color_name_cache[setting_id] = nil
     default_color_rgb_cache[setting_id] = nil
     if setting_id:match("_colour$") then
       clear_cache(colour_check)
     end
   else
-    clear_cache(healed_settings)
     clear_cache(default_color_name_cache)
     clear_cache(default_color_rgb_cache)
     clear_cache(colour_check)
@@ -246,7 +195,7 @@ end
 mod.ui.loadWarnings = function()
   mod:register_hud_element({
     class_name = "SpideySenseUINetWarning",
-    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/NetWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/ui/warnings/NetWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -254,7 +203,7 @@ mod.ui.loadWarnings = function()
   })
   mod:register_hud_element({
     class_name = "SpideySenseUICleaveWarning",
-    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/CleaveWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/ui/warnings/CleaveWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -262,7 +211,7 @@ mod.ui.loadWarnings = function()
   })
   mod:register_hud_element({
     class_name = "SpideySenseUIChargeWarning",
-    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/ChargeWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/ui/warnings/ChargeWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -271,7 +220,7 @@ mod.ui.loadWarnings = function()
 
   mod:register_hud_element({
     class_name = "SpideySenseUIShotWarning",
-    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/ShotWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/ui/warnings/ShotWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -279,7 +228,7 @@ mod.ui.loadWarnings = function()
   })
   mod:register_hud_element({
     class_name = "SpideySenseUIPounceWarning",
-    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/PounceWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/ui/warnings/PounceWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -287,7 +236,7 @@ mod.ui.loadWarnings = function()
   })
   mod:register_hud_element({
     class_name = "SpideySenseUISniperWarning",
-    filename = "Spidey Sense/scripts/mods/Spidey Sense/UI/Warnings/SniperWarning",
+    filename = "Spidey Sense/scripts/mods/Spidey Sense/ui/warnings/SniperWarning",
     use_hud_scale = true,
     visibility_groups = {
       "alive"
@@ -356,7 +305,6 @@ local load_arrow = function(indicator)
     return Promise.all(arrowpromise, arrow2promise)
   end
 
-  -- Fallback when SimpleAssets is absent: load the arrows from the hosted PNGs via the engine url loader (needs online + backend auth).
   if not (Managers.url_loader and Managers.backend) then return Promise:new() end
 
   return Managers.backend:authenticate():next(function()
@@ -454,7 +402,6 @@ mod.ui.show_indicator = function(distance, attacker, indicate, delay)
 
   if distance < settings.range_max then
     warning_expiry[indicate] = math.max(warning_expiry[indicate] or 0, get_main_time() + (delay or 0))
-    set_warning_flag(indicate, true)
   end
 end
 
@@ -506,12 +453,6 @@ local function get_default_color_rgb(setting_id)
   return fallback_color, fallback_name
 end
 
-local function persist_fallback_color(setting_id, color_rgb)
-  if type(setting_id) == "string" and setting_id:match("_colour$") and type(color_rgb) == "table" then
-    heal_setting_once(setting_id, color_rgb)
-  end
-end
-
 local function echo_color_fallback(setting_id, colour_value, fallback_name)
   local setting_label = setting_id
   if type(setting_id) == "string" then
@@ -536,32 +477,38 @@ local function is_silent_missing_color(colour_value)
   return colour_value == nil or colour_value == ""
 end
 
-local function get_color_rgb(colourValue, settingName)
+local function resolve_colour(colourValue, settingName)
   if type(colourValue) == "table" then
-    return colourValue
+    return nil, colourValue
   end
 
   if type(colourValue) ~= "string" or colourValue == "" then
-    local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
-    persist_fallback_color(settingName, fallback_rgb)
-    if not is_silent_missing_color(colourValue) then
+    local _, fallback_name = get_default_color_rgb(settingName)
+    if settingName and not is_silent_missing_color(colourValue) then
       echo_color_fallback(settingName, colourValue, fallback_name)
     end
-
-    return fallback_rgb
+    return fallback_name
   end
 
   if not colour_check[colourValue] then
     if rawget(Color, colourValue) then
       colour_check[colourValue] = colourValue
     else
-      local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
+      local _, fallback_name = get_default_color_rgb(settingName)
       colour_check[colourValue] = fallback_name
-      persist_fallback_color(settingName, fallback_rgb)
       echo_color_fallback(settingName, colourValue, fallback_name)
     end
   end
-  return Color[colour_check[colourValue]](255, true)
+
+  return colour_check[colourValue]
+end
+
+local function get_color_rgb(colourValue, settingName)
+  local name, literal = resolve_colour(colourValue, settingName)
+  if literal then
+    return literal
+  end
+  return Color[name](255, true)
 end
 
 local function sanitize_color_with_alpha(color_value, alpha_value)
@@ -580,42 +527,16 @@ local function sanitize_color_with_alpha(color_value, alpha_value)
 end
 
 mod.colourCache = function(colourValue, settingName)
-  if type(colourValue) == "table" then
-    return function(alpha, as_rgb)
+  local name, literal = resolve_colour(colourValue, settingName)
+  if literal then
+    return function(_alpha, as_rgb)
       if as_rgb then
-        return colourValue
-      else
-        return {colourValue[1], colourValue[2], colourValue[3], colourValue[4]}
+        return literal
       end
+      return { literal[1], literal[2], literal[3], literal[4] }
     end
   end
-
-  if type(colourValue) ~= "string" or colourValue == "" then
-    local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
-    persist_fallback_color(settingName, fallback_rgb)
-    if settingName and not is_silent_missing_color(colourValue) then
-      echo_color_fallback(settingName, colourValue, fallback_name)
-    end
-    return function(alpha, as_rgb)
-      if as_rgb then
-        return fallback_rgb
-      else
-        return { fallback_rgb[1], fallback_rgb[2], fallback_rgb[3], fallback_rgb[4] }
-      end
-    end
-  end
-  
-  if not colour_check[colourValue] then
-    if rawget(Color, colourValue) then      
-      colour_check[colourValue] = colourValue
-    else
-      local fallback_rgb, fallback_name = get_default_color_rgb(settingName)
-      colour_check[colourValue] = fallback_name
-      persist_fallback_color(settingName, fallback_rgb)
-      echo_color_fallback(settingName, colourValue, fallback_name)
-    end
-  end
-  return Color[colour_check[colourValue]]
+  return Color[name]
 end
 
 mod:hook_safe("HudElementDamageIndicator", "_draw_indicators", function(self, _dt, t, ui_renderer)
@@ -774,9 +695,9 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
   local position = get_position(unit_or_position)
 	local settings = get_target_settings(target_type)
 
-  if settings.nurgle_blessed then
-    local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")    
-    local buffs = buff_ext and buff_ext:buffs()    
+  if settings.nurgle_blessed and get_userdata_type(unit_or_position) == "Unit" then
+    local buff_ext = ScriptUnit.extension(unit_or_position, "buff_system")
+    local buffs = buff_ext and buff_ext:buffs()
     nurgled[unit_or_position] = false
     if buffs then
       for _, buff in ipairs(buffs) do        
