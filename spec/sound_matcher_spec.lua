@@ -13,6 +13,16 @@ local GOLDEN = {
 	{ "wwise/events/minions/play_minion_poxwalker_bomber_foley", nil, { "burster" } },
 	{ "wwise/events/minions/play_enemy_combat_poxwalker_bomber_a", nil, { "burster" } },
 	{ "wwise/events/minions/play_enemy_chaos_hound_foley", nil, { "hound" } },
+	-- all three hound variants must produce the indicator (2026-07-18): vanilla, armoured
+	-- (footsteps/bark use a renamed play_chaos_hound_armoured_* stem), and pack/mutator.
+	{ "wwise/events/minions/play_chaos_hound_armoured_footsteps", nil, { "hound" } },
+	{ "wwise/events/minions/play_chaos_hound_armoured_vce_bark", nil, { "hound" } },
+	{ "wwise/events/minions/play_chaos_hound_mutator_foley", nil, { "hound" } },
+	{ "wwise/events/minions/play_chaos_hound_mutator_footsteps", nil, { "hound" } },
+	-- but NOT the chaos ogryn houndmaster: its events are play_chaos_hound_master_*, and a bare
+	-- "chaos_hound" match would wrongly catch this boss-tier enemy.
+	{ "wwise/events/minions/play_chaos_hound_master_charge", nil, {} },
+	{ "wwise/events/minions/play_chaos_hound_master_swing_rod", nil, {} },
 	{ "wwise/events/minions/play_enemy_mutant_charger", nil, { "mutant" } },
 	{ "wwise/events/minions/play_netgunner_run_foley_special", nil, { "trapper" } },
 	{ "wwise/events/minions/play_netgunner_reload", nil, { "trapper" } },

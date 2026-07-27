@@ -1,14 +1,14 @@
 --[[
 Title: Spidey Sense
 Author: Wobin
-Date: 13/07/2026
+Date: 18/07/2026
 Repository: https://github.com/Wobin/SpideySense
-Version: 7.7
+Version: 7.8
 --]]
 
 local mod = get_mod("Spidey Sense")
 
-mod.version = "7.7"
+mod.version = "7.8"
 
 mod._indicators = {}
 
@@ -160,7 +160,9 @@ mod.hook_monster = function(sound_name, unit_or_position, check_unit)
 	then create_indicator(unit_or_position, "burster") end
   
 	if active_enemies.hound
-		and (sound_name:match("wwise/events/minions/play_enemy_chaos_hound"))
+		and (sound_name:match("wwise/events/minions/play_enemy_chaos_hound")
+			or sound_name:match("wwise/events/minions/play_chaos_hound_armoured")
+			or sound_name:match("wwise/events/minions/play_chaos_hound_mutator"))
 	then create_indicator(unit_or_position, "hound") end
 
 	if active_enemies.mutant 

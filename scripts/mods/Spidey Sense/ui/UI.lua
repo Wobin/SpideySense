@@ -356,16 +356,18 @@ end
 
 mod.ui.listener_position_rotation = function()
 	local player = Managers.player and Managers.player:local_player_safe(1)
+	local camera_manager = Managers.state and Managers.state.camera
 
-	if not player then
-		return Vector3.zero(), Quaternion.identity()
+	if not player or not camera_manager then
+		return nil
 	end
 
-	local listener_pose = Managers.state.camera:listener_pose(player.viewport_name)
-	local listener_position = listener_pose and Matrix4x4.translation(listener_pose) or Vector3.zero()
-	local listener_rotation = listener_pose and Matrix4x4.rotation(listener_pose) or Quaternion.identity()
+	local ok, listener_pose = pcall(camera_manager.listener_pose, camera_manager, player.viewport_name)
+	if not ok or not listener_pose then
+		return nil
+	end
 
-	return listener_position, listener_rotation
+	return Matrix4x4.translation(listener_pose), Matrix4x4.rotation(listener_pose)
 end
 
 local get_userdata_type = mod.helper.get_userdata_type
@@ -712,6 +714,7 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
   end
   
   local listener_position, listener_rotation = listener_position_rotation()
+  if not listener_position then return end
 	local direction = position - listener_position
 	local directionRotated = Quaternion.rotate(Quaternion.inverse(listener_rotation), direction)
 	local directionRotatedNormalized = Vector3.normalize(directionRotated)
@@ -744,8 +747,9 @@ mod.ui.create_indicator = function(unit_or_position, target_type, extra_duration
 end
 
 mod.ui.indicate_warning = function(unit_or_position, target_type)
-  local position = get_position(unit_or_position)  
+  local position = get_position(unit_or_position)
   local listener_position = listener_position_rotation()
+  if not position or not listener_position then return end
   local distance = Vector3.distance(position, listener_position)
   local w = warnings[target_type]
   show_indicator(distance, w[1], w[2], w[3])

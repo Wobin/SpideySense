@@ -21,6 +21,7 @@ local SPECS = {
 	"spec.sound_matcher_spec",
 	"spec.warning_cues_spec",
 	"spec.flash_resolution_spec",
+	"spec.teardown_spec",
 	"spec.settings_lint_spec",
 }
 

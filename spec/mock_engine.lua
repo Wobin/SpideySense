@@ -178,6 +178,12 @@ local fake_pose = { position = vec(0, 0, 0), rotation = Quaternion.identity() }
 
 function M.set_listener_position(p) fake_pose.position = p end
 
+-- Simulates mission teardown: the viewport is destroyed while cues still fire, so the engine's
+-- listener_pose crashes on a nil viewport (bad argument to ScriptViewport.camera). set to false
+-- to reproduce that; the mod must survive it.
+local camera_available = true
+function M.set_camera_available(v) camera_available = v end
+
 local player = { viewport_name = "player1", player_unit = nil }
 
 local Managers = {
@@ -188,8 +194,16 @@ local Managers = {
 	},
 	state = {
 		camera = {
-			camera = function(_self, _vp) return {} end,
-			listener_pose = function(_self, _vp) return fake_pose end,
+			camera = function(_self, _vp)
+				if not camera_available then return nil end
+				return {}
+			end,
+			listener_pose = function(_self, _vp)
+				if not camera_available then
+					error("bad argument #1 to 'camera' (userdata expected, got nil)", 2)
+				end
+				return fake_pose
+			end,
 		},
 		mission = { mission = function(_self) return { zone_id = "test" } end },
 	},
@@ -333,6 +347,7 @@ end
 function M.install(settings)
 	now = 0
 	fake_pose.position = vec(0, 0, 0)
+	camera_available = true
 	player.player_unit = nil
 
 	install_stdlib()
