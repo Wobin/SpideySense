@@ -1,0 +1,35 @@
+{
+	"name": "Spidey Sense",
+	"description": "Offers a coloured arc indicator for the direction of sound cues for certain special units",
+	"version": "7.9.0",
+	"author": "Wobin",
+	"homepage": "https://www.nexusmods.com/warhammer40kdarktide/mods/268",
+	"source": "https://github.com/Wobin/SpideySense",
+	"funding": {
+		"kofi": "https://ko-fi.com/wobin_dwonderdog"
+	},
+	"nexusId": "268",
+	"localization": {
+		"ru": {
+			"name": "Паучье чутьё",
+			"description": "Spidey Sense - Добавляет цветной дуговой индикатор, показывающий направление звуковых сигналов для определённых врагов."
+		},
+		"zh-cn": {
+			"name": "蜘蛛感应",
+			"description": "为某些特殊单位的音效提供彩色的方向圆弧指示器。"
+		},
+		"zh-tw": {
+			"name": "蜘蛛感應",
+			"description": "為某些特殊單位的音效提供彩色的方向弧形指示器。"
+		}
+	},
+	"order": {
+		"require": [
+			"SimpleAssets"
+		],
+		"this_after": [
+			"SimpleAssets"
+		],
+		"this_before": []
+	}
+}

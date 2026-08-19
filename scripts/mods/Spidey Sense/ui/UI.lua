@@ -17,11 +17,11 @@ local Promise = Promise
 mod.ui = {}
 mod.ui.default_warning_font = "proxima_nova_light"
 mod.ui.default_colors = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/core/Colours")
-mod.ui._target_settings_cache = mod.ui._target_settings_cache or {}
-mod.ui._warning_settings_cache = mod.ui._warning_settings_cache or {}
-mod.ui._default_color_name_cache = mod.ui._default_color_name_cache or {}
-mod.ui._default_color_rgb_cache = mod.ui._default_color_rgb_cache or {}
-mod.ui.warning_expiry = mod.ui.warning_expiry or {}
+mod.ui._target_settings_cache = {}
+mod.ui._warning_settings_cache = {}
+mod.ui._default_color_name_cache = {}
+mod.ui._default_color_rgb_cache = {}
+mod.ui.warning_expiry = mod:persistent_table("warning_expiry")
 
 local NUMERAL_RADIUS = HudElementDamageIndicatorSettings.center_distance + 10
 
@@ -278,52 +278,35 @@ mod:hook_require("scripts/ui/hud/elements/damage_indicator/hud_element_damage_in
 end)
 
 
-local arrowpng  = "https://wobin.github.io/SpideySense/images/arrow.png"
-local arrow2png = "https://wobin.github.io/SpideySense/images/arrow2.png"
-
 local load_arrow = function(indicator)
   if mod.arrow1_texture then indicator.style.arrow.material_values.texture_map = mod.arrow1_texture end
   if mod.arrow2_texture then indicator.style.arrow2.material_values.texture_map = mod.arrow2_texture end
 
   if mod.arrow1_texture and mod.arrow2_texture then return Promise:new() end
 
-  if SimpleAssets then
-    local arrowpromise = SimpleAssets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
-        if data and data.texture then
-          mod.arrow1_texture = data.texture
-          indicator.style.arrow.material_values.texture_map = data.texture
-        end
-      end):catch(function() end)
-
-    local arrow2promise = SimpleAssets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
-        if data and data.texture then
-          mod.arrow2_texture = data.texture
-          indicator.style.arrow2.material_values.texture_map = data.texture
-        end
-      end):catch(function() end)
-
-    return Promise.all(arrowpromise, arrow2promise)
+  if not SimpleAssets then
+    if not mod._simple_assets_warned then
+      mod._simple_assets_warned = true
+      mod:error("Spidey Sense requires the SimpleAssets mod - direction arrows cannot load without it.")
+    end
+    return Promise:new()
   end
 
-  if not (Managers.url_loader and Managers.backend) then return Promise:new() end
+  local arrowpromise = SimpleAssets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
+      if data and data.texture then
+        mod.arrow1_texture = data.texture
+        indicator.style.arrow.material_values.texture_map = data.texture
+      end
+    end):catch(function() end)
 
-  return Managers.backend:authenticate():next(function()
-    local arrowpromise = Managers.url_loader:load_texture(arrowpng, nil, "spidey_arrow"):next(function(data)
-        if data and data.texture then
-          mod.arrow1_texture = data.texture
-          indicator.style.arrow.material_values.texture_map = data.texture
-        end
-      end):catch(function() end)
+  local arrow2promise = SimpleAssets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
+      if data and data.texture then
+        mod.arrow2_texture = data.texture
+        indicator.style.arrow2.material_values.texture_map = data.texture
+      end
+    end):catch(function() end)
 
-    local arrow2promise = Managers.url_loader:load_texture(arrow2png, nil, "spidey_arrow2"):next(function(data)
-        if data and data.texture then
-          mod.arrow2_texture = data.texture
-          indicator.style.arrow2.material_values.texture_map = data.texture
-        end
-      end):catch(function() end)
-
-    return Promise.all(arrowpromise, arrow2promise)
-  end):catch(function() end)
+  return Promise.all(arrowpromise, arrow2promise)
 end
 
 local function get_player_direction_angle()

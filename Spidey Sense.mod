@@ -8,9 +8,13 @@ return {
 			mod_localization = "Spidey Sense/scripts/mods/Spidey Sense/Spidey Sense_localization",
 		})
 	end,
+	require = {
+		"SimpleAssets"
+	},
 	load_after = {
-   		 "SimpleAssets"
-  	},
-	version = "7.8",
-	packages = {},
+		"SimpleAssets"
+	},
+	packages = {
+		"packages/ui/views/inventory_background_view/inventory_background_view",
+	},
 }
