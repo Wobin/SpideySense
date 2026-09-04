@@ -302,6 +302,8 @@ mod.update = function(dt)
 end
 
 mod.on_all_mods_loaded = function()
+  mod._all_mods_loaded = true
+
   if mod._loaded then return end
   mod._loaded = true
 

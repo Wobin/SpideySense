@@ -4,7 +4,13 @@ local UIWidget = require("scripts/managers/ui/ui_widget")
 
 local mod = get_mod("Spidey Sense")
 local widget_definitions = mod:io_dofile("Spidey Sense/scripts/mods/Spidey Sense/ui/widget_definitions")
-local SimpleAssets = get_mod("SimpleAssets")
+local SimpleAssets
+
+local function simple_assets()
+  SimpleAssets = SimpleAssets or get_mod("SimpleAssets")
+
+  return SimpleAssets
+end
 local Color = Color
 local Vector3 = Vector3
 local Quaternion = Quaternion
@@ -284,22 +290,24 @@ local load_arrow = function(indicator)
 
   if mod.arrow1_texture and mod.arrow2_texture then return Promise:new() end
 
-  if not SimpleAssets then
-    if not mod._simple_assets_warned then
+  local assets = simple_assets()
+
+  if not assets then
+    if mod._all_mods_loaded and not mod._simple_assets_warned then
       mod._simple_assets_warned = true
       mod:error("Spidey Sense requires the SimpleAssets mod - direction arrows cannot load without it.")
     end
     return Promise:new()
   end
 
-  local arrowpromise = SimpleAssets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
+  local arrowpromise = assets.load_texture("Spidey Sense/images/arrow.png"):next(function(data)
       if data and data.texture then
         mod.arrow1_texture = data.texture
         indicator.style.arrow.material_values.texture_map = data.texture
       end
     end):catch(function() end)
 
-  local arrow2promise = SimpleAssets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
+  local arrow2promise = assets.load_texture("Spidey Sense/images/arrow2.png"):next(function(data)
       if data and data.texture then
         mod.arrow2_texture = data.texture
         indicator.style.arrow2.material_values.texture_map = data.texture

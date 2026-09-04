@@ -180,7 +180,7 @@ table.insert(
                 setting_id = "melee_backstab_radius",
                 type = "numeric",
                 default_value = 50,
-                range = {0, 200},
+                range = {-125, 200},
                 decimals_number = 0
             },
             {
@@ -234,7 +234,7 @@ table.insert(
                 setting_id = "ranged_backstab_radius",
                 type = "numeric",
                 default_value = 50,
-                range = {0, 200},
+                range = {-125, 200},
                 decimals_number = 0
             },
             {
