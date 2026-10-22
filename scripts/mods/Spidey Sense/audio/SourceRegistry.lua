@@ -108,8 +108,10 @@ registry.install = function()
 	end)
 
 	mod:hook_safe(WwiseWorld, "destroy_manual_source", function(wwise_world, source_id)
-		manual_map[source_id] = nil
-		manual_positions[source_id] = nil
+		if source_id ~= nil then
+			manual_map[source_id] = nil
+			manual_positions[source_id] = nil
+		end
 	end)
 end
 

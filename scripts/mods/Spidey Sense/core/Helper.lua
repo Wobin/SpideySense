@@ -5,11 +5,15 @@ mod.helper.get_userdata_type = function (userdata)
 		return nil
 	end
 
-	if Unit.alive(userdata) then
+	local ok, is_unit = pcall(Unit.alive, userdata)
+	if ok and is_unit then
 		return "Unit"
-	elseif Vector3.is_valid(userdata) then
-		return "Vector3"
-	else
-		return tostring(userdata)
 	end
+
+	local ok_vec, is_vec = pcall(Vector3.is_valid, userdata)
+	if ok_vec and is_vec then
+		return "Vector3"
+	end
+
+	return tostring(userdata)
 end
